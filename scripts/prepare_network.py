@@ -304,7 +304,9 @@ def attach_interconnections_ES(n, ic_dic):
         ########## Identify the closest bus:
         ### Select candidates: buses in peninsular Spain with carrier AC
         candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='AC'), ['x', 'y']]
-        # print(f'candidates: {candidates}')
+        # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
+        if candidates.empty:
+            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (n.buses['carrier']=='AC'), ['x', 'y']]
         ### Compute distances
         x0 = ic_dic[kk]['bus_params']['x']
         y0 = ic_dic[kk]['bus_params']['y']
