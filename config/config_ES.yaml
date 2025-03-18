@@ -19,6 +19,9 @@ pypsa_spain:
     annual_value: 316.5 # TWh   230 # TWh
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS2_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS2_by_economicSector_2022.csv
+  interconnections:
+    enable: false
+    ic_ES_file: data_ES/interconnections/interconnections.yaml    
   update_elec_capacities:
     enable: false
     carriers_to_update:
@@ -58,7 +61,7 @@ run:
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
   clusters:
-  - 30
+  - 5
   opts:
   - ''
   sector_opts:
@@ -99,7 +102,7 @@ co2_budget:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#electricity
 electricity:
   extendable_carriers:
-    Generator: [solar, onwind, offwind-float, CCGT, biomass]
+    Generator: [solar, onwind, offwind-float, CCGT]
     StorageUnit: [] # battery, H2
     Store: [battery, H2]
     Link: [] # H2 pipeline
@@ -293,6 +296,9 @@ sector:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
 clustering:
+  mode: busmap
+  administrative:
+    level: 1
   temporal:
     resolution_elec: false
     resolution_sector: 168H   #####

@@ -1091,6 +1091,66 @@ def attach_stores(
 
 ######################################## PyPSA-Spain
 #
+# Function to add interconnections
+#
+
+def attach_interconnections_ES(n, ic_dic):
+
+    for kk, vv in ic_dic.items():
+
+        logger.info(f'########## [PyPSA-Spain] <add_electricity.py> INFO: Adding interconnection {kk}')
+
+
+        ########## Identify the closest bus:
+        ### Select candidates: buses in peninsular Spain with carrier AC
+        candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='AC'), ['x', 'y']]
+        # print(f'candidates: {candidates}')
+        ### Compute distances
+        x0 = ic_dic[kk]['bus_params']['x']
+        y0 = ic_dic[kk]['bus_params']['y']
+        distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
+        # print(f'distances: {distances}')
+        ### Find closest bus, and assign it to the correct side of the link
+        closest_bus_index = distances.idxmin()
+        # print(f'closest_bus_index: {closest_bus_index}')
+        ic_dic[kk]['link_params']['bus0'] = closest_bus_index        
+
+
+        ########## Add bus
+        n.add('Bus', ic_dic[kk]['bus_name'], **ic_dic[kk]['bus_params'])
+        n.buses.loc[ic_dic[kk]['bus_name'], 'location'] = ic_dic[kk]['bus_name']
+        #n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'
+        
+
+        ########## Add links
+        n.add('Link', ic_dic[kk]['link_name'], **ic_dic[kk]['link_params'])
+
+        n.links.loc[ic_dic[kk]['link_name'], 'underwater_fraction'] = 0.0
+        # n.links.loc[ic_dic[kk]['link_name'], 'underground'] = False      ### The following line makes an error when saving the network..
+        # n.links.loc[ic_dic[kk]['link_name'], 'under_construction'] = 0
+
+
+
+        ########## Add generator
+        n.add('Generator', ic_dic[kk]['generator_name'], **ic_dic[kk]['generator_params'])
+
+        ########## Add generator_t: marginal cost
+        df_ic_prices = pd.read_csv(ic_dic[kk]['generator_prices'])
+        n.generators_t['marginal_cost'][ic_dic[kk]['generator_name']] = df_ic_prices.values
+
+        ########## Add load
+        n.add('Load', ic_dic[kk]['load_name'], **ic_dic[kk]['load_params'])
+
+        ########## Add load_t
+        ### Large enough to not be fully served by the interconnection
+        n.loads_t['p_set'][ic_dic[kk]['load_name']] = 9999
+
+
+
+
+
+######################################## PyPSA-Spain
+#
 # Function to correct initial capacities according to PyPSA-Spain methodology
 #
 # TODO: Needs to be modified: loop over network regions, compute overlap with NUTS 2 regions, and assign target capacity according to the overlap and the provided capacities
@@ -1132,8 +1192,6 @@ def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_
         if int(required_capacity) < int(initial_capacity):
             factor = required_capacity / initial_capacity
             df_updated.loc[:, 'p_nom'] *= factor
-
-
 
         return df_updated
 
@@ -1261,8 +1319,6 @@ def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_
 
                     ############### Update n.generators with df_updated
                     n.generators.update(df_updated)
-
-
 #
 #
 #
@@ -1403,6 +1459,30 @@ if __name__ == "__main__":
     attach_storageunits(n, costs, extendable_carriers, max_hours)
     attach_stores(n, costs, extendable_carriers)
 
+
+
+    ################################################## PyPSA-Spain
+    #
+    # Add interconnections with PT and FR
+    #
+    interconnections = snakemake.params.interconnections
+
+    if interconnections['enable']:
+
+        ##### read ic data
+        file = interconnections['ic_ES_file']
+
+        with open(file, 'r') as archivo:
+            ic_dic = yaml.safe_load(archivo)
+
+        ##### call function
+        attach_interconnections_ES(n, ic_dic)
+
+    ########################################
+
+
+
+
     sanitize_carriers(n, snakemake.config)
     if "location" in n.buses:
         sanitize_locations(n)
@@ -1417,19 +1497,19 @@ if __name__ == "__main__":
     #
     # Update elec capacities 
     #
-
     ##### parameters
     update_elec_capacities = snakemake.params.update_elec_capacities
 
-    carriers_to_update = update_elec_capacities['carriers_to_update']
-    method_increase = update_elec_capacities['method_increase']
-
-    ##### inputs
-    nuts2_ES_file = snakemake.input.nuts2_ES
-    dic_nuts_file = snakemake.input.dic_nuts # is employed to loop over the regions considered in PyPSA-Spain
-
-    ##### call function
     if update_elec_capacities['enable']:
+    
+        carriers_to_update = update_elec_capacities['carriers_to_update']
+        method_increase = update_elec_capacities['method_increase']
+
+        ##### inputs
+        nuts2_ES_file = snakemake.input.nuts2_ES
+        dic_nuts_file = snakemake.input.dic_nuts # is employed to loop over the regions considered in PyPSA-Spain
+
+        ##### call function
         fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_file, dic_nuts_file)
     #
     #
