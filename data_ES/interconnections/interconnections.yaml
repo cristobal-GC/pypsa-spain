@@ -28,7 +28,7 @@ ES FR0:
     bus1: ES FR0
     carrier: DC
     p_nom: 2800 
-    p_nom_extendable: True
+    p_nom_extendable: False
     length: 34.25 # ES side
     efficiency: 1  
     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
@@ -84,7 +84,7 @@ ES FR1:
     bus1: ES FR1
     carrier: DC
     p_nom: 2000 
-    p_nom_extendable: True
+    p_nom_extendable: False
     length: 200 # ES side
     efficiency: 1  
     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
@@ -153,7 +153,7 @@ ES PT0:
     bus1: ES PT0
     carrier: DC
     p_nom: 2000 
-    p_nom_extendable: True
+    p_nom_extendable: False
     length: 100 # random
     efficiency: 1  
     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
@@ -198,7 +198,7 @@ ES PT1:
     bus1: ES PT1
     carrier: DC
     p_nom: 2000
-    p_nom_extendable: True
+    p_nom_extendable: False
     length: 100 # random
     efficiency: 1  
     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
