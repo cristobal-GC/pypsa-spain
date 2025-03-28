@@ -304,8 +304,8 @@ load:
   fixed_year: false # false or year (e.g. 2013)
   supplement_synthetic: true
   distribution_key:
-  gdp: 0.18   ##### 0.6
-  population: 0.82   ##### 0.4
+    gdp: 0.18   ##### 0.6
+    population: 0.82   ##### 0.4
 
 
 # docs
