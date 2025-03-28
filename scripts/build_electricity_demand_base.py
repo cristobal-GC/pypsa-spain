@@ -88,9 +88,12 @@ def upsample_load(
 
 
 
-######################################## PyPSA-Spain
+
+
+################################################## PyPSA-Spain
 #
-# Function to attach loads according to PyPSA-Spain methodology    ### EN PROCESO
+# Function to attach electricity demand according to PyPSA-Spain methodology
+#
 #
 def upsample_load_vPyPSA_Spain(
     n: pypsa.Network,
@@ -166,8 +169,12 @@ def upsample_load_vPyPSA_Spain(
 
 
     return xr.concat(data_arrays, dim="bus")
-
+#
+#
+#
 ########################################
+
+
 
 
 
@@ -195,7 +202,7 @@ if __name__ == "__main__":
 
     if electricity_demand['enable']:
 
-        logger.info(f'##### [PyPSA-Spain] <build_electricity_demand_base>: Using upsample_load_vPyPSA_Spain to add electricity demand in ES.')
+        logger.info(f'########## [PyPSA-Spain] <build_electricity_demand_base> INFO: Using upsample_load_vPyPSA_Spain to add electricity demand in ES.')
 
         load = upsample_load_vPyPSA_Spain(
             n,

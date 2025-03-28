@@ -240,21 +240,24 @@ if __name__ == "__main__":
 
 
 #################### PyPSA-Spain: if not requested, compute load as usual in PyPSA-Eur
-
+#
+#
+#
     #################### Unwrap parameters
     electricity_demand = snakemake.params.electricity_demand
     annual_value = electricity_demand['annual_value']
-    df_profiles = pd.read_csv(electricity_demand['profiles'], index_col=0)#.fillna(0, inplace=True)
+    df_profiles = pd.read_csv(electricity_demand['profiles'], index_col=0, parse_dates=[0])#.fillna(0, inplace=True)
     df_percentages = pd.read_csv(electricity_demand['percentages'], index_col=0)
     nHours = df_profiles.shape[0]
 
 
+    ##### snapshots are required in both approaches (pypsa-eur and pypsa-spain)
+    snapshots = get_snapshots(
+        snakemake.params.snapshots, snakemake.params.drop_leap_day
+    )
+
 
     if not electricity_demand['enable']:
-
-        snapshots = get_snapshots(
-            snakemake.params.snapshots, snakemake.params.drop_leap_day
-        )
 
         fixed_year = snakemake.params["load"].get("fixed_year", False)
         years = (
@@ -314,20 +317,25 @@ if __name__ == "__main__":
         # need to reindex load time series to target year
         if fixed_year:
             load.index = load.index.map(lambda t: t.replace(year=snapshots.year[0]))
-
-
-
-
+#
+#
+#
+#
+#
     else:
     ##### Generate electricity demand according to PyPSA-Spain customisation
         
         logger.info(f'##### [PyPSA-Spain] <build_electricity_demand>: Creating customised electricity demand for Spain..')
-               
+
+
+        ##### Fix the year in df_profiles
+        # need to reindex load time series to target year
+        df_profiles.index = df_profiles.index.map(lambda t: t.replace(year=snapshots.year[0]))
 
 
         ##### Initialise output
         load = pd.DataFrame()
-
+        
 
         ##### Loop over rr and ff, multiply each profile by corresponding factor
 
@@ -352,7 +360,9 @@ if __name__ == "__main__":
 
         ##### Sort columns
         load.sort_index(axis=1, inplace=True)
-
+#
+#
+#
 ####################
 
 
