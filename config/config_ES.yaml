@@ -14,7 +14,7 @@ pypsa_spain:
     solar-hsat: ''
   electricity_demand:
     enable: false
-    annual_value: 316.5 # TWh   230 # TWh
+    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS2_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS2_by_economicSector_2022.csv
   interconnections:
@@ -99,7 +99,7 @@ co2_budget:
   # 2020: 0.720 # average emissions of 2019 to 2021 relative to 1990, CO2 excl LULUCF, EEA data, European Environment Agency. (2023a). Annual European Union greenhouse gas inventory 1990–2021 and inventory report 2023 - CRF Table. https://unfccc.int/documents/627830
   # 2025: 0.648 # With additional measures (WAM) projection, CO2 excl LULUCF, European Environment Agency. (2023e). Member States’ greenhouse gas (GHG) emission projections 2023. https://www.eea.europa.eu/en/datahub/datahubitem-view/4b8d94a4-aed7-4e67-a54c-0623a50f48e8
   # 2030: 0.450 # 55% reduction by 2030 (Ff55)
-  2030: 0.166   # 0.297   ##### PNIEC target for power system: 10'891 MtCO2. Real CO2 emissions in Spain 1990: 65'5754 MtCO2
+  2030: 0.183   ##### CO2 Emissions for power system simulation: 11.986 MtCO2 (2030): PNIEC final version 2024 / 11.221 MtCO2 (2030): PNIEC 2nd draft 2023   #####   Total CO2 emissions in Spain 1990: 65.5754 MtCO2
   # 2035: 0.250
   # 2040: 0.100 # 90% by 2040
   # 2045: 0.050
