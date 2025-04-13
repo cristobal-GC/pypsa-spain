@@ -362,7 +362,6 @@ if __name__ == "__main__":
         snakemake = mock_snakemake(
             "prepare_network",
             clusters="37",
-            ll="v1.0",
             opts="Co2L-4H",
         )
     configure_logging(snakemake)  # pylint: disable=E0606
@@ -410,7 +409,7 @@ if __name__ == "__main__":
         add_emission_prices(
             n, dict(co2=snakemake.params.costs["emission_prices"]["co2"])
         )
-    
+
     kind = snakemake.params.transmission_limit[0]
     factor = snakemake.params.transmission_limit[1:]
     set_transmission_limit(n, kind, factor, costs, Nyears)
@@ -460,4 +459,3 @@ if __name__ == "__main__":
 
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
     n.export_to_netcdf(snakemake.output[0])
-

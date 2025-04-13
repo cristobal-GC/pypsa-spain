@@ -47,8 +47,6 @@ run:
     enable: true
     file: "config/test/scenarios.yaml"
   disable_progressbar: true
-  shared_resources:
-    policy: base
   shared_cutouts: true
 
 scenario:
@@ -79,16 +77,10 @@ atlite:
       time: ["2013-03-01", "2013-03-08"]
 
 renewable:
-  onwind:
-    cutout: be-03-2013-era5
   offwind-ac:
-    cutout: be-03-2013-era5
     max_depth: false
   offwind-dc:
-    cutout: be-03-2013-era5
     max_depth: false
-  solar:
-    cutout: be-03-2013-era5
 
 solving:
   solver:
