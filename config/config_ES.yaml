@@ -70,7 +70,7 @@ foresight: overnight
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
   clusters:
-  - 50   #####
+  - 'adm'   ##### 50
   opts:
   - ''
   sector_opts:
@@ -864,9 +864,9 @@ costs:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
 clustering:
-  mode: busmap   ##### administrative
+  mode: administrative   ##### busmap
   administrative:
-    level: 1   ##### from 0 to 3 for NUTS-x
+    level: 3   ##### from 0 to 3 for NUTS-x
   focus_weights: false
   simplify_network:
     to_substations: false
