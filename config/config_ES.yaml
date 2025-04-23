@@ -160,7 +160,7 @@ electricity:
     enable: false
     by_country: false
 
-  transmission_limit: vopt
+  transmission_limit: vopt   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#atlite
 atlite:
