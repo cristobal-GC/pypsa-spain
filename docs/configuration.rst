@@ -9,7 +9,7 @@
 Configuration
 ##########################################
 
-Features included in PyPSA-Spain are configured in a new block within a ``config/config.yaml`` file. 
+Features included in PyPSA-Spain are configured in a new block within the ``config/config_ES.yaml`` file. 
 
 
 
@@ -22,7 +22,7 @@ Features included in PyPSA-Spain are configured in a new block within a ``config
 .. literalinclude:: ../config/config_ES.yaml
    :language: yaml
    :start-at: pypsa_spain:
-   :end-before: logging:
+   :end-before: version:
 
 .. csv-table::
    :header-rows: 1

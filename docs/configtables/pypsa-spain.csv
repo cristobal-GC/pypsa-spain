@@ -1,19 +1,24 @@
 ,Unit,Values,Description
-retrieve_Iberian_cutout,bool,"{true, false}","Switch to ``true`` to download a cutout for the Iberian peninsula (2022)."
-update_gdp_pop,bool,"{true, false}","Switch to ``true`` to use Gross Domestic Product (``gdp``) and population (``pop``) weights estimated specifically for Spain. If ``false``, standard values from PyPSA-Eur are utilised. These weights are used to distribute the load across the buses."
-electricity_demand,,,
--- enable,bool,"{true, false}","Switch to ``true`` to customise the electricity demand."
--- annual_value, TWh,int/float,"Annual demand."
--- profiles,,,
--- percentages,,,
 q2q_transform,,,
--- enable,bool,"{true, false}","Switch to ``true`` to apply Q2Q transforms to the renewable profiles to improve their estimation."
--- onwind,,,
+-- enable,bool,"{true, false}","Q2Q transforms improve the estimation of the renewable profiles based on historical data. A repository and additional explanation an analyses can be found at the `Q2Q_repository <https://github.com/cristobal-GC/Q2Q_repository>`_"
+-- onwind,-,str,Path of the file with the q2q transform for this carrier. See ``data_ES/q2q/``.
 -- offwind-ac,,,
 -- offwind-dc,,,
 -- offwind-float
--- solar,,,
+-- solar,-,str,Path of the file with the q2q transform for this carrier. See ``data_ES/q2q/``.
 -- solar-hsat,,,
-interconnections:
--- enable,bool,"{true, false}","Switch to ``true`` to include user-defined interconnections with Portugal and France."
--- ic_ES_file,,,
+electricity_demand,,,
+-- enable,bool,"{true, false}","Allows to customise the electricity demand."
+-- annual_value, TWh,int/float,"Annual demand."
+-- profiles,-,str,Path of the file with the electricity demand profiles. See ``data_ES/electricity_demand/``.
+-- percentages,-,str,Path of the file with the electricity demand percentages. See ``data_ES/electricity_demand/``.
+interconnections,,,
+-- enable,bool,"{true, false}","Allows to include user-defined interconnections with Portugal and France."
+-- ic_ES_file,-,str,Path of the file with the configuration of the interconnections. See ``data_ES/interconnections/``.
+update_elec_capacities,,,
+-- enable,bool,"{true, false}","Allows to impose the installed capacity at NUTS 2 level."
+-- carriers_to_update,,,
+-- method_increase,,,
+costs_update,,,
+-- enable,bool,"{true, false}","Allows to introduce modifications in the cost file."
+-- costs_update_file,,,
