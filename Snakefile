@@ -203,7 +203,7 @@ rule filegraph:
     shell:
         r"""
         snakemake --filegraph all | sed -n "/digraph/,\$p" > {output.dot}
-        dot -Tpdf -o {output.pdf} {output.dot}
+        dot -Tpdf -o {output.pdf} {output.dot} -Nfontsize=20
         dot -Tpng -o {output.png} {output.dot}
         """
 

@@ -1,0 +1,331 @@
+digraph snakemake_dag {
+    graph[bgcolor=white, margin=0];
+    node[shape=box, style=rounded, fontname=sans,                 fontsize=10, penwidth=2];
+    edge[penwidth=2, color=grey];
+	0[label = "all", color = "0.01 0.6 0.85", style="rounded"];
+	1[label = "plot_summary", color = "0.42 0.6 0.85", style="rounded"];
+	2[label = "make_global_summary", color = "0.36 0.6 0.85", style="rounded"];
+	3[label = "make_summary", color = "0.37 0.6 0.85", style="rounded"];
+	4[label = "solve_sector_network", color = "0.63 0.6 0.85", style="rounded"];
+	5[label = "prepare_sector_network", color = "0.44 0.6 0.85", style="rounded"];
+	6[label = "build_renewable_profiles", color = "0.23 0.6 0.85", style="rounded"];
+	7[label = "determine_availability_matrix\ntechnology: offwind-float", color = "0.32 0.6 0.85", style="rounded"];
+	8[label = "retrieve_databundle", color = "0.47 0.6 0.85", style="rounded"];
+	9[label = "build_ship_raster", color = "0.25 0.6 0.85", style="rounded"];
+	10[label = "retrieve_ship_raster", color = "0.59 0.6 0.85", style="rounded,dashed"];
+	11[label = "retrieve_cutout\ncutout: europe-2023-sarah3-era5", color = "0.47 0.6 0.85", style="rounded"];
+	12[label = "build_shapes", color = "0.25 0.6 0.85", style="rounded"];
+	13[label = "retrieve_eez", color = "0.48 0.6 0.85", style="rounded,dashed"];
+	14[label = "retrieve_nuts_2021_shapes", color = "0.57 0.6 0.85", style="rounded,dashed"];
+	15[label = "build_osm_boundaries", color = "0.21 0.6 0.85", style="rounded,dashed"];
+	16[label = "retrieve_osm_boundaries\ncountry: BA", color = "0.57 0.6 0.85", style="rounded,dashed"];
+	17[label = "build_osm_boundaries", color = "0.21 0.6 0.85", style="rounded,dashed"];
+	18[label = "retrieve_osm_boundaries\ncountry: MD", color = "0.57 0.6 0.85", style="rounded,dashed"];
+	19[label = "build_osm_boundaries", color = "0.21 0.6 0.85", style="rounded,dashed"];
+	20[label = "retrieve_osm_boundaries\ncountry: UA", color = "0.57 0.6 0.85", style="rounded,dashed"];
+	21[label = "build_osm_boundaries", color = "0.21 0.6 0.85", style="rounded,dashed"];
+	22[label = "retrieve_osm_boundaries\ncountry: XK", color = "0.57 0.6 0.85", style="rounded,dashed"];
+	23[label = "retrieve_jrc_ardeco", color = "0.53 0.6 0.85", style="rounded,dashed"];
+	24[label = "cluster_network\nclusters: adm", color = "0.30 0.6 0.85", style="rounded"];
+	25[label = "simplify_network", color = "0.61 0.6 0.85", style="rounded"];
+	26[label = "add_transmission_projects_and_dlr", color = "0.01 0.6 0.85", style="rounded"];
+	27[label = "base_network", color = "0.02 0.6 0.85", style="rounded"];
+	28[label = "retrieve_osm_prebuilt", color = "0.58 0.6 0.85", style="rounded,dashed"];
+	29[label = "build_transmission_projects", color = "0.29 0.6 0.85", style="rounded"];
+	30[label = "build_electricity_demand_base", color = "0.10 0.6 0.85", style="rounded"];
+	31[label = "build_electricity_demand", color = "0.09 0.6 0.85", style="rounded"];
+	32[label = "retrieve_electricity_demand", color = "0.48 0.6 0.85", style="rounded,dashed"];
+	33[label = "retrieve_synthetic_electricity_demand", color = "0.59 0.6 0.85", style="rounded"];
+	34[label = "cluster_gas_network", color = "0.30 0.6 0.85", style="rounded"];
+	35[label = "build_gas_network", color = "0.12 0.6 0.85", style="rounded"];
+	36[label = "retrieve_gas_infrastructure_data", color = "0.50 0.6 0.85", style="rounded,dashed"];
+	37[label = "build_gas_input_locations", color = "0.11 0.6 0.85", style="rounded"];
+	38[label = "retrieve_gem_europe_gas_tracker", color = "0.50 0.6 0.85", style="rounded,dashed"];
+	39[label = "time_aggregation\nsector_opts: ", color = "0.66 0.6 0.85", style="rounded"];
+	40[label = "prepare_network\nopts: ", color = "0.43 0.6 0.85", style="rounded"];
+	41[label = "add_electricity", color = "0.00 0.6 0.85", style="rounded"];
+	42[label = "build_renewable_profiles", color = "0.23 0.6 0.85", style="rounded"];
+	43[label = "determine_availability_matrix\ntechnology: solar", color = "0.32 0.6 0.85", style="rounded"];
+	44[label = "build_renewable_profiles", color = "0.23 0.6 0.85", style="rounded"];
+	45[label = "determine_availability_matrix\ntechnology: onwind", color = "0.32 0.6 0.85", style="rounded"];
+	46[label = "build_hydro_profile", color = "0.15 0.6 0.85", style="rounded"];
+	47[label = "retrieve_cutout\ncutout: europe-2013-sarah3-era5", color = "0.47 0.6 0.85", style="rounded"];
+	48[label = "retrieve_cost_data\nyear: 2030", color = "0.46 0.6 0.85", style="rounded"];
+	49[label = "build_powerplants", color = "0.23 0.6 0.85", style="rounded"];
+	50[label = "build_solar_thermal_profiles", color = "0.27 0.6 0.85", style="rounded"];
+	51[label = "build_population_layouts", color = "0.22 0.6 0.85", style="rounded"];
+	52[label = "retrieve_worldbank_urban_population", color = "0.60 0.6 0.85", style="rounded,dashed"];
+	53[label = "retrieve_eurostat_data", color = "0.49 0.6 0.85", style="rounded,dashed"];
+	54[label = "build_population_weighted_energy_totals\nkind: energy", color = "0.22 0.6 0.85", style="rounded"];
+	55[label = "build_energy_totals", color = "0.10 0.6 0.85", style="rounded"];
+	56[label = "retrieve_jrc_idees", color = "0.54 0.6 0.85", style="rounded,dashed"];
+	57[label = "retrieve_eurostat_household_data", color = "0.49 0.6 0.85", style="rounded,dashed"];
+	58[label = "build_clustered_population_layouts", color = "0.05 0.6 0.85", style="rounded"];
+	59[label = "build_population_weighted_energy_totals\nkind: heat", color = "0.22 0.6 0.85", style="rounded"];
+	60[label = "build_heat_totals", color = "0.14 0.6 0.85", style="rounded"];
+	61[label = "build_shipping_demand", color = "0.26 0.6 0.85", style="rounded"];
+	62[label = "build_transport_demand", color = "0.29 0.6 0.85", style="rounded"];
+	63[label = "build_temperature_profiles", color = "0.28 0.6 0.85", style="rounded"];
+	64[label = "build_biomass_potentials\nplanning_horizons: 2030", color = "0.03 0.6 0.85", style="rounded"];
+	65[label = "retrieve_jrc_enspreso_biomass", color = "0.53 0.6 0.85", style="rounded"];
+	66[label = "retrieve_nuts_2013_shapes", color = "0.56 0.6 0.85", style="rounded,dashed"];
+	67[label = "build_salt_cavern_potentials", color = "0.24 0.6 0.85", style="rounded"];
+	68[label = "build_industrial_energy_demand_per_node", color = "0.16 0.6 0.85", style="rounded"];
+	69[label = "build_industry_sector_ratios_intermediate\nplanning_horizons: 2030", color = "0.20 0.6 0.85", style="rounded"];
+	70[label = "build_industry_sector_ratios", color = "0.19 0.6 0.85", style="rounded"];
+	71[label = "build_ammonia_production", color = "0.02 0.6 0.85", style="rounded"];
+	72[label = "retrieve_usgs_ammonia_production", color = "0.60 0.6 0.85", style="rounded,dashed"];
+	73[label = "build_industrial_energy_demand_per_country_today", color = "0.16 0.6 0.85", style="rounded"];
+	74[label = "build_industrial_production_per_country", color = "0.17 0.6 0.85", style="rounded"];
+	75[label = "build_industrial_production_per_node", color = "0.18 0.6 0.85", style="rounded"];
+	76[label = "build_industrial_distribution_key", color = "0.15 0.6 0.85", style="rounded"];
+	77[label = "retrieve_hotmaps_industrial_sites", color = "0.52 0.6 0.85", style="rounded,dashed"];
+	78[label = "retrieve_gem_steel_plant_tracker", color = "0.51 0.6 0.85", style="rounded,dashed"];
+	79[label = "build_industrial_production_per_country_tomorrow\nplanning_horizons: 2030", color = "0.18 0.6 0.85", style="rounded"];
+	80[label = "build_industrial_energy_demand_per_node_today", color = "0.17 0.6 0.85", style="rounded"];
+	81[label = "build_hourly_heat_demand", color = "0.14 0.6 0.85", style="rounded"];
+	82[label = "build_daily_heat_demand", color = "0.07 0.6 0.85", style="rounded"];
+	83[label = "build_district_heat_share\nplanning_horizons: 2030", color = "0.08 0.6 0.85", style="rounded"];
+	84[label = "build_cop_profiles", color = "0.07 0.6 0.85", style="rounded"];
+	85[label = "build_central_heating_temperature_profiles\nplanning_horizons: 2030", color = "0.04 0.6 0.85", style="rounded"];
+	86[label = "build_tes_capacity_profiles", color = "0.28 0.6 0.85", style="rounded"];
+	87[label = "build_clustered_solar_rooftop_potentials", color = "0.05 0.6 0.85", style="rounded"];
+	88[label = "build_direct_heat_source_utilisation_profiles", color = "0.08 0.6 0.85", style="rounded"];
+	89[label = "plot_power_network_clustered", color = "0.42 0.6 0.85", style="rounded"];
+	90[label = "plot_power_network", color = "0.41 0.6 0.85", style="rounded"];
+	91[label = "plot_balance_map\ncarrier: AC", color = "0.37 0.6 0.85", style="rounded"];
+	92[label = "plot_balance_map\ncarrier: H2", color = "0.37 0.6 0.85", style="rounded"];
+	93[label = "plot_balance_map\ncarrier: gas", color = "0.37 0.6 0.85", style="rounded"];
+	94[label = "plot_balance_map\ncarrier: oil", color = "0.37 0.6 0.85", style="rounded"];
+	95[label = "plot_balance_map\ncarrier: methanol", color = "0.37 0.6 0.85", style="rounded"];
+	96[label = "plot_balance_map\ncarrier: co2 stored", color = "0.37 0.6 0.85", style="rounded"];
+	97[label = "plot_balance_map\ncarrier: urban central heat", color = "0.37 0.6 0.85", style="rounded"];
+	98[label = "plot_balance_timeseries", color = "0.38 0.6 0.85", style="rounded"];
+	99[label = "plot_heatmap_timeseries", color = "0.40 0.6 0.85", style="rounded"];
+	1 -> 0
+	89 -> 0
+	90 -> 0
+	91 -> 0
+	92 -> 0
+	93 -> 0
+	94 -> 0
+	95 -> 0
+	96 -> 0
+	97 -> 0
+	98 -> 0
+	99 -> 0
+	2 -> 1
+	53 -> 1
+	8 -> 1
+	3 -> 2
+	4 -> 3
+	5 -> 4
+	6 -> 5
+	34 -> 5
+	37 -> 5
+	39 -> 5
+	40 -> 5
+	53 -> 5
+	54 -> 5
+	59 -> 5
+	61 -> 5
+	62 -> 5
+	55 -> 5
+	8 -> 5
+	64 -> 5
+	48 -> 5
+	67 -> 5
+	25 -> 5
+	24 -> 5
+	58 -> 5
+	68 -> 5
+	81 -> 5
+	75 -> 5
+	83 -> 5
+	63 -> 5
+	84 -> 5
+	86 -> 5
+	50 -> 5
+	87 -> 5
+	88 -> 5
+	7 -> 6
+	12 -> 6
+	24 -> 6
+	11 -> 6
+	8 -> 7
+	9 -> 7
+	12 -> 7
+	24 -> 7
+	11 -> 7
+	10 -> 9
+	11 -> 9
+	13 -> 12
+	14 -> 12
+	15 -> 12
+	17 -> 12
+	19 -> 12
+	21 -> 12
+	23 -> 12
+	8 -> 12
+	16 -> 15
+	13 -> 15
+	18 -> 17
+	13 -> 17
+	20 -> 19
+	13 -> 19
+	22 -> 21
+	13 -> 21
+	25 -> 24
+	27 -> 24
+	30 -> 24
+	26 -> 25
+	27 -> 25
+	27 -> 26
+	29 -> 26
+	28 -> 27
+	12 -> 27
+	27 -> 29
+	12 -> 29
+	25 -> 30
+	12 -> 30
+	31 -> 30
+	32 -> 31
+	33 -> 31
+	35 -> 34
+	24 -> 34
+	36 -> 35
+	38 -> 37
+	36 -> 37
+	24 -> 37
+	40 -> 39
+	50 -> 39
+	41 -> 40
+	48 -> 40
+	42 -> 41
+	44 -> 41
+	6 -> 41
+	46 -> 41
+	24 -> 41
+	48 -> 41
+	49 -> 41
+	30 -> 41
+	43 -> 42
+	12 -> 42
+	24 -> 42
+	11 -> 42
+	8 -> 43
+	12 -> 43
+	24 -> 43
+	11 -> 43
+	45 -> 44
+	12 -> 44
+	24 -> 44
+	11 -> 44
+	8 -> 45
+	12 -> 45
+	24 -> 45
+	11 -> 45
+	12 -> 46
+	8 -> 46
+	47 -> 46
+	24 -> 49
+	51 -> 50
+	24 -> 50
+	11 -> 50
+	12 -> 51
+	52 -> 51
+	11 -> 51
+	55 -> 54
+	58 -> 54
+	12 -> 55
+	8 -> 55
+	56 -> 55
+	53 -> 55
+	57 -> 55
+	51 -> 58
+	24 -> 58
+	11 -> 58
+	60 -> 59
+	58 -> 59
+	8 -> 60
+	55 -> 60
+	12 -> 61
+	24 -> 61
+	55 -> 61
+	58 -> 62
+	54 -> 62
+	55 -> 62
+	8 -> 62
+	63 -> 62
+	51 -> 63
+	24 -> 63
+	11 -> 63
+	65 -> 64
+	53 -> 64
+	66 -> 64
+	24 -> 64
+	8 -> 64
+	12 -> 64
+	8 -> 67
+	24 -> 67
+	69 -> 68
+	75 -> 68
+	80 -> 68
+	70 -> 69
+	73 -> 69
+	74 -> 69
+	71 -> 70
+	56 -> 70
+	72 -> 71
+	55 -> 73
+	56 -> 73
+	74 -> 73
+	71 -> 74
+	56 -> 74
+	53 -> 74
+	76 -> 75
+	79 -> 75
+	24 -> 76
+	58 -> 76
+	77 -> 76
+	78 -> 76
+	74 -> 79
+	76 -> 80
+	73 -> 80
+	82 -> 81
+	51 -> 82
+	24 -> 82
+	11 -> 82
+	55 -> 83
+	58 -> 83
+	85 -> 84
+	63 -> 84
+	24 -> 84
+	63 -> 85
+	24 -> 85
+	85 -> 86
+	24 -> 86
+	51 -> 87
+	42 -> 87
+	11 -> 87
+	85 -> 88
+	24 -> 89
+	4 -> 90
+	24 -> 90
+	4 -> 91
+	24 -> 91
+	4 -> 92
+	24 -> 92
+	4 -> 93
+	24 -> 93
+	4 -> 94
+	24 -> 94
+	4 -> 95
+	24 -> 95
+	4 -> 96
+	24 -> 96
+	4 -> 97
+	24 -> 97
+	4 -> 98
+	4 -> 99
+}            
