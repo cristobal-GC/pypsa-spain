@@ -2,45 +2,39 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-
-
-
 # docs in https://pypsa-spain.readthedocs.io/
 pypsa_spain:
   q2q_transform:
-    enable: true
-    onwind: data_ES/q2q/q2q_onwind_europe_2023_NUTS3_v3.pkl
+    enable: false
+    onwind: data_ES/q2q/q2q_onwind_v003.pkl
     offwind-ac: ''
     offwind-dc: ''
     offwind-float: ''
-    solar: data_ES/q2q/q2q_solar_europe_2023_NUTS3_v1.pkl
+    solar: data_ES/q2q/q2q_solar_v001.pkl
     solar-hsat: ''
   electricity_demand:
-    enable: true
-    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
+    enable: false
+    annual_value: 316.5 # TWh   230 # TWh
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS3_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
-    enable: true
+    enable: false
     ic_ES_file: data_ES/interconnections/interconnections.yaml    
   update_elec_capacities:
-    enable: true
+    enable: false
     carriers_to_update:
-      onwind: data_ES/esios/esios_onwind_capacity_2023.csv
-      solar: data_ES/esios/esios_solar_capacity_2023.csv
-      nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv
-      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
+      # onwind: data_ES/esios/esios_onwind_capacity_2022.csv
+      # solar: data_ES/esios/esios_solar_capacity_2022.csv
+      # nuclear: data_ES/esios/esios_nuclear_capacity_2022.csv
+      CCGT: data_ES/esios/esios_CCGT_capacity_2022.csv
     method_increase: proportional # additional / proportional
   costs_update:
     enable: true
     costs_update_file: 'data_ES/costs/costs_updates.csv'
 
+pypsa_spain_temporarily_disabled:
+  retrieve_Iberian_cutout: false
 
-
-
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#top-level-configuration
-version: v2025.04.0
-tutorial: false
 
 logging:
   level: INFO
@@ -52,8 +46,8 @@ remote:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#run
 run:
-  prefix: ""   #####
-  name: ""   #####
+  prefix: ""  #####
+  name:  "case_00_NUTS3"   #####
   scenarios:
     enable: false
     file: config/scenarios.yaml
@@ -71,7 +65,7 @@ foresight: overnight
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
   clusters:
-  - 'adm'   ##### Recommended for Spain: 35-50
+  - 50   #####
   opts:
   - ''
   sector_opts:
@@ -87,8 +81,8 @@ countries: ['ES']   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
 snapshots:
-  start: "2023-01-01"
-  end: "2024-01-01"
+  start: "2013-01-01"
+  end: "2014-01-01"
   inclusive: 'left'
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#enable
@@ -105,7 +99,7 @@ co2_budget:
   # 2020: 0.720 # average emissions of 2019 to 2021 relative to 1990, CO2 excl LULUCF, EEA data, European Environment Agency. (2023a). Annual European Union greenhouse gas inventory 1990–2021 and inventory report 2023 - CRF Table. https://unfccc.int/documents/627830
   # 2025: 0.648 # With additional measures (WAM) projection, CO2 excl LULUCF, European Environment Agency. (2023e). Member States’ greenhouse gas (GHG) emission projections 2023. https://www.eea.europa.eu/en/datahub/datahubitem-view/4b8d94a4-aed7-4e67-a54c-0623a50f48e8
   # 2030: 0.450 # 55% reduction by 2030 (Ff55)
-  2030: 0.183   ##### CO2 Emissions for power system simulation: 11.986 MtCO2 (2030): PNIEC final version 2024 / 11.221 MtCO2 (2030): PNIEC 2nd draft 2023   #####   Total CO2 emissions in Spain 1990: 65.5754 MtCO2
+  2030: 0.166   # 0.297   ##### PNIEC target for power system: 10'891 MtCO2. Real CO2 emissions in Spain 1990: 65'5754 MtCO2
   # 2035: 0.250
   # 2040: 0.100 # 90% by 2040
   # 2045: 0.050
@@ -134,38 +128,38 @@ electricity:
     H2: 168
 
   extendable_carriers:
-    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, OCGT, CCGT]
+    Generator: [solar, onwind, offwind-float, CCGT]   #####
     StorageUnit: [] # battery, H2
     Store: [battery, H2]
     Link: [] # H2 pipeline
 
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)   #####
+  powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)   #####
   custom_powerplants: false
   everywhere_powerplants: []
 
-  conventional_carriers: [nuclear, CCGT, biomass]   ##### [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
-  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, hydro]
+  conventional_carriers: [nuclear, CCGT, biomass]   #####
+  renewable_carriers: [solar, onwind, offwind-float, hydro]   #####
 
   estimate_renewable_capacities:
     enable: true
-    from_gem: true
+    from_opsd: true
     year: 2020
     expansion_limit: false
     technology_mapping:
-      Offshore: offwind-float   #####
-      Onshore: onwind
-      PV: solar
+      Offshore: [offwind-float]   #####
+      Onshore: [onwind]
+      PV: [solar]
 
   autarky:
     enable: false
     by_country: false
 
-  transmission_limit: vopt   #####
+  transmission_limit: vopt
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#atlite
 atlite:
   cutout_directory: cutouts
-  default_cutout: europe-2023-sarah3-era5
+  default_cutout: europe-2013-sarah3-era5
   nprocesses: 4
   show_progress: false
   cutouts:
@@ -183,15 +177,14 @@ atlite:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#renewable
 renewable:
   onwind:
-    cutout: default
+    cutout: europe-2013-sarah3-era5
     resource:
       method: wind
       turbine: Vestas_V112_3MW   #####
       smooth: false
       add_cutout_windspeed: true
-    resource_classes: 1
     capacity_per_sqkm: 3   #####
-    # correction_factor: 0.93
+    # correction_factor: 0.93   #####
     corine:
       grid_codes: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32]
       distance: 1000
@@ -204,16 +197,15 @@ renewable:
     excluder_resolution: 100
     clip_p_max_pu: 1.e-2
   offwind-float:
-    cutout: default
+    cutout: europe-2013-sarah3-era5
     resource:
       method: wind
       turbine: NREL_ReferenceTurbine_2020ATB_7MW   ##### NREL_ReferenceTurbine_5MW_offshore
       smooth: false
       add_cutout_windspeed: true
-    resource_classes: 1
     # ScholzPhd Tab 4.3.1: 10MW/km^2
     capacity_per_sqkm: 2   #####
-    # correction_factor: 0.8855   #####
+    correction_factor: 1   ##### 0.8855
     # proxy for wake losses
     # from 10.1016/j.energy.2018.08.153
     # until done more rigorously in #153
@@ -226,16 +218,15 @@ renewable:
     clip_p_max_pu: 1.e-2
     landfall_length: 10
   solar:
-    cutout: default
+    cutout: europe-2013-sarah3-era5
     resource:
       method: pv
       panel: CSi
       orientation:
         slope: 35.
         azimuth: 180.
-    resource_classes: 1
     capacity_per_sqkm: 5.1   #####
-    # correction_factor: 0.854337
+    # correction_factor: 1   ##### 0.854337
     corine: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 26, 31, 32]
     luisa: false # [1111, 1121, 1122, 1123, 1130, 1210, 1221, 1222, 1230, 1241, 1242, 1310, 1320, 1330, 1410, 1421, 1422, 2110, 2120, 2130, 2210, 2220, 2230, 2310, 2410, 2420, 3210, 3320, 3330]
     natura: true
@@ -267,7 +258,7 @@ lines:
   under_construction: 'keep' # 'zero': set capacity to zero, 'remove': remove, 'keep': with full capacity for lines in grid extract
   dynamic_line_rating:
     activate: false
-    cutout: default
+    cutout: europe-2013-sarah3-era5
     correction_factor: 0.95
     max_voltage_difference: false
     max_line_rating: false
@@ -315,6 +306,7 @@ load:
   distribution_key:
     gdp: 0.18   ##### 0.6
     population: 0.82   ##### 0.4
+
 
 # docs
 # TODO: PyPSA-Eur merge issue in prepare_sector_network.py
@@ -451,10 +443,6 @@ sector:
       upper_threshold_ambient_temperature: 10
       rolling_window_ambient_temperature: 72
       relative_annual_temperature_reduction: 0.01
-    ptes:
-      dynamic_capacity: true
-      max_top_temperature: 90
-      min_bottom_temperature: 35
     heat_source_cooling: 6 #K
     heat_pump_cop_approximation:
       refrigerant: ammonia
@@ -464,7 +452,6 @@ sector:
     limited_heat_sources:
       geothermal:
         constant_temperature_celsius: 65
-        ignore_missing_regions: false
     direct_utilisation_heat_sources:
     - geothermal
   heat_pump_sources:
@@ -605,8 +592,8 @@ sector:
   allam_cycle_gas: false
   hydrogen_fuel_cell: true
   hydrogen_turbine: false
-  SMR: false   ##### This adds a link with 'p3', which used to break 'make_summary.py' (?)
-  SMR_cc: false   ##### This adds a link with 'p3', which used to break 'make_summary.py' (?)
+  SMR: false   ##### This adds a link with 'p3', which could break 'make_summary.py' (?)
+  SMR_cc: false   ##### This adds a link with 'p3', which could break 'make_summary.py' ?
   regional_oil_demand: false
   regional_coal_demand: false
   regional_co2_sequestration_potential:
@@ -665,11 +652,6 @@ sector:
   electricity_distribution_grid: false   #####
   electricity_grid_connection: true
   transmission_efficiency:
-    enable:
-    - DC
-    - H2 pipeline
-    - gas pipeline
-    - electricity distribution grid
     DC:
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
@@ -900,6 +882,7 @@ adjustments:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#solving
 solving:
+  #tmpdir: "path/to/tmp"
   options:
     clip_p_max_pu: 1.e-2
     load_shedding: false
@@ -930,9 +913,6 @@ solving:
         H2 pipeline: 0.3
         gas pipeline: 0.3
       fractional_last_unit_size: false
-    keep_files: false
-    model_kwargs:
-      solver_dir: "/tmp"
 
   agg_p_nom_limits:
     agg_offwind: false
