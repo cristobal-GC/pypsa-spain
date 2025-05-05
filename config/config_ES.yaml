@@ -9,7 +9,7 @@
 pypsa_spain:
   q2q_transform:
     enable: true
-    onwind: data_ES/q2q/q2q_onwind_europe_2023_NUTS3_v3.pkl
+    onwind: data_ES/q2q/q2q_onwind_europe_2023_NUTS3_v2.pkl
     offwind-ac: ''
     offwind-dc: ''
     offwind-float: ''
@@ -71,7 +71,7 @@ foresight: overnight
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
   clusters:
-  - 'adm'   ##### Recommended for Spain: 35-50
+  - 'adm'   ##### Recommended for Spain: NUTS3 / 35-50 nodes
   opts:
   - ''
   sector_opts:
@@ -165,7 +165,7 @@ electricity:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#atlite
 atlite:
   cutout_directory: cutouts
-  default_cutout: europe-2023-sarah3-era5
+  default_cutout: europe-2023-sarah3-era5   #####
   nprocesses: 4
   show_progress: false
   cutouts:
