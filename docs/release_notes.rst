@@ -29,4 +29,4 @@ New release based on PyPSA-Eur v2025.04.0.
 PyPSA-Spain v0.0.0 (12th December 2024)
 ========================================
 
-This is the first release of PyPSA-Spain. The details are described in the seminal paper `"PyPSA-Spain: an extension of PyPSA-Eur to model the Spanish energy system" <https://arxiv.org/abs/2412.06571>''__.
+This is the first release of PyPSA-Spain. The details are described in the seminal paper `"PyPSA-Spain: an extension of PyPSA-Eur to model the Spanish energy system" <https://arxiv.org/abs/2412.06571>`__.
