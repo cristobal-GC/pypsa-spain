@@ -25,6 +25,6 @@ costs_update,,,
 ISA_class,,,
 -- enable,bool,"{true, false}","Allows to use the Spanish 'Indice de Sostenibilidad Ambiental' for solar and onwind land elegibility."
 ISA_onwind,,,
--- grid_codes,-,{0,1,2,3,4},"Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
+-- grid_codes,-,"{0,1,2,3,4}","Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
 ISA_solar,,,
--- grid_codes,-,{0,1,2,3,4},"Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
+-- grid_codes,-,"{0,1,2,3,4}","Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
