@@ -31,3 +31,4 @@ Further details will be posted soon, stay tuned..
 
    introduction
    configuration
+   release_notes
