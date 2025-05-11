@@ -12,7 +12,7 @@ Upcoming Release
 ================
 
 
-* New functionality: Implemented the Spanish "Indice de Sostenibilidad Ambiental" for solar and onshore land elegibility.
+* New functionality: Implemented the Spanish "Indice de Sostenibilidad Ambiental" for solar and onwind land elegibility.
 
 
 
