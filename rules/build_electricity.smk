@@ -254,7 +254,7 @@ def input_ua_md_availability_matrix(w):
 rule determine_availability_matrix:
     params:
         renewable=config_provider("renewable"),
-        q2q_transform=config_provider("pypsa_spain","q2q_transform"), #####
+        ISA_class=config_provider("pypsa_spain","ISA_class"), #####
     input:
         unpack(input_ua_md_availability_matrix),
         corine=ancient("data/bundle/corine/g250_clc06_V18_5.tif"),
@@ -293,6 +293,8 @@ rule determine_availability_matrix:
         cutout=lambda w: input_cutout(
             w, config_provider("renewable", w.technology, "cutout")(w)
         ),
+        ISA_onwind=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),           ##### Spanish "Indice de Sensibilidad Ambiental"
+        ISA_solar=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),           ##### Spanish "Indice de Sensibilidad Ambiental"
     output:
         resources("availability_matrix_{clusters}_{technology}.nc"),
     log:

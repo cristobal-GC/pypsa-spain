@@ -105,6 +105,38 @@ if config["enable"]["retrieve"]:
 
 
 
+##### Retrieve Spanish "Indice de Sensibilidad Ambiental" (ISA)
+if config["pypsa_spain"]["ISA_class"]["enable"]:
+
+    rule retrieve_ISA:
+        input:
+            eol=storage("https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_EOL_clasificada_2024.zip"),
+            ftv=storage("https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_FTV_clasificada_2024.zip"),
+        output:
+            ISA_eol="data_ES/ISA/Clas_ISA_eol_pb.tiff",
+            ISA_ftv="data_ES/ISA/Clas_ISA_ftv_pb.tiff",
+        params:
+            zip_paths={
+                "eol": "data_ES/ISA/Zonificacion_EOL_clasificada_2024.zip",
+                "ftv": "data_ES/ISA/Zonificacion_FTV_clasificada_2024.zip",
+            },
+        run:
+            import os
+            from zipfile import ZipFile
+            from pathlib import Path
+            suffixes = ["eol", "ftv"]
+            for suffix in suffixes:
+                input_file = getattr(input, suffix)
+                zip_path = params.zip_paths[suffix]
+                os.rename(input_file, zip_path)
+                with ZipFile(zip_path, "r") as zip_ref:
+                    filename = f"Clas_ISA_{suffix}_pb.tiff"
+                    zip_ref.extract(filename, Path(zip_path).parent)
+                    extracted = Path(zip_path).parent / filename
+                os.remove(zip_path)
+
+
+
 if config["enable"]["retrieve"]:
 
     rule retrieve_nuts_2021_shapes:

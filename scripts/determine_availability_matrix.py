@@ -72,7 +72,7 @@ if __name__ == "__main__":
         from _helpers import mock_snakemake
 
         snakemake = mock_snakemake(
-            "build_renewable_profiles", clusters=100, technology="onwind"
+            "determine_availability_matrix", configfiles=['config/config_ES.yaml'], clusters='adm', technology="onwind"
         )
     configure_logging(snakemake)
     set_scenario_config(snakemake)
@@ -82,6 +82,22 @@ if __name__ == "__main__":
     noprogress = noprogress or not snakemake.config["atlite"]["show_progress"]
     technology = snakemake.wildcards.technology
     params = snakemake.params.renewable[technology]
+
+
+
+    ########## [PyPSA-Spain]: include ISA grid_codes in params
+    params_ISA = snakemake.params.ISA_class
+
+    if params_ISA['enable']:
+        params[f'ISA_{technology}'] = params_ISA[f'ISA_{technology}']
+
+        logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix>: Using the Spanish "Indice de Sensibilidad Ambiental"..')
+
+    else:
+        params[f'ISA_{technology}'] = {'ISA': False}
+    ##########
+
+
 
     cutout = load_cutout(snakemake.input.cutout)
     regions = gpd.read_file(snakemake.input.regions)
@@ -98,7 +114,7 @@ if __name__ == "__main__":
     if params["natura"]:
         excluder.add_raster(snakemake.input.natura, nodata=0, allow_no_overlap=True)
 
-    for dataset in ["corine", "luisa"]:
+    for dataset in ["corine", "luisa", f"ISA_{technology}"]:
         kwargs = {"nodata": 0} if dataset == "luisa" else {}
         settings = params.get(dataset, {})
         if not settings:
