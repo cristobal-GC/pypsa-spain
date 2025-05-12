@@ -86,10 +86,10 @@ if __name__ == "__main__":
 
 
     ########## [PyPSA-Spain]: include ISA grid_codes in params
-    params_ISA = snakemake.params.ISA_class
+    params_ISA_class = snakemake.params.ISA_class
 
-    if params_ISA['enable']:
-        params[f'ISA_{technology}'] = params_ISA[f'ISA_{technology}']
+    if params_ISA_class['enable']:
+        params[f'ISA_{technology}'] = params_ISA_class[f'ISA_{technology}']
 
         logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix>: Using the Spanish "Indice de Sensibilidad Ambiental"..')
 

@@ -294,7 +294,6 @@ rule determine_availability_matrix:
             w, config_provider("renewable", w.technology, "cutout")(w)
         ),
         ISA_onwind=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),          ##### Spanish "Indice de Sensibilidad Ambiental" for onwind (eol)
-        ISA_offwind_float=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),   ##### Spanish "Indice de Sensibilidad Ambiental" for offwind-float (eol)
         ISA_solar=ancient("data_ES/ISA/Clas_ISA_ftv_pb.tiff"),           ##### Spanish "Indice de Sensibilidad Ambiental" for solar (ftv)
     output:
         resources("availability_matrix_{clusters}_{technology}.nc"),
