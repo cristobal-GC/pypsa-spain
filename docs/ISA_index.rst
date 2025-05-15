@@ -25,8 +25,8 @@ The methodology relies on multi-criteria evaluation techniques using Geographic 
 - Biosphere Reserves
 - Sites of Geological Interest
 - Visibility
-- the Camino de Santiago
-- traditional livestock routes
+- The Camino de Santiago
+- Traditional livestock routes
 - Public Utility Forests
 - UNESCO World Heritage sites
 
@@ -34,22 +34,23 @@ As a result, an **Environmental Sensitivity Index (ISA)** was calculated for eac
 
 .. csv-table::
    :header-rows: 1
-   :widths: 22,7,22,33
+   :widths: 8,12,12,12
    :file: configtables/ISA_index.csv
 
 See more details on the ISA index `here <https://www.miteco.gob.es/en/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental/zonificacion_ambiental_energias_renovables.html>`__ (in Spanish).
 
 PyPSA-Spain allows land elegibility to be defined according to the ISA index (see `config <https://pypsa-spain.readthedocs.io/en/latest/configuration.html>`__.
 
-The following figures show the potential capacity in Spain according to different ISA levels and NUTS 2 regions. For example, *High* means that eligible land includes ISA levels 2, 3 and 4. Horizontal lines indicate the installed capacity of the corresponding technology in 2025, and the target for 2030 as defined in the Spanish National Energy and Climate Plan (NECP). Energy densities of 10 MW/km2 and 50 MW/km2 were assumed for wind power and solar PV, respectively. A land occupation factor of 25% was assumed, meaning that only this percentage of eligible land was considered when determining the potential capacity.
+The following figures show the potential capacity computed with PyPSA-Spain according to different ISA levels and NUTS 2 regions. For example, *High* means that eligible land includes ISA levels 2, 3 and 4. Horizontal lines indicate the installed capacity of the corresponding technology in 2025, and the target for 2030 as defined in the Spanish National Energy and Climate Plan (NECP). Energy densities of 10 MW/km2 and 50 MW/km2 were assumed for wind power and solar PV, respectively. A land occupation factor of 25% was assumed, meaning that only this percentage of eligible land was considered when determining the potential capacity.
 
 
 .. image:: img/ISA_onwind.jpg
-    :width: 70%
+    :width: 100%
     :align: center
 
+
 .. image:: img/ISA_solar.jpg
-    :width: 70%
+    :width: 100%
     :align: center
     
     
@@ -59,5 +60,4 @@ The following figures show the potential capacity in Spain according to differen
    :maxdepth: 1
    :caption: Getting Started
 
-   configuration
-   release_notes
+
