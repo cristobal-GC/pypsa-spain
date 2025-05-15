@@ -12,7 +12,7 @@ The primary motivation behind the development of PyPSA-Spain was to leverage the
 
 PyPSA-Spain is an up-to-date fork of PyPSA-Eur, ensuring that advancements and bug fixes made to PyPSA-Eur are integrated. In addition, PyPSA-Spain includes a number of novel functionalities that enhance the representation of the Spanish energy system, as compared with PyPSA-Eur. 
 
-Find the details in `this preprint introducing PyPSA-Spain <https://arxiv.org/abs/2412.06571>`__.
+Find the details of PyPSA-Spain v.0.0.0 in `this preprint introducing PyPSA-Spain <https://arxiv.org/abs/2412.06571>`__. For more updates, see the `Release Notes <https://pypsa-spain.readthedocs.io/en/latest/release_notes.html>`__.
 
 Further details will be posted soon, stay tuned..
 
@@ -29,6 +29,6 @@ Further details will be posted soon, stay tuned..
    :maxdepth: 1
    :caption: Getting Started
 
-   introduction
    configuration
+   ISA_index
    release_notes
