@@ -38,10 +38,14 @@ As a result, an **Environmental Sensitivity Index (ISA)** was calculated for eac
    :file: configtables/ISA_index.csv
 
 
-.. image:: img/ISA_map.jpg
-    :width: 80%
+.. image:: img/ISA_onwind_map.jpg
+    :width: 45%
     :align: center
 
+.. image:: img/ISA_solar_map.jpg
+    :width: 45%
+    :align: center
+    
 
 See more details on the ISA index `here <https://www.miteco.gob.es/en/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental/zonificacion_ambiental_energias_renovables.html>`__ (in Spanish).
 
