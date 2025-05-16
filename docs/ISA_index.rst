@@ -37,11 +37,17 @@ As a result, an **Environmental Sensitivity Index (ISA)** was calculated for eac
    :widths: 8,12,12,12
    :file: configtables/ISA_index.csv
 
+
+.. image:: img/ISA_map.jpg
+    :width: 80%
+    :align: center
+
+
 See more details on the ISA index `here <https://www.miteco.gob.es/en/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental/zonificacion_ambiental_energias_renovables.html>`__ (in Spanish).
 
-PyPSA-Spain allows land elegibility to be defined according to the ISA index (see `config <https://pypsa-spain.readthedocs.io/en/latest/configuration.html>`__.
+**PyPSA-Spain** allows land elegibility to be defined according to the ISA index (see `config <https://pypsa-spain.readthedocs.io/en/latest/configuration.html>`__ section).
 
-The following figures show the potential capacity computed with PyPSA-Spain according to different ISA levels and NUTS 2 regions. For example, *High* means that eligible land includes ISA levels 2, 3 and 4. Horizontal lines indicate the installed capacity of the corresponding technology in 2025, and the target for 2030 as defined in the Spanish National Energy and Climate Plan (NECP). Energy densities of 10 MW/km2 and 50 MW/km2 were assumed for wind power and solar PV, respectively. A land occupation factor of 25% was assumed, meaning that only this percentage of eligible land was considered when determining the potential capacity.
+The following figures show the potential capacity computed with PyPSA-Spain according to different ISA levels and NUTS 2 regions. For example, *High* means that eligible land includes ISA levels 2, 3 and 4. The horizontal lines indicate the installed capacity of the corresponding technology in 2025, and the target for 2030 as defined in the Spanish National Energy and Climate Plan (NECP). Energy densities of 10 MW/km2 and 50 MW/km2 were assumed for wind power and solar PV, respectively. A land occupation factor of 25% was assumed, meaning that only this percentage of eligible land was considered when determining the potential capacity.
 
 
 .. image:: img/ISA_onwind.jpg
