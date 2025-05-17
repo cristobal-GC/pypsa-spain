@@ -1147,7 +1147,7 @@ def attach_stores(
 def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_file, dic_nuts_file):
 
 
-    def _update_in_network(df, required_capacity, method_increase):
+    def _update_in_network(df, required_capacity, method_increase, cc, rr_name):   ##### cc, rr_name is for the message
         '''
         This function operates on a df = n.generators. It modifies 'p_nom' to match a target installed capacity
         '''
@@ -1247,7 +1247,7 @@ def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_
 
     
                     ############### Update capacities
-                    df_updated = _update_in_network(df_generators_local_cc, required_capacity, method_increase)
+                    df_updated = _update_in_network(df_generators_local_cc, required_capacity, method_increase, cc, rr_name)   ##### cc, rr_name is for the message
 
 
 
@@ -1278,7 +1278,7 @@ def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_
 
                         # Share the overcapacity across the other buses
                         required_capacity = df_to_sanitise['p_nom'].sum() + overcapacity
-                        df_to_sanitise = _update_in_network(df_to_sanitise, required_capacity, method_increase)
+                        df_to_sanitise = _update_in_network(df_to_sanitise, required_capacity, method_increase, cc, rr_name)   ##### cc, rr_name is for the message
 
 
                         ############### Update df_generators_local_cc with df_to_sanitise
