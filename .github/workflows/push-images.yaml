@@ -1,11 +1,11 @@
 name: Push images
 
-#on: ##### PyPSA-Spain: Deactivated
-#  push:
+on:
+#  push:    ##### PyPSA-Spain: Deactivated
 #
 #    branches:
 #    - master
-#  workflow_dispatch:
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: pypsa/eur-dev-env
