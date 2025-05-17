@@ -2,7 +2,7 @@ name: Push images
 
 
 ##### PyPSA-Spain: Deactivated
-#on:
+on:
 #  push:
 
     branches:
