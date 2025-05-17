@@ -1,7 +1,9 @@
 name: Push images
 
-on:
-  push:
+
+##### PyPSA-Spain: Deactivated
+#on:
+#  push:
 
     branches:
     - master
