@@ -12,19 +12,18 @@ Upcoming Release
 ================
 
 
-* New functionality: Implemented the Spanish "Indice de Sostenibilidad Ambiental" for solar and onwind land elegibility.
-
+* Land elegibility based on the Spanish Environmental Sensitivity Index (ISA) (see details `here <https://pypsa-spain.readthedocs.io/en/latest/ISA_index.html>`__).
 
 
 
 PyPSA-Spain v2025.04.0 (23th April 2025)
 ========================================
 
-New release based on PyPSA-Eur v2025.04.0.
+* New release based on PyPSA-Eur v2025.04.0.
 
 * Includes new Q2Q transforms for improved renewable profile estimation. These transforms have been obtained from the recently developed `Q2Q_repository <https://github.com/cristobal-GC/Q2Q_repository>`__.
 
-* Land elegibility based on the Spanish Environmental Sensitivity Index (ISA) (see details `here<<https://pypsa-spain.readthedocs.io/en/latest/ISA_index.html>`__).
+
 
 
 
