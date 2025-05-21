@@ -37,9 +37,9 @@ pypsa_spain:
   ISA_class:
     enable: true
     ISA_onwind:
-      grid_codes: [4]
+      grid_codes: [3, 4]
     ISA_solar:
-      grid_codes: [4]
+      grid_codes: [3, 4]
     ISA_offwind-float: False   ##### ISA is only for land
 
 
@@ -219,8 +219,8 @@ renewable:
       add_cutout_windspeed: true
     resource_classes: 1
     # ScholzPhd Tab 4.3.1: 10MW/km^2
-    capacity_per_sqkm: 2   #####
-    # correction_factor: 0.8855   #####
+    capacity_per_sqkm: 10   #####
+    correction_factor: 0.8855   #####
     # proxy for wake losses
     # from 10.1016/j.energy.2018.08.153
     # until done more rigorously in #153
