@@ -58,16 +58,18 @@ import pandas as pd
 import powerplantmatching as pm
 import pypsa
 import xarray as xr
+from pypsa.clustering.spatial import DEFAULT_ONE_PORT_STRATEGIES, normed_or_uniform
+
 import yaml   ##### Required in PyPSA-Spain
 import geopandas as gpd   ##### Required in PyPSA-Spain
-from _helpers import (
+
+from scripts._helpers import (
     configure_logging,
     get_snapshots,
     rename_techs,
     set_scenario_config,
     update_p_nom_max,
 )
-from pypsa.clustering.spatial import DEFAULT_ONE_PORT_STRATEGIES, normed_or_uniform
 
 idx = pd.IndexSlice
 
@@ -1318,7 +1320,7 @@ def fun_update_elec_capacities(n, carriers_to_update, method_increase, nuts2_ES_
 
 if __name__ == "__main__":
     if "snakemake" not in globals():
-        from _helpers import mock_snakemake
+        from scripts._helpers import mock_snakemake
 
         snakemake = mock_snakemake("add_electricity", clusters=100)
     configure_logging(snakemake)  # pylint: disable=E0606

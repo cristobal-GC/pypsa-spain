@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# coding: utf-8
+
 """
 Prepare PyPSA network for solving according to :ref:`opts` and :ref:`ll`, such
 as.
@@ -29,15 +29,17 @@ import logging
 import numpy as np
 import pandas as pd
 import pypsa
+from pypsa.descriptors import expand_series
+
 import yaml   ##### Required in PyPSA-Spain
-from _helpers import (
+
+from scripts._helpers import (
     configure_logging,
     get,
     set_scenario_config,
     update_config_from_wildcards,
 )
-from add_electricity import load_costs, set_transmission_costs
-from pypsa.descriptors import expand_series
+from scripts.add_electricity import load_costs, set_transmission_costs
 
 idx = pd.IndexSlice
 
@@ -357,7 +359,7 @@ def attach_interconnections_ES(n, ic_dic):
 # %%
 if __name__ == "__main__":
     if "snakemake" not in globals():
-        from _helpers import mock_snakemake
+        from scripts._helpers import mock_snakemake
 
         snakemake = mock_snakemake(
             "prepare_network",
