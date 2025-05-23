@@ -273,7 +273,7 @@ def load_costs(
     costs.at["OCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
     costs.at["CCGT", "CO2 intensity"] = costs.at["gas", "CO2 intensity"]
 
-    costs.at["solar", "capital_cost"] = costs.at["solar-utility", "capital_cost"]
+    costs.at["solar", "capital_cost"] = costs.at["solar-utility", "capital_cost"]   ##### This is the line where solar-utility costs are used for solar
     costs = costs.rename({"solar-utility single-axis tracking": "solar-hsat"})
 
     # Calculate storage costs if max_hours is provided

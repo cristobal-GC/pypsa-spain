@@ -453,7 +453,7 @@ def update_wind_solar_costs(
     # when distribution grid is inserted
     n.generators.loc[n.generators.carrier == "solar", "capital_cost"] = costs.at[
         "solar-utility", "capital_cost"
-    ]
+    ]   ##### This is the line where solar-utility costs are used for solar
 
     n.generators.loc[n.generators.carrier == "onwind", "capital_cost"] = costs.at[
         "onwind", "capital_cost"
