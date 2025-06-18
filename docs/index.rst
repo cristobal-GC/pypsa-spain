@@ -22,18 +22,25 @@ Find the details of PyPSA-Spain v.0.0.0 in the `seminal paper <https://doi.org/1
     :align: center
 
 
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+   :caption: Configuration
+
+   configuration
 
 .. toctree::
    :hidden:
    :maxdepth: 1
-
-   :caption: Configuration
-   configuration
-
    :caption: Features
+
    ISA_index
-   
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
    :caption: References
+
    publications
    release_notes
-   
+

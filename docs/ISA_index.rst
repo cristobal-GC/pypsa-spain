@@ -4,8 +4,10 @@
   SPDX-License-Identifier: CC-BY-4.0
 
 
+####################################################################
 The Spanish Environmental Sensitivity Index (ISA)
-=======================================================================================
+####################################################################
+
 
 In 2020, the Ministry for Ecological Transition and the Demographic Challenge (MITECO) created a tool for identifying areas across the national territory that present significant environmental constraints for the installation of wind farms and photovoltaic plants. This was achieved through a territorial model that produces environmental sensitivity zoning, aiming to facilitate decision-making and public participation from the early stages of authorization.
 
@@ -62,9 +64,6 @@ The following figures show the potential capacity computed with PyPSA-Spain acco
     
     
 
-.. toctree::
-   :hidden:
-   :maxdepth: 1
-   :caption: Getting Started
+
 
 
