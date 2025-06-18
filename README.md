@@ -24,7 +24,7 @@ of the Spanish energy system, as compared with PyPSA-Eur.
 
 Find more details in [https://pypsa-spain.readthedocs.io/en/latest/](https://pypsa-spain.readthedocs.io/en/latest/)
 
-A description of the new functionalities implemented in PyPSA-Spain is now available in this preprint: [https://arxiv.org/abs/2412.06571](https://arxiv.org/abs/2412.06571).
+A description of the new functionalities implemented in PyPSA-Spain is now available in this article: [https://doi.org/10.1016/j.esr.2025.101764](https://doi.org/10.1016/j.esr.2025.101764).
 
 
 
