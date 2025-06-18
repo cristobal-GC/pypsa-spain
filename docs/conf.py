@@ -13,7 +13,12 @@ author = 'Cristobal Gallego-Castillo'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    "sphinxcontrib.bibtex",
+]
+
+bibtex_bibfiles = ["bib_github_pypsa_spain.bib"]
+bibtex_default_style = "unsrt"
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
