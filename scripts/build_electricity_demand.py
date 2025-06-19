@@ -240,8 +240,8 @@ if __name__ == "__main__":
 
 
 
-#################### PyPSA-Spain: if not requested, compute load as usual in PyPSA-Eur
-#
+#################### PyPSA-Spain: First, compute load as usual in PyPSA-Eur
+# If requested, the rewrite with PyPSA-Spain code
 #
 #
     #################### Unwrap parameters
@@ -252,80 +252,82 @@ if __name__ == "__main__":
     nHours = df_profiles.shape[0]
 
 
-    ##### snapshots are required in both approaches (pypsa-eur and pypsa-spain)
     snapshots = get_snapshots(
         snakemake.params.snapshots, snakemake.params.drop_leap_day
     )
 
+    fixed_year = snakemake.params["load"].get("fixed_year", False)
+    years = (
+        slice(str(fixed_year), str(fixed_year))
+        if fixed_year
+        else slice(snapshots[0], snapshots[-1])
+    )
 
-    if not electricity_demand['enable']:
+    interpolate_limit = snakemake.params.load["fill_gaps"]["interpolate_limit"]
+    countries = snakemake.params.countries
 
-        fixed_year = snakemake.params["load"].get("fixed_year", False)
-        years = (
-            slice(str(fixed_year), str(fixed_year))
-            if fixed_year
-            else slice(snapshots[0], snapshots[-1])
-        )
+    time_shift = snakemake.params.load["fill_gaps"]["time_shift_for_large_gaps"]
 
-        interpolate_limit = snakemake.params.load["interpolate_limit"]
-        countries = snakemake.params.countries
+    load = load_timeseries(snakemake.input.reported, years, countries)
 
-        time_shift = snakemake.params.load["time_shift_for_large_gaps"]
+    load = load.reindex(index=snapshots)
 
-        load = load_timeseries(snakemake.input.reported, years, countries)
+    if "UA" in countries:
+        # attach load of UA (best data only for entsoe transparency)
+        load_ua = load_timeseries(snakemake.input.reported, "2018", ["UA"])
+        snapshot_year = str(snapshots.year.unique().item())
+        time_diff = pd.Timestamp("2018") - pd.Timestamp(snapshot_year)
+        # hack indices (currently, UA is manually set to 2018)
+        load_ua.index -= time_diff
+        load["UA"] = load_ua
+        # attach load of MD (no time-series available, use 2020-totals and distribute according to UA):
+        # https://www.iea.org/data-and-statistics/data-browser/?country=MOLDOVA&fuel=Energy%20consumption&indicator=TotElecCons
+        if "MD" in countries:
+            load["MD"] = 6.2e6 * (load_ua / load_ua.sum())
 
-        load = load.reindex(index=snapshots)
+    if snakemake.params.load["manual_adjustments"]:
+        load = manual_adjustment(load, snakemake.input[0], countries)
 
-        if "UA" in countries:
-            # attach load of UA (best data only for entsoe transparency)
-            load_ua = load_timeseries(snakemake.input.reported, "2018", ["UA"])
-            snapshot_year = str(snapshots.year.unique().item())
-            time_diff = pd.Timestamp("2018") - pd.Timestamp(snapshot_year)
-            # hack indices (currently, UA is manually set to 2018)
-            load_ua.index -= time_diff
-            load["UA"] = load_ua
-            # attach load of MD (no time-series available, use 2020-totals and distribute according to UA):
-            # https://www.iea.org/data-and-statistics/data-browser/?country=MOLDOVA&fuel=Energy%20consumption&indicator=TotElecCons
-            if "MD" in countries:
-                load["MD"] = 6.2e6 * (load_ua / load_ua.sum())
-
-        if snakemake.params.load["manual_adjustments"]:
-            load = manual_adjustment(load, snakemake.input[0], countries)
-
+    if snakemake.params.load["fill_gaps"]["enable"]:
         logger.info(f"Linearly interpolate gaps of size {interpolate_limit} and less.")
         load = load.interpolate(method="linear", limit=interpolate_limit)
 
         logger.info(
-            "Filling larger gaps by copying time-slices of period " f"'{time_shift}'."
+            f"Filling larger gaps by copying time-slices of period '{time_shift}'."
         )
         load = load.apply(fill_large_gaps, shift=time_shift)
 
-        if snakemake.params.load["supplement_synthetic"]:
-            logger.info("Supplement missing data with synthetic data.")
-            fn = snakemake.input.synthetic
-            synthetic_load = pd.read_csv(fn, index_col=0, parse_dates=True)
-            # UA, MD, XK do not appear in synthetic load data
-            countries = list(set(countries) - set(["UA", "MD", "XK"]))
-            synthetic_load = synthetic_load.loc[snapshots, countries]
-            load = load.combine_first(synthetic_load)
+    if snakemake.params.load["supplement_synthetic"]:
+        logger.info("Supplement missing data with synthetic data.")
+        fn = snakemake.input.synthetic
+        synthetic_load = pd.read_csv(fn, index_col=0, parse_dates=True)
+        # UA, MD, XK do not appear in synthetic load data
+        countries = list(set(countries) - set(["UA", "MD", "XK"]))
+        synthetic_load = synthetic_load.loc[snapshots, countries]
+        load = load.combine_first(synthetic_load)
 
-        assert not load.isna().any().any(), (
-            "Load data contains nans. Adjust the parameters "
-            "`time_shift_for_large_gaps` or modify the `manual_adjustment` function "
-            "for implementing the needed load data modifications."
-        )
+    assert not load.isna().any().any(), (
+        "Load data contains nans. Adjust the parameters "
+        "`time_shift_for_large_gaps` or modify the `manual_adjustment` function "
+        "for implementing the needed load data modifications."
+    )
 
-        # need to reindex load time series to target year
-        if fixed_year:
-            load.index = load.index.map(lambda t: t.replace(year=snapshots.year[0]))
+    # need to reindex load time series to target year
+    if fixed_year:
+        load.index = load.index.map(lambda t: t.replace(year=snapshots.year[0]))
 #
 #
 #
 #
 #
-    else:
+    if electricity_demand['enable']:
     ##### Generate electricity demand according to PyPSA-Spain customisation
+
+
+        ##### Remove load computed according to PyPSA-Eur methodology
+        del load
         
+
         logger.info(f'##### [PyPSA-Spain] <build_electricity_demand>: Creating customised electricity demand for Spain..')
 
 
@@ -371,4 +373,3 @@ if __name__ == "__main__":
 
 
     load.to_csv(snakemake.output[0])
-
