@@ -69,7 +69,7 @@ run:
     policy: false
     exclude: []
   shared_cutouts: true
-  use_shadow_directory: true # Set to false if problems regarding missing directories occur
+  use_shadow_directory: false
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#foresight
 foresight: overnight
@@ -141,7 +141,7 @@ electricity:
     H2: 168
 
   extendable_carriers:
-    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, OCGT, CCGT]
+    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar-hsat, offwind-ac, offwind-dc, OCGT]
     StorageUnit: [] # battery, H2
     Store: [battery, H2]
     Link: [] # H2 pipeline
@@ -150,8 +150,8 @@ electricity:
   custom_powerplants: false
   everywhere_powerplants: []
 
-  conventional_carriers: [nuclear, CCGT, biomass]   ##### [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
-  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, hydro]
+  conventional_carriers: [nuclear, CCGT, biomass]   ##### [oil, OCGT, coal, lignite, geothermal]
+  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar-hsat, offwind-ac, offwind-dc]
 
   estimate_renewable_capacities:
     enable: true
@@ -293,6 +293,7 @@ lines:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#links
 links:
   p_max_pu: 1.0
+  p_min_pu: -1.0
   p_nom_max: .inf
   max_extension: 30000 #MW
   length_factor: 1.25
@@ -324,8 +325,10 @@ transformers:
 
 # docs-load in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#load
 load:
-  interpolate_limit: 3
-  time_shift_for_large_gaps: 1w
+  fill_gaps:
+    enable: true
+    interpolate_limit: 3
+    time_shift_for_large_gaps: 1w
   manual_adjustments: true # false
   scaling_factor: 1.0
   fixed_year: false # false or year (e.g. 2013)
@@ -903,6 +906,10 @@ clustering:
   administrative:
     level: 3   ##### from 0 to 3 for NUTS-x
   focus_weights: false
+  copperplate_regions: []
+  build_bidding_zones:
+    remove_islands: false
+    aggregate_to_tyndp: false
   simplify_network:
     to_substations: false
     remove_stubs: true
@@ -967,7 +974,7 @@ solving:
       fractional_last_unit_size: false
     keep_files: false
     model_kwargs:
-      solver_dir: "/tmp"
+      solver_dir: ""
 
   agg_p_nom_limits:
     agg_offwind: false
