@@ -92,7 +92,8 @@ if __name__ == "__main__":
     if params_ISA_class['enable']:
         params[f'ISA_{technology}'] = params_ISA_class[f'ISA_{technology}']
 
-        logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix>: Using the Spanish "Indice de Sensibilidad Ambiental"..')
+        if params[f'ISA_{technology}']:
+            logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix>: Using the Spanish "Indice de Sensibilidad Ambiental"..')
 
     else:
         params[f'ISA_{technology}'] = {'ISA': False}
