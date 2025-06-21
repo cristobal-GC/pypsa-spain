@@ -244,14 +244,8 @@ if __name__ == "__main__":
 # If requested, the rewrite with PyPSA-Spain code
 #
 #
-    #################### Unwrap parameters
-    electricity_demand = snakemake.params.electricity_demand
-    annual_value = electricity_demand['annual_value']
-    df_profiles = pd.read_csv(electricity_demand['profiles'], index_col=0, parse_dates=[0])#.fillna(0, inplace=True)
-    df_percentages = pd.read_csv(electricity_demand['percentages'], index_col=0)
-    nHours = df_profiles.shape[0]
-
-
+#
+#
     snapshots = get_snapshots(
         snakemake.params.snapshots, snakemake.params.drop_leap_day
     )
@@ -320,8 +314,18 @@ if __name__ == "__main__":
 #
 #
 #
+    electricity_demand = snakemake.params.electricity_demand
+
+
     if electricity_demand['enable']:
     ##### Generate electricity demand according to PyPSA-Spain customisation
+
+
+        #################### Unwrap parameters
+        annual_value = electricity_demand['annual_value']
+        df_profiles = pd.read_csv(electricity_demand['profiles'], index_col=0, parse_dates=[0])#.fillna(0, inplace=True)
+        df_percentages = pd.read_csv(electricity_demand['percentages'], index_col=0)
+        nHours = df_profiles.shape[0]
 
 
         ##### Remove load computed according to PyPSA-Eur methodology
@@ -363,6 +367,8 @@ if __name__ == "__main__":
 
         ##### Sort columns
         load.sort_index(axis=1, inplace=True)
+#
+#
 #
 #
 #
