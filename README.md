@@ -32,7 +32,50 @@ A description of the new functionalities implemented in PyPSA-Spain is now avail
 ![PyPSA-Spain Grid Model](docs/img/base.jpg)
 
 
-# Licence
+
+## Basic commands for running PyPSA-Spain
+
+As a fork of PyPSA-Eur, PyPSA-Spain uses the same command structure.  
+Note that PyPSA-Spain employs the **sector network** approach
+
+
+
+- **Full workflow run**:
+
+```bash
+$ snakemake all --configfile config/config_ES.yaml --cores 4
+```
+
+
+- **Partial runs**:
+
+```bash
+##### Cluster the network
+$ snakemake cluster_network --configfile config/config_ES.yaml --cores 4
+```
+
+
+```bash
+##### Prepare the network
+$ snakemake prepare_sector_network --configfile config/config_ES.yaml --cores 4
+```
+
+```bash
+##### Solve the network
+$ snakemake solve_sector_network --configfile config/config_ES.yaml --cores 4
+```
+
+
+**Comments:**
+1. Adjust the number of `--cores` according to your system.
+2. Add the `-n` flag (dry-run) to check the workflow before execution 
+
+
+
+
+
+
+## Licence
 
 PyPSA-Spain is a fork of [PyPSA-Eur](https://github.com/PyPSA/pypsa-eur), which is released as free software under the
 [MIT License](https://opensource.org/licenses/MIT), see [`doc/licenses.rst`](doc/licenses.rst).
