@@ -64,6 +64,7 @@ import yaml   ##### Required in PyPSA-Spain
 import geopandas as gpd   ##### Required in PyPSA-Spain
 
 from scripts._helpers import (
+    PYPSA_V1,
     configure_logging,
     get_snapshots,
     rename_techs,
@@ -441,7 +442,9 @@ def attach_load(
     )
 
     # apply clustering busmap
-    busmap = pd.read_csv(busmap_fn, dtype=str).set_index("Bus").squeeze()
+    busmap = pd.read_csv(busmap_fn, dtype=str)
+    index_col = "name" if PYPSA_V1 else "Bus"
+    busmap = busmap.set_index(index_col).squeeze()
     load = load.groupby(busmap).sum().T
 
     logger.info(f"Load data scaled by factor {scaling}.")
