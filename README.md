@@ -51,19 +51,26 @@ $ snakemake all --configfile config/config_ES.yaml --cores 4
 
 ```bash
 ##### Cluster the network
-$ snakemake cluster_network --configfile config/config_ES.yaml --cores 4
+$ snakemake cluster_networks --configfile config/config_ES.yaml --cores 4
 ```
-
 
 ```bash
 ##### Prepare the network
-$ snakemake prepare_sector_network --configfile config/config_ES.yaml --cores 4
+$ snakemake prepare_sector_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 ```bash
 ##### Solve the network
-$ snakemake solve_sector_network --configfile config/config_ES.yaml --cores 4
+$ snakemake solve_sector_networks --configfile config/config_ES.yaml --cores 4
 ```
+
+- **Run to get a specific output**, for example, `base.nc` network:
+
+```bash
+$ snakemake resources/networks/base.nc --configfile config/config_ES.yaml --cores 4
+```
+
+
 
 
 **Comments:**
