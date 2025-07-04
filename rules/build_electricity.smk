@@ -327,6 +327,7 @@ rule determine_availability_matrix:
         ),
         ISA_onwind=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),          ##### Spanish "Indice de Sensibilidad Ambiental" for onwind (eol)
         ISA_solar=ancient("data_ES/ISA/Clas_ISA_ftv_pb.tiff"),           ##### Spanish "Indice de Sensibilidad Ambiental" for solar (ftv)
+        ISA_solar-hsat=ancient("data_ES/ISA/Clas_ISA_ftv_pb.tiff"),      ##### Spanish "Indice de Sensibilidad Ambiental" for solar-hsat (same as solar)
     output:
         resources("availability_matrix_{clusters}_{technology}.nc"),
     log:

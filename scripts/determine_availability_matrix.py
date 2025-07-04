@@ -93,7 +93,7 @@ if __name__ == "__main__":
         params[f'ISA_{technology}'] = params_ISA_class[f'ISA_{technology}']
 
         if params[f'ISA_{technology}']:
-            logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix>: Using the Spanish "Indice de Sensibilidad Ambiental"..')
+            logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix> for {technology}: Using the Spanish "Indice de Sensibilidad Ambiental"..')
 
     else:
         params[f'ISA_{technology}'] = {'ISA': False}
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     if params["natura"]:
         excluder.add_raster(snakemake.input.natura, nodata=0, allow_no_overlap=True)
 
-    for dataset in ["corine", "luisa", f"ISA_{technology}"]:
+    for dataset in ["corine", "luisa", f"ISA_{technology.replace('-', '_')}"]:   ##### To replace solar-hsat for solar_hsat. The snakemake input does not accept '-'
         kwargs = {"nodata": 0} if dataset == "luisa" else {}
         settings = params.get(dataset, {})
         if not settings:
