@@ -43,7 +43,7 @@ pypsa_spain:
       grid_codes: [3, 4]
     ISA_solar_hsat:   
       grid_codes: [3, 4]
-    ISA_offwind-float: False   ##### ISA is only for land
+    ISA_offwind_float: False   ##### ISA is only for land
 
 
 
