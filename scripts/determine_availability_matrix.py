@@ -90,13 +90,13 @@ if __name__ == "__main__":
     params_ISA_class = snakemake.params.ISA_class
 
     if params_ISA_class['enable']:
-        params[f'ISA_{technology}'] = params_ISA_class[f'ISA_{technology}']
+        params[f'ISA_{technology.replace('-', '_')}'] = params_ISA_class[f'ISA_{technology.replace('-', '_')}']
 
-        if params[f'ISA_{technology}']:
+        if params[f'ISA_{technology.replace('-', '_')}']:
             logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix> for {technology}: Using the Spanish "Indice de Sensibilidad Ambiental"..')
 
     else:
-        params[f'ISA_{technology}'] = {'ISA': False}
+        params[f'ISA_{technology.replace('-', '_')}'] = {'ISA': False}
     ##########
 
 

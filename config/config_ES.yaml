@@ -22,12 +22,13 @@ pypsa_spain:
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
     enable: true
-    ic_ES_file: data_ES/interconnections/interconnections.yaml    
+    ic_ES_file: data_ES/interconnections/interconnections.yaml
   update_elec_capacities:
     enable: true
     carriers_to_update:
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
+      solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv
       # nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv   ##### Do not update, nuclear power is filtered below to consider the Spanish nuclear decommissioning plan
       CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
     method_increase: proportional # additional / proportional
@@ -39,6 +40,8 @@ pypsa_spain:
     ISA_onwind:
       grid_codes: [3, 4]
     ISA_solar:
+      grid_codes: [3, 4]
+    ISA_solar_hsat:   
       grid_codes: [3, 4]
     ISA_offwind-float: False   ##### ISA is only for land
 
