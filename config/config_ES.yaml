@@ -26,11 +26,11 @@ pypsa_spain:
   update_elec_capacities:
     enable: true
     carriers_to_update:
+      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
-      solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv
-      # nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv   ##### Do not update, nuclear power is filtered below to consider the Spanish nuclear decommissioning plan
-      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
+      # solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv   ##### Update either solar or solar-hsat
+      # nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv   ##### Do not update for future planning horizons (nuclear power is filtered to consider the Spanish nuclear decommissioning plan)
     method_increase: proportional # additional / proportional
   costs_update:
     enable: true
