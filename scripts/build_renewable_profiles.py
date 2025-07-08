@@ -138,7 +138,7 @@ if __name__ == "__main__":
     capacity_per_sqkm = params["capacity_per_sqkm"]
 
     if correction_factor != 1.0:
-        logger.info(f"correction_factor is set as {correction_factor}")
+        logger.info(f"correction_factor for {technology} is set as {correction_factor}")   ##### Add technology in the message
 
     if nprocesses > 1:
         client = Client(n_workers=nprocesses, threads_per_worker=1)
