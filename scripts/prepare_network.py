@@ -298,6 +298,11 @@ def set_line_nom_max(
 
 def attach_interconnections_ES(n, ic_dic):
 
+    ##### Add AC_country carriers, to differentiate with AC
+    n.add("Carrier", name='AC_FR', color=n.carriers.at['AC', 'color'], nice_name='AC_FR')
+    n.add("Carrier", name='AC_PT', color=n.carriers.at['AC', 'color'], nice_name='AC_PT')
+
+
     for kk, vv in ic_dic.items():
 
         logger.info(f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding interconnection {kk}')
@@ -307,8 +312,9 @@ def attach_interconnections_ES(n, ic_dic):
         ### Select candidates: buses in peninsular Spain with carrier AC
         candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='AC'), ['x', 'y']]
         # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
+        # But remove those with 'FR' and 'PT' in the search
         if candidates.empty:
-            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (n.buses['carrier']=='AC'), ['x', 'y']]
+            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='AC'), ['x', 'y']]
         ### Compute distances
         x0 = ic_dic[kk]['bus_params']['x']
         y0 = ic_dic[kk]['bus_params']['y']
@@ -316,23 +322,36 @@ def attach_interconnections_ES(n, ic_dic):
         # print(f'distances: {distances}')
         ### Find closest bus, and assign it to the correct side of the link
         closest_bus_index = distances.idxmin()
-        # print(f'closest_bus_index: {closest_bus_index}')
-        ic_dic[kk]['link_params']['bus0'] = closest_bus_index        
+        ic_dic[kk]['link_params']['bus0'] = closest_bus_index
 
 
-        ########## Add bus
+        ########## Add bus AC
         n.add('Bus', ic_dic[kk]['bus_name'], **ic_dic[kk]['bus_params'])
-        n.buses.loc[ic_dic[kk]['bus_name'], 'location'] = ic_dic[kk]['bus_name']
+        ##### n.buses.loc[ic_dic[kk]['bus_name'], 'location'] = ic_dic[kk]['bus_name']   ##### Need to add location for the AC bus? lo quito de momento, pero lo añado en bus AC_country
+        #n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'
+
+
+        ########## Add bus 2 (AC_country)
+        n.add('Bus', ic_dic[kk]['bus_2_name'], **ic_dic[kk]['bus_2_params'])
+        n.buses.loc[ic_dic[kk]['bus_2_name'], 'location'] = ic_dic[kk]['bus_name']   ##### Need to add location for the AC bus? lo quito de momento, pero lo añado en bus AC_country
         #n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'
         
 
-        ########## Add links
+        ########## Add link with the network
         n.add('Link', ic_dic[kk]['link_name'], **ic_dic[kk]['link_params'])
 
         n.links.loc[ic_dic[kk]['link_name'], 'p_nom_min'] = n.links.loc[ic_dic[kk]['link_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
         n.links.loc[ic_dic[kk]['link_name'], 'underwater_fraction'] = 0.0
         # n.links.loc[ic_dic[kk]['link_name'], 'underground'] = False      ### The following line makes an error when saving the network..
         # n.links.loc[ic_dic[kk]['link_name'], 'under_construction'] = 0
+
+
+        ########## Add link 2, between AC and AC_country
+        n.add('Link', ic_dic[kk]['link_2_name'], **ic_dic[kk]['link_2_params'])
+
+        ##### Is that needed??
+        # n.links.loc[ic_dic[kk]['link_name'], 'p_nom_min'] = n.links.loc[ic_dic[kk]['link_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
+        #n.links.loc[ic_dic[kk]['link_name'], 'underwater_fraction'] = 0.0
 
 
 
