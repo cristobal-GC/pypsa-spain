@@ -293,15 +293,33 @@ def set_line_nom_max(
 
 ######################################## PyPSA-Spain
 #
-# Function to add interconnections
+# Functions to add interconnections
 #
 
+
+
+def attach_neighbouring_countries_ES(n, nc_dic):
+
+    for kk, vv in nc_dic.items():
+
+        logger.info(f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding neighbouring country {kk}')
+
+        ########## Add neighbouring country bus
+        n.add('Bus', vv['bus_name'], **vv['bus_params'])
+        
+        ########## Add neighbouring country generator
+        n.add('Generator', vv['generator_name'], **vv['generator_params'])
+
+        ########## Add neighbouring country generator_t: marginal cost
+        df_ic_prices = pd.read_csv(vv['generator_prices'])
+        n.generators_t['marginal_cost'][vv['generator_name']] = df_ic_prices.values
+
+        ########## Add neighbouring country load
+        n.add('Load', vv['load_name'], **vv['load_params'])
+
+
+
 def attach_interconnections_ES(n, ic_dic):
-
-    ##### Add AC_country carriers, to differentiate with AC
-    n.add("Carrier", name='AC_FR', color=n.carriers.at['AC', 'color'], nice_name='AC_FR')
-    n.add("Carrier", name='AC_PT', color=n.carriers.at['AC', 'color'], nice_name='AC_PT')
-
 
     for kk, vv in ic_dic.items():
 
@@ -319,55 +337,34 @@ def attach_interconnections_ES(n, ic_dic):
         x0 = ic_dic[kk]['bus_params']['x']
         y0 = ic_dic[kk]['bus_params']['y']
         distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
-        # print(f'distances: {distances}')
+
         ### Find closest bus, and assign it to the correct side of the link
         closest_bus_index = distances.idxmin()
-        ic_dic[kk]['link_params']['bus0'] = closest_bus_index
+        vv['link_export_params']['bus0'] = closest_bus_index
+        vv['link_import_params']['bus1'] = closest_bus_index
 
 
-        ########## Add bus AC
-        n.add('Bus', ic_dic[kk]['bus_name'], **ic_dic[kk]['bus_params'])
-        ##### n.buses.loc[ic_dic[kk]['bus_name'], 'location'] = ic_dic[kk]['bus_name']   ##### Need to add location for the AC bus? lo quito de momento, pero lo añado en bus AC_country
-        #n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'
+        ########## Add border bus
+        n.add('Bus', vv['bus_name'], **vv['bus_params'])
+        n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'  ### Mirar al final si esto da problemas
 
 
-        ########## Add bus 2 (AC_country)
-        n.add('Bus', ic_dic[kk]['bus_2_name'], **ic_dic[kk]['bus_2_params'])
-        n.buses.loc[ic_dic[kk]['bus_2_name'], 'location'] = ic_dic[kk]['bus_name']   ##### Need to add location for the AC bus? lo quito de momento, pero lo añado en bus AC_country
-        #n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'
+        ########## Add links between Spanish network and border bus (export and import), and set some features
+        n.add('Link', vv['link_export_name'], **vv['link_export_params'])
+        n.links.loc[vv['link_export_name'], 'p_nom_min'] = n.links.loc[vv['link_export_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
+        n.links.loc[vv['link_export_name'], 'underwater_fraction'] = 0.0
         
+        n.add('Link', vv['link_import_name'], **vv['link_import_params'])
+        n.links.loc[vv['link_import_name'], 'p_nom_min'] = n.links.loc[vv['link_import_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
+        n.links.loc[vv['link_import_name'], 'underwater_fraction'] = 0.0
 
-        ########## Add link with the network
-        n.add('Link', ic_dic[kk]['link_name'], **ic_dic[kk]['link_params'])
-
-        n.links.loc[ic_dic[kk]['link_name'], 'p_nom_min'] = n.links.loc[ic_dic[kk]['link_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
-        n.links.loc[ic_dic[kk]['link_name'], 'underwater_fraction'] = 0.0
         # n.links.loc[ic_dic[kk]['link_name'], 'underground'] = False      ### The following line makes an error when saving the network..
         # n.links.loc[ic_dic[kk]['link_name'], 'under_construction'] = 0
 
 
-        ########## Add link 2, between AC and AC_country
-        n.add('Link', ic_dic[kk]['link_2_name'], **ic_dic[kk]['link_2_params'])
-
-        ##### Is that needed??
-        # n.links.loc[ic_dic[kk]['link_name'], 'p_nom_min'] = n.links.loc[ic_dic[kk]['link_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
-        #n.links.loc[ic_dic[kk]['link_name'], 'underwater_fraction'] = 0.0
-
-
-
-        ########## Add generator
-        n.add('Generator', ic_dic[kk]['generator_name'], **ic_dic[kk]['generator_params'])
-
-        ########## Add generator_t: marginal cost
-        df_ic_prices = pd.read_csv(ic_dic[kk]['generator_prices'])
-        n.generators_t['marginal_cost'][ic_dic[kk]['generator_name']] = df_ic_prices.values
-
-        ########## Add load
-        n.add('Load', ic_dic[kk]['load_name'], **ic_dic[kk]['load_params'])
-
-        ########## Add load_t
-        ### Large enough to not be fully served by the interconnection
-        n.loads_t['p_set'][ic_dic[kk]['load_name']] = 9999
+        ########## Add link between border bus and neighbouring country, and set some features
+        n.add('Link', vv['link_nc_name'], **vv['link_nc_params'])
+        n.links.loc[vv['link_nc_name'], 'underwater_fraction'] = 0.0
 #
 #
 ########################################
@@ -458,14 +455,40 @@ if __name__ == "__main__":
 
     if interconnections['enable']:
 
-        ##### read ic data
-        file = interconnections['ic_ES_file']
+        ##### Add AC_abroad carrier, to differentiate with AC
+        n.add("Carrier", name='AC_abroad', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad')
+        n.add("Carrier", name='AC_abroad export', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad export')
+        n.add("Carrier", name='AC_abroad import', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad import')
 
+
+        ##### Attach neighbouring countries
+        ## read nc data
+        file = interconnections['nc_ES_file']
+        with open(file, 'r') as archivo:
+            nc_dic = yaml.safe_load(archivo)
+        ## call function
+        attach_neighbouring_countries_ES(n, nc_dic)
+
+
+        ##### Attach interconnections
+        ## read ic data
+        file = interconnections['ic_ES_file']
         with open(file, 'r') as archivo:
             ic_dic = yaml.safe_load(archivo)
-
-        ##### call function
+        ## call function
         attach_interconnections_ES(n, ic_dic)
+
+
+        ##### Define the load level of the neighbouring countries (as the addition of all the abroad import links capacities
+        # This ensures that, if required, cheap imports can cover all the demand in the neighbouring country
+        ## read ic data
+        file = interconnections['nc_ES_file']
+        with open(file, 'r') as archivo:
+            nc_dic = yaml.safe_load(archivo)
+
+            for kk, vv in nc_dic.items():
+                ########## Add neighbouring country load_t
+                n.loads_t['p_set'][vv['load_name']] = n.links.filter(like=kk, axis=0).filter(like='import', axis=0)['p_nom'].sum()
     #
     #
     ########################################

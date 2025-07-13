@@ -19,21 +19,14 @@ ES FR0:
   bus_params:
     x: 2.877482 
     y: 42.426598
-    carrier: AC
-    v_nom: 380
+    carrier: AC_abroad
 
-  bus_2_name: ES FR0 AC_FR
-  bus_2_params:
-    x: 2.877482 
-    y: 42.426598
-    carrier: AC_FR
-    v_nom: 1
 
-  link_name: ES FR0 ic
-  link_params:
+  link_export_name: ES FR0 export
+  link_export_params:
     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
     bus1: ES FR0
-    carrier: DC
+    carrier: AC_abroad export
     p_nom: 2800 
     p_nom_extendable: False
     length: 34.25 # ES side
@@ -43,38 +36,31 @@ ES FR0:
     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    
-  link_2_name: ES FR0 AC_FR
-  link_2_params:
+
+
+  link_import_name: ES FR0 import
+  link_import_params:
     bus0: ES FR0
-    bus1: ES FR0 AC_FR
-    carrier: AC_FR
-    p_nom: 666
-    p_nom_extendable: True
+    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    carrier: AC_abroad import
+    p_nom: 2800 
+    p_nom_extendable: False
+    length: 34.25 # ES side
     efficiency: 1  
-    capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
     lifetime: 50 ### No afecta a cómo se calculan los costes
     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-  generator_name: ES FR0 gen
-  generator_params: 
-    carrier: biomass
-    bus: ES FR0
-    p_nom: 66.6
-    efficiency: 1   
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
+
+  link_nc_name: FR0 FR
+  link_nc_params:
+    bus0: ES FR0   ##### Select the border bus
+    bus1: FR    ##### Select the country bus (defined at neighbouring_countries.yaml)
+    carrier: AC_abroad
     p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030.csv
-
-  load_name: ES FR0
-  load_params:
-    bus: ES FR0
-    # carrier: electricity ##### NO HAY QUE AÑADIR ESTE CARRIER, en add_electricity se comenta para que no se añada
-
+    efficiency: 1
 
 
 
@@ -96,21 +82,30 @@ ES FR1:
   bus_params:
     x: -2.858534 
     y: 43.364801
-    carrier: AC
-    v_nom: 380
+    carrier: AC_abroad
 
-  bus_2_name: ES FR1 AC_FR
-  bus_2_params:
-    x: 2.877482 
-    y: 42.426598
-    carrier: AC_FR
-    v_nom: 1
-    
-  link_name: ES FR1 ic
-  link_params:
+
+  link_export_name: ES FR1 export
+  link_export_params:
     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
     bus1: ES FR1
-    carrier: DC
+    carrier: AC_abroad export
+    p_nom: 2000 
+    p_nom_extendable: False
+    length: 200 # ES side
+    efficiency: 1  
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    lifetime: 50 ### No afecta a cómo se calculan los costes
+    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    
+    
+  link_import_name: ES FR1 import
+  link_import_params:
+    bus0: ES FR1
+    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    carrier: AC_abroad import
     p_nom: 2000 
     p_nom_extendable: False
     length: 200 # ES side
@@ -121,38 +116,14 @@ ES FR1:
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-  link_2_name: ES FR1 AC_FR
-  link_2_params:
-    bus0: ES FR1
-    bus1: ES FR1 AC_FR
-    carrier: AC_FR
-    p_nom: 666
+
+  link_nc_name: FR1 FR
+  link_nc_params:
+    bus0: ES FR1   ##### Select the border bus
+    bus1: FR    ##### Select the country bus (defined at neighbouring_countries.yaml)
+    carrier: AC_abroad
     p_nom_extendable: True
-    efficiency: 1  
-    capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    
-  generator_name: ES FR1 gen
-  generator_params: 
-    carrier: biomass
-    bus: ES FR1
-    p_nom: 66.6
-    efficiency: 1   
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
-    p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030.csv
-
-  load_name: ES FR1
-  load_params:
-    bus: ES FR1
-    # carrier: electricity
-
-
+    efficiency: 1
 
 
 ########## Además, hay dos proyectos más a través de los Pirineos para 2030, en fase de diseño (por Navarra y Aragón)
@@ -180,135 +151,70 @@ ES FR1:
 
 
 
-ES PT0:
+# ES PT0:
 
-  bus_name: ES PT0
-  bus_params:
-    x: -6.652149
-    y: 41.223112
-    carrier: AC
-    v_nom: 380
+#   bus_name: ES PT0
+#   bus_params:
+#     x: -6.652149
+#     y: 41.223112
+#     carrier: AC
+#     v_nom: 380
     
-  bus_2_name: ES PT0 AC_PT
-  bus_2_params:
-    x: 2.877482 
-    y: 42.426598
-    carrier: AC_PT
-    v_nom: 1
+#   bus_2_name: ES PT0 AC_PT
+#   bus_2_params:
+#     x: 2.877482 
+#     y: 42.426598
+#     carrier: AC_PT
+#     v_nom: 1
 
-  link_name: ES PT0 ic
-  link_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-    bus1: ES PT0
-    carrier: DC
-    p_nom: 2000 
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: inf ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-
-  link_2_name: ES PT0 AC_PT
-  link_2_params:
-    bus0: ES PT0
-    bus1: ES PT0 AC_PT
-    carrier: AC_PT
-    p_nom: 666
-    p_nom_extendable: True
-    efficiency: 1  
-    capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    
-  generator_name: ES PT0 gen
-  generator_params: 
-    carrier: biomass
-    bus: ES PT0
-    p_nom: 66.6
-    efficiency: 1   
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
-    p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030.csv
-
-  load_name: ES PT0
-  load_params:
-    bus: ES PT0
-    # carrier: electricity
+#   link_name: ES PT0 ic
+#   link_params:
+#     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+#     bus1: ES PT0
+#     carrier: DC
+#     p_nom: 2000 
+#     p_nom_extendable: False
+#     length: 100 # random
+#     efficiency: 1  
+#     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+#     lifetime: inf ### No afecta a cómo se calculan los costes
+#     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+#     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+#     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
 
 
 
+# ES PT1:
 
-ES PT1:
+#   bus_name: ES PT1
+#   bus_params:
+#     x: -7.014351
+#     y: 38.901836
+#     carrier: AC
+#     v_nom: 380
 
-  bus_name: ES PT1
-  bus_params:
-    x: -7.014351
-    y: 38.901836
-    carrier: AC
-    v_nom: 380
+#   bus_2_name: ES PT1 AC_PT
+#   bus_2_params:
+#     x: 2.877482 
+#     y: 42.426598
+#     carrier: AC_PT
+#     v_nom: 1
 
-  bus_2_name: ES PT1 AC_PT
-  bus_2_params:
-    x: 2.877482 
-    y: 42.426598
-    carrier: AC_PT
-    v_nom: 1
-
-  link_name: ES PT1 ic
-  link_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-    bus1: ES PT1
-    carrier: DC
-    p_nom: 2000
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: inf ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-
-  link_2_name: ES PT1 AC_PT
-  link_2_params:
-    bus0: ES PT1
-    bus1: ES PT1 AC_PT
-    carrier: AC_PT
-    p_nom: 666
-    p_nom_extendable: True
-    efficiency: 1  
-    capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    
-  generator_name: ES PT1 gen
-  generator_params: 
-    carrier: biomass
-    bus: ES PT1
-    p_nom: 66.6
-    efficiency: 1   
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
-    p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030.csv
-
-  load_name: ES PT1
-  load_params:
-    bus: ES PT1
-    # carrier: electricity
-
-
+#   link_name: ES PT1 ic
+#   link_params:
+#     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+#     bus1: ES PT1
+#     carrier: DC
+#     p_nom: 2000
+#     p_nom_extendable: False
+#     length: 100 # random
+#     efficiency: 1  
+#     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+#     lifetime: inf ### No afecta a cómo se calculan los costes
+#     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+#     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+#     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
 
 
