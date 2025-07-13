@@ -22,6 +22,7 @@ pypsa_spain:
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
     enable: true
+    nc_ES_file: data_ES/interconnections/neighbouring_countries.yaml
     ic_ES_file: data_ES/interconnections/interconnections.yaml
   update_elec_capacities:
     enable: true
@@ -367,8 +368,12 @@ load:
 pypsa_eur:
   Bus:
   - AC
+  - AC_abroad   #####
   Link:
   - DC
+  - AC_abroad   #####
+  - "AC_abroad export"   #####
+  - "AC_abroad import"   #####
   Generator:
   - onwind
   # - offwind-ac   #####
@@ -379,6 +384,7 @@ pypsa_eur:
   - ror
   - nuclear
   - biomass   #####
+  - AC_abroad   #####
   StorageUnit:
   - PHS
   - hydro
@@ -925,7 +931,7 @@ costs:
 clustering:
   mode: administrative   ##### busmap
   administrative:
-    level: 3   ##### from 0 to 3 for NUTS-x
+    level: 1   ##### from 0 to 3 for NUTS-x
   focus_weights: false
   copperplate_regions: []
   build_bidding_zones:

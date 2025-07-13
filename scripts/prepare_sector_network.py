@@ -675,10 +675,11 @@ def remove_elec_base_techs(n: pypsa.Network, carriers_to_keep: dict) -> None:
 def remove_non_electric_buses(n):
     """
     Remove buses from pypsa-eur with carriers which are not AC buses.
+    ##### In PyPSA-Spain, keep also with "AC_abroad'
     """
-    if to_drop := list(n.buses.query("carrier not in ['AC', 'DC']").carrier.unique()):
+    if to_drop := list(n.buses.query("carrier not in ['AC', 'DC', 'AC_abroad']").carrier.unique()):   #####
         logger.info(f"Drop buses from PyPSA-Eur with carrier: {to_drop}")
-        n.buses = n.buses[n.buses.carrier.isin(["AC", "DC"])]
+        n.buses = n.buses[n.buses.carrier.isin(["AC", "DC", "AC_abroad"])]   #####
 
 
 def patch_electricity_network(n, costs, carriers_to_keep, profiles, landfall_lengths):
