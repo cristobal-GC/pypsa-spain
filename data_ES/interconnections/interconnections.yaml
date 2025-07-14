@@ -15,18 +15,19 @@
 
 ES FR0:
 
+  ##### border bus
   bus_name: ES FR0
   bus_params:
     x: 2.877482 
     y: 42.426598
-    carrier: AC_abroad
+    carrier: DC_ic
 
-
+  ##### link Spanish network - border bus (export)
   link_export_name: ES FR0 export
   link_export_params:
     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
     bus1: ES FR0
-    carrier: AC_abroad export
+    carrier: DC_ic export
     p_nom: 2800 
     p_nom_extendable: False
     length: 34.25 # ES side
@@ -37,12 +38,12 @@ ES FR0:
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-
+  ##### link Spanish network - border bus (import)
   link_import_name: ES FR0 import
   link_import_params:
     bus0: ES FR0
     bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-    carrier: AC_abroad import
+    carrier: DC_ic import
     p_nom: 2800 
     p_nom_extendable: False
     length: 34.25 # ES side
@@ -53,12 +54,12 @@ ES FR0:
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-
+  ##### link border bus . neighbouring country bus
   link_nc_name: FR0 FR
   link_nc_params:
     bus0: ES FR0   ##### Select the border bus
-    bus1: FR    ##### Select the country bus (defined at neighbouring_countries.yaml)
-    carrier: AC_abroad
+    bus1: FR    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
+    carrier: DC_ic
     p_nom_extendable: True
     efficiency: 1
 
@@ -78,18 +79,19 @@ ES FR0:
 
 ES FR1:
 
+  ##### border bus
   bus_name: ES FR1
   bus_params:
     x: -2.858534 
     y: 43.364801
-    carrier: AC_abroad
+    carrier: DC_ic
 
-
+  ##### link Spanish network - border bus (export)
   link_export_name: ES FR1 export
   link_export_params:
     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
     bus1: ES FR1
-    carrier: AC_abroad export
+    carrier: DC_ic export
     p_nom: 2000 
     p_nom_extendable: False
     length: 200 # ES side
@@ -99,13 +101,13 @@ ES FR1:
     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    
-    
+
+  ##### link Spanish network - border bus (import)
   link_import_name: ES FR1 import
   link_import_params:
     bus0: ES FR1
     bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-    carrier: AC_abroad import
+    carrier: DC_ic import
     p_nom: 2000 
     p_nom_extendable: False
     length: 200 # ES side
@@ -116,20 +118,17 @@ ES FR1:
     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-
+  ##### link border bus . neighbouring country bus
   link_nc_name: FR1 FR
   link_nc_params:
     bus0: ES FR1   ##### Select the border bus
-    bus1: FR    ##### Select the country bus (defined at neighbouring_countries.yaml)
-    carrier: AC_abroad
+    bus1: FR    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
+    carrier: DC_ic
     p_nom_extendable: True
     efficiency: 1
 
 
 ########## Además, hay dos proyectos más a través de los Pirineos para 2030, en fase de diseño (por Navarra y Aragón)
-
-
-
 
 
 
@@ -143,78 +142,113 @@ ES FR1:
 #	Brovales (centro-sur)
 #	Puebla de Guzmán (sur)
 #
-# Aquí se simplifica asumiendo 4000 MW, en dos interconexiones, una al norte y otra al sur, con 2000 MW cada una (actualmente se tiene una capacidad de exportación total de 3600 MW, y de importación de 2880 MW. El PNIEC asume exportación 4200 MW e importación 3500 MW).
+# Aquí se simplifica asumiendo lo mismo que el PNIEC (exportación 4200 MW e importación 3500 MW) dividido en dos interconexiones, una al norte y otra al sur. Actualmente se tiene una capacidad de exportación total de 3600 MW, y de importación de 2880 MW.
 
 
 
 ########## Interconnection ES-PT0
 
 
+ES PT0:
 
-# ES PT0:
+  ##### border bus
+  bus_name: ES PT0
+  bus_params:
+    x: -6.652149
+    y: 41.223112
+    carrier: DC_ic
 
-#   bus_name: ES PT0
-#   bus_params:
-#     x: -6.652149
-#     y: 41.223112
-#     carrier: AC
-#     v_nom: 380
-    
-#   bus_2_name: ES PT0 AC_PT
-#   bus_2_params:
-#     x: 2.877482 
-#     y: 42.426598
-#     carrier: AC_PT
-#     v_nom: 1
+  ##### link Spanish network - border bus (export)
+  link_export_name: ES PT0 export
+  link_export_params:
+    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1: ES PT0
+    carrier: DC_ic export
+    p_nom: 2100 
+    p_nom_extendable: False
+    length: 100 # random
+    efficiency: 1  
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    lifetime: 50 ### No afecta a cómo se calculan los costes
+    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-#   link_name: ES PT0 ic
-#   link_params:
-#     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-#     bus1: ES PT0
-#     carrier: DC
-#     p_nom: 2000 
-#     p_nom_extendable: False
-#     length: 100 # random
-#     efficiency: 1  
-#     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-#     lifetime: inf ### No afecta a cómo se calculan los costes
-#     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-#     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-#     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  ##### link Spanish network - border bus (import)
+  link_import_name: ES PT0 import
+  link_import_params:
+    bus0: ES PT0
+    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    carrier: DC_ic import
+    p_nom: 1750 
+    p_nom_extendable: False
+    length: 100 # random
+    efficiency: 1  
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    lifetime: 50 ### No afecta a cómo se calculan los costes
+    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+
+  ##### link border bus . neighbouring country bus
+  link_nc_name: PT0 PT
+  link_nc_params:
+    bus0: ES PT0   ##### Select the border bus
+    bus1: PT    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
+    carrier: DC_ic
+    p_nom_extendable: True
+    efficiency: 1
 
 
 
+ES PT1:
 
-# ES PT1:
+  ##### border bus
+  bus_name: ES PT1
+  bus_params:
+    x: -7.014351
+    y: 38.901836
+    carrier: DC_ic
 
-#   bus_name: ES PT1
-#   bus_params:
-#     x: -7.014351
-#     y: 38.901836
-#     carrier: AC
-#     v_nom: 380
+  ##### link Spanish network - border bus (export)
+  link_export_name: ES PT1 export
+  link_export_params:
+    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1: ES PT1
+    carrier: DC_ic export
+    p_nom: 2100 
+    p_nom_extendable: False
+    length: 100 # random
+    efficiency: 1  
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    lifetime: 50 ### No afecta a cómo se calculan los costes
+    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-#   bus_2_name: ES PT1 AC_PT
-#   bus_2_params:
-#     x: 2.877482 
-#     y: 42.426598
-#     carrier: AC_PT
-#     v_nom: 1
+  ##### link Spanish network - border bus (import)
+  link_import_name: ES PT1 import
+  link_import_params:
+    bus0: ES PT1
+    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    carrier: DC_ic import
+    p_nom: 1750 
+    p_nom_extendable: False
+    length: 100 # random
+    efficiency: 1  
+    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
+    lifetime: 50 ### No afecta a cómo se calculan los costes
+    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
 
-#   link_name: ES PT1 ic
-#   link_params:
-#     bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
-#     bus1: ES PT1
-#     carrier: DC
-#     p_nom: 2000
-#     p_nom_extendable: False
-#     length: 100 # random
-#     efficiency: 1  
-#     # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-#     lifetime: inf ### No afecta a cómo se calculan los costes
-#     ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-#     ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-#     ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-
+  ##### link border bus . neighbouring country bus
+  link_nc_name: PT1 PT
+  link_nc_params:
+    bus0: ES PT1   ##### Select the border bus
+    bus1: PT    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
+    carrier: DC_ic
+    p_nom_extendable: True
+    efficiency: 1
 
 

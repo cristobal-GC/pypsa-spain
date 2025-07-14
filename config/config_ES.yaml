@@ -39,11 +39,11 @@ pypsa_spain:
   ISA_class:
     enable: true
     ISA_onwind:
-      grid_codes: [3, 4]
+      grid_codes: [4, 3]
     ISA_solar:
-      grid_codes: [3, 4]
+      grid_codes: [4, 3]
     ISA_solar_hsat:   
-      grid_codes: [3, 4]
+      grid_codes: [4, 3]
     ISA_offwind_float: False   ##### ISA is only for land
 
 
@@ -368,12 +368,12 @@ load:
 pypsa_eur:
   Bus:
   - AC
-  - AC_abroad   #####
+  - DC_ic   ##### For Spanish interconnections
   Link:
   - DC
-  - AC_abroad   #####
-  - "AC_abroad export"   #####
-  - "AC_abroad import"   #####
+  - DC_ic   #####
+  - "DC_ic export"   ##### For Spanish interconnections
+  - "DC_ic import"   ##### For Spanish interconnections
   Generator:
   - onwind
   # - offwind-ac   #####
@@ -384,7 +384,7 @@ pypsa_eur:
   - ror
   - nuclear
   - biomass   #####
-  - AC_abroad   #####
+  - DC_ic   ##### For Spanish interconnections
   StorageUnit:
   - PHS
   - hydro

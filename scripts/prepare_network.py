@@ -455,10 +455,10 @@ if __name__ == "__main__":
 
     if interconnections['enable']:
 
-        ##### Add AC_abroad carrier, to differentiate with AC
-        n.add("Carrier", name='AC_abroad', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad')
-        n.add("Carrier", name='AC_abroad export', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad export')
-        n.add("Carrier", name='AC_abroad import', color=n.carriers.at['AC', 'color'], nice_name='AC_abroad import')
+        ##### Add DC_ic carrier, to differentiate with AC
+        n.add("Carrier", name='DC_ic', color=n.carriers.at['AC', 'color'], nice_name='DC_ic')
+        n.add("Carrier", name='DC_ic export', color=n.carriers.at['AC', 'color'], nice_name='DC_ic export')
+        n.add("Carrier", name='DC_ic import', color=n.carriers.at['AC', 'color'], nice_name='DC_ic import')
 
 
         ##### Attach neighbouring countries

@@ -1,5 +1,5 @@
 
-########## FR
+########## France
 
 FR:
 
@@ -7,13 +7,12 @@ FR:
   bus_params:
     x: 1.58 
     y: 44.5
-    carrier: AC_abroad
+    carrier: DC_ic
 #    v_nom: 10
-
 
   generator_name: FR_gen
   generator_params: 
-    carrier: AC_abroad
+    carrier: DC_ic
     bus: FR
     efficiency: 1
     capital_cost: 0
@@ -22,7 +21,6 @@ FR:
     p_nom_extendable: True
   generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030.csv
 
-
   load_name: FR_load
   load_params:
     bus: FR
@@ -30,13 +28,33 @@ FR:
 
 
 
-########## PT
 
-#PT:
 
-#  bus_name: PT
-#  bus_params:
-#    x: -8.30
-#    y: 39.81
-#    carrier: AC_abroad
-# #    v_nom: 10
+########## Portugal
+
+PT:
+
+  bus_name: PT
+  bus_params:
+    x: -8.30
+    y: 39.81
+    carrier: DC_ic
+#    v_nom: 10
+
+  generator_name: PT_gen
+  generator_params: 
+    carrier: DC_ic
+    bus: PT
+    efficiency: 1
+    capital_cost: 0
+    p_nom_max: inf
+    p_max_pu: 1
+    p_nom_extendable: True
+  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030.csv
+
+
+  load_name: PT_load
+  load_params:
+    bus: PT
+    # carrier: electricity ##### NO HAY QUE AÑADIR ESTE CARRIER, en add_electricity se comenta para que no se añada
+

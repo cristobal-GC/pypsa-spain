@@ -1,20 +1,16 @@
 ,Unit,Values,Description
 q2q_transform,,,
 -- enable,bool,"{true, false}","Q2Q transforms improve the estimation of the renewable profiles based on historical data. A repository and additional explanation an analyses can be found at the `Q2Q_repository <https://github.com/cristobal-GC/Q2Q_repository>`_"
--- onwind,-,str,Path of the file with the q2q transform for this carrier. See ``data_ES/q2q/``.
--- offwind-ac,,,
--- offwind-dc,,,
--- offwind-float
--- solar,-,str,Path of the file with the q2q transform for this carrier. See ``data_ES/q2q/``.
--- solar-hsat,,,
+-- {carrier},-,str,Path of the file with the q2q transform for this carrier. See ``data_ES/q2q/``.
 electricity_demand,,,
 -- enable,bool,"{true, false}","Allows to customise the electricity demand."
 -- annual_value, TWh,int/float,"Annual demand."
 -- profiles,-,str,Path of the file with the electricity demand profiles. See ``data_ES/electricity_demand/``.
 -- percentages,-,str,Path of the file with the electricity demand percentages. See ``data_ES/electricity_demand/``.
 interconnections,,,
--- enable,bool,"{true, false}","Allows to include user-defined interconnections with Portugal and France."
--- ic_ES_file,-,str,Path of the file with the configuration of the interconnections. See ``data_ES/interconnections/``.
+-- enable,bool,"{true, false}","Allows to include user-defined interconnections with neighbouring countries."
+-- nc_ES_file,-,str,Path of the file with the configuration of the neighbouring countries.
+-- ic_ES_file,-,str,Path of the file with the configuration of the interconnections.
 update_elec_capacities,,,
 -- enable,bool,"{true, false}","Allows to impose the installed capacity at NUTS 2 level."
 -- carriers_to_update,,,
@@ -24,7 +20,5 @@ costs_update,,,
 -- costs_update_file,,,
 ISA_class,,,
 -- enable,bool,"{true, false}","Allows to use the Spanish 'Indice de Sostenibilidad Ambiental' for solar and onwind land elegibility."
-ISA_onwind,,,
--- grid_codes,-,"{0,1,2,3,4}","Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
-ISA_solar,,,
--- grid_codes,-,"{0,1,2,3,4}","Level 0 means highest ambiental sensitivity, level 4 means lowest. Include always higher indices, e.g. to select areas with level 2, set {2, 3, 4}"
+ISA_{carrier},,,
+-- grid_codes,-,"{4,3,2,1,0}","Level 0 means highest ambiental sensitivity, level 4 means lowest. For example, to set sensitivity threshold 2, select {4, 3, 2}"
