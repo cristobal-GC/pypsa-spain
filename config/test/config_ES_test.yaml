@@ -22,14 +22,16 @@ pypsa_spain:
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
     enable: true
-    ic_ES_file: data_ES/interconnections/interconnections.yaml    
+    nc_ES_file: data_ES/interconnections/neighbouring_countries.yaml
+    ic_ES_file: data_ES/interconnections/interconnections.yaml
   update_elec_capacities:
     enable: true
     carriers_to_update:
+      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
-      nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv
-      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
+      # solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv   ##### Update either solar or solar-hsat
+      # nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv   ##### Do not update for future planning horizons (nuclear power is filtered to consider the Spanish nuclear decommissioning plan)
     method_increase: proportional # additional / proportional
   costs_update:
     enable: true
@@ -37,10 +39,12 @@ pypsa_spain:
   ISA_class:
     enable: true
     ISA_onwind:
-      grid_codes: [4]
+      grid_codes: [4, 3]
     ISA_solar:
-      grid_codes: [4]
-    ISA_offwind-float: False   ##### ISA is only for land
+      grid_codes: [4, 3]
+    ISA_solar_hsat:   
+      grid_codes: [4, 3]
+    ISA_offwind_float: False   ##### ISA is only for land
 
 
 
@@ -69,7 +73,7 @@ run:
     policy: false
     exclude: []
   shared_cutouts: true
-  use_shadow_directory: true # Set to false if problems regarding missing directories occur
+  use_shadow_directory: false
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#foresight
 foresight: overnight
@@ -141,7 +145,7 @@ electricity:
     H2: 168
 
   extendable_carriers:
-    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, OCGT, CCGT]
+    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar-hsat, offwind-ac, offwind-dc, OCGT]
     StorageUnit: [] # battery, H2
     Store: [battery, H2]
     Link: [] # H2 pipeline
@@ -150,8 +154,8 @@ electricity:
   custom_powerplants: false
   everywhere_powerplants: []
 
-  conventional_carriers: [nuclear, CCGT, biomass]   ##### [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
-  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, hydro]
+  conventional_carriers: [nuclear, CCGT, biomass]   ##### [oil, OCGT, coal, lignite, geothermal]
+  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar-hsat, offwind-ac, offwind-dc]
 
   estimate_renewable_capacities:
     enable: true
@@ -186,6 +190,8 @@ atlite:
       dx: 0.3
       dy: 0.3
       time: ['2013', '2013']
+      # features: [] 
+      # sarah_dir: ""
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#renewable
 renewable:
@@ -219,8 +225,8 @@ renewable:
       add_cutout_windspeed: true
     resource_classes: 1
     # ScholzPhd Tab 4.3.1: 10MW/km^2
-    capacity_per_sqkm: 2   #####
-    # correction_factor: 0.8855   #####
+    capacity_per_sqkm: 10   #####
+    correction_factor: 0.8855   #####
     # proxy for wake losses
     # from 10.1016/j.energy.2018.08.153
     # until done more rigorously in #153
@@ -248,6 +254,22 @@ renewable:
     natura: false   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'   # true
     excluder_resolution: 100
     clip_p_max_pu: 1.e-2
+  solar-hsat:
+    cutout: default
+    resource:
+      method: pv
+      panel: CSi
+      orientation:
+        slope: 35.
+        azimuth: 180.
+      tracking: horizontal
+    resource_classes: 1
+    capacity_per_sqkm: 10 # 15% higher land usage acc. to NREL
+    corine: false   #####  Using the Spanish 'Indice de Sensibilidad Ambiental' [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 26, 31, 32]
+    luisa: false # [1111, 1121, 1122, 1123, 1130, 1210, 1221, 1222, 1230, 1241, 1242, 1310, 1320, 1330, 1410, 1421, 1422, 2110, 2120, 2130, 2210, 2220, 2230, 2310, 2410, 2420, 3210, 3320, 3330]
+    natura: false   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'
+    excluder_resolution: 100
+    clip_p_max_pu: 1.e-2
   hydro:
     cutout: default
     carriers: [ror, PHS, hydro]
@@ -258,7 +280,7 @@ renewable:
     clip_min_inflow: 1.0
     eia_norm_year: false
     eia_correct_by_capacity: false
-    eia_approximate_missing: false    
+    eia_approximate_missing: false
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#conventional
 conventional:
@@ -293,6 +315,7 @@ lines:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#links
 links:
   p_max_pu: 1.0
+  p_min_pu: -1.0
   p_nom_max: .inf
   max_extension: 30000 #MW
   length_factor: 1.25
@@ -324,8 +347,10 @@ transformers:
 
 # docs-load in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#load
 load:
-  interpolate_limit: 3
-  time_shift_for_large_gaps: 1w
+  fill_gaps:
+    enable: true
+    interpolate_limit: 3
+    time_shift_for_large_gaps: 1w
   manual_adjustments: true # false
   scaling_factor: 1.0
   fixed_year: false # false or year (e.g. 2013)
@@ -343,8 +368,12 @@ load:
 pypsa_eur:
   Bus:
   - AC
+  - DC_ic   ##### For Spanish interconnections
   Link:
   - DC
+  - DC_ic   #####
+  - "DC_ic export"   ##### For Spanish interconnections
+  - "DC_ic import"   ##### For Spanish interconnections
   Generator:
   - onwind
   # - offwind-ac   #####
@@ -355,6 +384,7 @@ pypsa_eur:
   - ror
   - nuclear
   - biomass   #####
+  - DC_ic   ##### For Spanish interconnections
   StorageUnit:
   - PHS
   - hydro
@@ -471,20 +501,37 @@ sector:
       relative_annual_temperature_reduction: 0.01
     ptes:
       dynamic_capacity: true
+      supplemental_heating:
+        enable: false
+        booster_heat_pump: false
       max_top_temperature: 90
       min_bottom_temperature: 35
+    ates:
+      enable: false
+      suitable_aquifer_types: ['Highly productive porous aquifers']
+      aquifer_volumetric_heat_capacity: 2600
+      fraction_of_aquifer_area_available: 0.2
+      effective_screen_length: 20
+      dh_area_buffer: 1000
+      capex_as_fraction_of_geothermal_heat_source: 0.75
+      recovery_factor: 0.6
+      marginal_cost_charger: 0.035
+      ignore_missing_regions: false
     heat_source_cooling: 6 #K
     heat_pump_cop_approximation:
       refrigerant: ammonia
       heat_exchanger_pinch_point_temperature_difference: 5 #K
       isentropic_compressor_efficiency: 0.8
       heat_loss: 0.0
+      min_delta_t_lift: 10 #K
     limited_heat_sources:
       geothermal:
         constant_temperature_celsius: 65
         ignore_missing_regions: false
     direct_utilisation_heat_sources:
     - geothermal
+    temperature_limited_stores:
+    - ptes
   heat_pump_sources:
     urban central:
     - air
@@ -884,8 +931,12 @@ costs:
 clustering:
   mode: administrative   ##### busmap
   administrative:
-    level: 3   ##### from 0 to 3 for NUTS-x
+    level: 2   ##### from 0 to 3 for NUTS-x
   focus_weights: false
+  copperplate_regions: []
+  build_bidding_zones:
+    remove_islands: false
+    aggregate_to_tyndp: false
   simplify_network:
     to_substations: false
     remove_stubs: true
@@ -950,10 +1001,11 @@ solving:
       fractional_last_unit_size: false
     keep_files: false
     model_kwargs:
-      solver_dir: "/tmp"
+      solver_dir: ""
 
   agg_p_nom_limits:
     agg_offwind: false
+    agg_solar: false
     include_existing: false
     file: data/agg_p_nom_minmax.csv
 
