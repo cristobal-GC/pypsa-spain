@@ -14,7 +14,6 @@ interconnections,,,
 update_elec_capacities,,,
 -- enable,bool,"{true, false}","Allows to impose the installed capacity at NUTS 2 level."
 -- carriers_to_update,,,
--- method_increase,,,
 costs_update,,,
 -- enable,bool,"{true, false}","Allows to introduce modifications in the cost file."
 -- costs_update_file,,,

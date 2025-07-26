@@ -14,6 +14,8 @@ Upcoming Release
 
 * Land elegibility based on the Spanish Environmental Sensitivity Index (ISA) (see details `here <https://pypsa-spain.readthedocs.io/en/latest/ISA_index.html>`__).
 
+* Functionality ``update_elec_capacities`` has been improved to work fine with a reduced number of clusters.
+  
 
 
 PyPSA-Spain v2025.04.0 (23th April 2025)
