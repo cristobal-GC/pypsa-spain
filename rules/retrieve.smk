@@ -106,7 +106,7 @@ if config["enable"]["retrieve"]:
 
 
 ##### Retrieve Spanish "Indice de Sensibilidad Ambiental" (ISA)
-if config["pypsa_spain"]["ISA_class"]["enable"]:
+if config["enable"]["retrieve"]:
 
     rule retrieve_ISA:
         input:
