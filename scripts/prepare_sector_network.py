@@ -21,6 +21,8 @@ from networkx.algorithms.connectivity.edge_augmentation import k_edge_augmentati
 from pypsa.geo import haversine_pts
 from scipy.stats import beta
 
+import yaml   ##### Required in PyPSA-Spain
+
 from scripts._helpers import (
     configure_logging,
     get,
@@ -6132,6 +6134,49 @@ def add_import_options(
         )
 
 
+
+
+
+######################################## PyPSA-Spain
+#
+# Functions to add H2 demand in H2 valleys
+#
+
+def attach_H2_valley_demands(n, H2_valley_demands_dic):
+
+    for kk, vv in H2_valley_demands_dic.items():
+
+        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 demand for H2 vallye {kk}')
+
+
+        ########## Identify the closest bus:
+        ### Select candidates: buses in peninsular Spain with carrier H2
+        candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
+        # But remove those with 'FR' and 'PT' in the search
+        if candidates.empty:
+            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        ### Compute distances
+        x0 = vv['valley_params']['x']
+        y0 = vv['valley_params']['y']
+        distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
+
+        ### Find closest bus
+        closest_bus_index = distances.idxmin()
+        vv['load_params']['bus'] = closest_bus_index
+
+
+        ########## Add H2 load
+        n.add('Load', vv['load_name'], **vv['load_params'])
+        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / 8760  # 1e6 tH2 ~ 33.33e6 MWh
+#
+#
+########################################
+
+
+
+
+
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from scripts._helpers import mock_snakemake
@@ -6239,6 +6284,28 @@ if __name__ == "__main__":
         spatial=spatial,
         options=options,
     )
+
+
+
+    ################################################## PyPSA-Spain
+    #
+    ##### Add H2 valley demands
+    #
+    H2_valley_demands = snakemake.params.H2_valley_demands
+
+    if H2_valley_demands['enable']:
+
+        ## read file data
+        file = H2_valley_demands['file']
+        with open(file, 'r') as archivo:
+            H2_valley_demands_dic = yaml.safe_load(archivo)
+
+        attach_H2_valley_demands(n, H2_valley_demands_dic)
+    #
+    #
+    ########################################
+
+
 
     if options["transport"]:
         add_land_transport(

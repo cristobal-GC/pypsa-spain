@@ -334,8 +334,8 @@ def attach_interconnections_ES(n, ic_dic):
         if candidates.empty:
             candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='AC'), ['x', 'y']]
         ### Compute distances
-        x0 = ic_dic[kk]['bus_params']['x']
-        y0 = ic_dic[kk]['bus_params']['y']
+        x0 = vv['bus_params']['x']
+        y0 = vv['bus_params']['y']
         distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
 
         ### Find closest bus, and assign it to the correct side of the link
@@ -346,7 +346,7 @@ def attach_interconnections_ES(n, ic_dic):
 
         ########## Add border bus
         n.add('Bus', vv['bus_name'], **vv['bus_params'])
-        n.buses.loc[ic_dic[kk]['bus_name'], 'country'] = 'ES'  ### Mirar al final si esto da problemas
+        n.buses.loc[vv['bus_name'], 'country'] = 'ES'  ### Mirar al final si esto da problemas
 
 
         ########## Add links between Spanish network and border bus (export and import), and set some features

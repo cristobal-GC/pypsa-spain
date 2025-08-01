@@ -17,7 +17,7 @@ pypsa_spain:
     solar-hsat: ''
   electricity_demand:
     enable: true
-    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
+    annual_value: 0.000344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS3_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
@@ -64,7 +64,7 @@ remote:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#run
 run:
   prefix: ""   #####
-  name: ""   #####
+  name: "case_with_H2_network"   #####
   scenarios:
     enable: false
     file: config/scenarios.yaml
@@ -82,7 +82,7 @@ foresight: overnight
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
   clusters:
-  - 'adm'   ##### Recommended for Spain: NUTS3 / 35-50 nodes
+  - 8
   opts:
   - ''
   sector_opts:
@@ -108,7 +108,7 @@ enable:
   retrieve_databundle: true
   retrieve_cost_data: true
   build_cutout: false
-  retrieve_cutout: true   ##### if possible, disable if there is a path with available cutouts (set the path at 'atlite' module)
+  retrieve_cutout: false   ##### true   ##### if possible, disable if there is a path with available cutouts (set the path at 'atlite' module)
   drop_leap_day: true
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#co2-budget
@@ -462,7 +462,7 @@ existing_capacities:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#sector
 sector:
-  transport: false   #####
+  transport: false   ##### false   #####
   heating: false   #####
   biomass: false   #####
   industry: false   #####
@@ -560,29 +560,29 @@ sector:
   bev_avail_mean: 0.8
   v2g: true
   land_transport_fuel_cell_share:
-    2020: 0
-    2025: 0
-    2030: 0
-    2035: 0
-    2040: 0
-    2045: 0
-    2050: 0
+    2020: 1   #####
+    2025: 1   #####
+    2030: 1   #####
+    2035: 1   #####
+    2040: 1   #####
+    2045: 1   #####
+    2050: 1   #####
   land_transport_electric_share:
-    2020: 0
-    2025: 0.05
-    2030: 0.2
-    2035: 0.45
-    2040: 0.7
-    2045: 0.85
-    2050: 1
+    2020: 0   #####
+    2025: 0   #####
+    2030: 0   #####
+    2035: 0   #####
+    2040: 0   #####
+    2045: 0   #####
+    2050: 0   #####
   land_transport_ice_share:
-    2020: 1
-    2025: 0.95
-    2030: 0.8
-    2035: 0.55
-    2040: 0.3
-    2045: 0.15
-    2050: 0
+    2020: 0   #####
+    2025: 0   #####
+    2030: 0   #####
+    2035: 0   #####
+    2040: 0   #####
+    2045: 0   #####
+    2050: 0   #####
   transport_electric_efficiency: 53.19 # 1 MWh_el = 53.19*100 km
   transport_fuel_cell_efficiency: 30.003 # 1 MWh_H2 = 30.003*100 km
   transport_ice_efficiency: 16.0712 # 1 MWh_oil = 16.0712 * 100 km
@@ -747,7 +747,7 @@ sector:
       compression_per_1000km: 0.01
     electricity distribution grid:
       efficiency_static: 0.97
-  H2_network: false   ##### true
+  H2_network: true   ##### false   ##### true
   gas_network: false   ##### true
   H2_retrofit: false
   H2_retrofit_capacity_per_CH4: 0.6
@@ -931,7 +931,7 @@ costs:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
 clustering:
-  mode: administrative   ##### busmap
+  mode: busmap   ##### administrative   ##### busmap
   administrative:
     level: 2   ##### from 0 to 3 for NUTS-x
   focus_weights: false

@@ -25,7 +25,7 @@ ES FR0:
   ##### link Spanish network - border bus (export)
   link_export_name: ES FR0 export
   link_export_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
     bus1: ES FR0
     carrier: DC_ic export
     p_nom: 2800 
@@ -42,7 +42,7 @@ ES FR0:
   link_import_name: ES FR0 import
   link_import_params:
     bus0: ES FR0
-    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
     carrier: DC_ic import
     p_nom: 2800 
     p_nom_extendable: False
@@ -89,7 +89,7 @@ ES FR1:
   ##### link Spanish network - border bus (export)
   link_export_name: ES FR1 export
   link_export_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
     bus1: ES FR1
     carrier: DC_ic export
     p_nom: 2000 
@@ -106,7 +106,7 @@ ES FR1:
   link_import_name: ES FR1 import
   link_import_params:
     bus0: ES FR1
-    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
     carrier: DC_ic import
     p_nom: 2000 
     p_nom_extendable: False
@@ -161,7 +161,7 @@ ES PT0:
   ##### link Spanish network - border bus (export)
   link_export_name: ES PT0 export
   link_export_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
     bus1: ES PT0
     carrier: DC_ic export
     p_nom: 2100 
@@ -178,7 +178,7 @@ ES PT0:
   link_import_name: ES PT0 import
   link_import_params:
     bus0: ES PT0
-    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
     carrier: DC_ic import
     p_nom: 1750 
     p_nom_extendable: False
@@ -213,7 +213,7 @@ ES PT1:
   ##### link Spanish network - border bus (export)
   link_export_name: ES PT1 export
   link_export_params:
-    bus0:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
     bus1: ES PT1
     carrier: DC_ic export
     p_nom: 2100 
@@ -230,7 +230,7 @@ ES PT1:
   link_import_name: ES PT1 import
   link_import_params:
     bus0: ES PT1
-    bus1:        ### to be determined in <add_extra_components.py> (the closest one from the network)
+    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
     carrier: DC_ic import
     p_nom: 1750 
     p_nom_extendable: False

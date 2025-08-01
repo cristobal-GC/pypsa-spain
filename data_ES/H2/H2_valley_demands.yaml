@@ -1,0 +1,28 @@
+
+H2 valley 0:
+
+  valley_name: H2_valley_0
+  valley_params:
+    x: -4.0 
+    y: 41.3
+    demand: 0.4   ### H2 annual demand [1e6 tons ~ 33.33 TWh]
+
+  load_name: H2_valley_0_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 1:
+
+  valley_name: H2_valley_1
+  valley_params:
+    x: -2.7 
+    y: 38.0
+    demand: 0.2   ### H2 annual demand [1e6 tons ~ 33.33 TWh]
+
+  load_name: H2_valley_1_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
