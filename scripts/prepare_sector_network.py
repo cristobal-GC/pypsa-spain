@@ -6146,7 +6146,7 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
 
     for kk, vv in H2_valley_demands_dic.items():
 
-        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 demand for H2 vallye {kk}')
+        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 demand for {kk}')
 
 
         ########## Identify the closest bus:
@@ -6292,6 +6292,9 @@ if __name__ == "__main__":
     ##### Add H2 valley demands
     #
     H2_valley_demands = snakemake.params.H2_valley_demands
+
+    # Sanitize locations, because H2 buses still have no coordinates
+    sanitize_locations(n)
 
     if H2_valley_demands['enable']:
 
