@@ -571,6 +571,8 @@ plotting:
     DC-DC: "#8a1caf"
     DC link: "#8a1caf"
     DC_ic: "#8a1caf"   ##### For Spanish ics
+    DC_ic export:  "#9B30FF"   ##### For Spanish ics
+    DC_ic import:  "#A020F0"   ##### For Spanish ics
     load: "#dd2e23"
     waste CHP: '#e3d37d'
     waste CHP CC: '#e3d3ff'
