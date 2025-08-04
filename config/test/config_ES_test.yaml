@@ -27,12 +27,9 @@ pypsa_spain:
   update_elec_capacities:
     enable: true
     carriers_to_update:
-      CCGT: data_ES/esios/esios_CCGT_capacity_2023.csv
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
       # solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv   ##### Update either solar or solar-hsat
-      # nuclear: data_ES/esios/esios_nuclear_capacity_2023.csv   ##### Do not update for future planning horizons (nuclear power is filtered to consider the Spanish nuclear decommissioning plan)
-    method_increase: proportional # additional / proportional
   costs_update:
     enable: true
     costs_update_file: 'data_ES/costs/costs_updates.csv'
@@ -45,6 +42,9 @@ pypsa_spain:
     ISA_solar_hsat:   
       grid_codes: [4, 3]
     ISA_offwind_float: False   ##### ISA is only for land
+  H2_valley_demands:
+    enable: true
+    file: data_ES/H2/H2_valley_demands.yaml
 
 
 
@@ -747,7 +747,7 @@ sector:
       compression_per_1000km: 0.01
     electricity distribution grid:
       efficiency_static: 0.97
-  H2_network: false   ##### true
+  H2_network: true
   gas_network: false   ##### true
   H2_retrofit: false
   H2_retrofit_capacity_per_CH4: 0.6
