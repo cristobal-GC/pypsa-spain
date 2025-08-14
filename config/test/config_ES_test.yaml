@@ -81,23 +81,21 @@ foresight: overnight
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#scenario
 # Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
 scenario:
-  clusters:
-  - 'adm'   ##### Recommended for Spain: NUTS3 / 35-50 nodes
+  clusters:   ##### Recommended for Spain: NUTS3 / 35-50 nodes
+  - 8
   opts:
   - ''
   sector_opts:
   - ''
-  planning_horizons:
-  # - 2020
-  - 2030    #####
-  # - 2040
-  # - 2050
+  planning_horizons:    #####
+  - 2030
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#countries
-countries: ['ES']   #####
+countries:   #####
+- ES
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
-snapshots:
+snapshots:   #####
   start: "2023-01-01"
   end: "2024-01-01"
   inclusive: 'left'
@@ -145,7 +143,7 @@ electricity:
     H2: 168
 
   extendable_carriers:
-    Generator: [solar, onwind, offwind-float, CCGT]   ##### [solar-hsat, offwind-ac, offwind-dc, OCGT]
+    Generator: [solar, onwind, offwind-float, CCGT] # [solar-hsat, offwind-ac, offwind-dc, OCGT]   #####
     StorageUnit: [] # battery, H2
     Store: [battery, H2]
     Link: [] # H2 pipeline
@@ -154,8 +152,8 @@ electricity:
   custom_powerplants: false
   everywhere_powerplants: []
 
-  conventional_carriers: [nuclear, CCGT, biomass]   ##### [oil, OCGT, coal, lignite, geothermal]
-  renewable_carriers: [solar, onwind, offwind-float, hydro]   ##### [solar-hsat, offwind-ac, offwind-dc]
+  conventional_carriers: [nuclear, CCGT, biomass] # [oil, OCGT, coal, lignite, geothermal]   #####
+  renewable_carriers: [solar, onwind, offwind-float, hydro] # [solar-hsat, offwind-ac, offwind-dc]   ##### 
 
   estimate_renewable_capacities:
     enable: true
@@ -163,7 +161,7 @@ electricity:
     year: 2020
     expansion_limit: false
     technology_mapping:
-      Offshore: offwind-float   #####
+      Offshore: offwind-float # offwind-ac   #####
       Onshore: onwind
       PV: solar
 
@@ -177,7 +175,7 @@ electricity:
 atlite:
   cutout_directory: cutouts   ##### if possible, define a path with available cutouts (also, disable retrieve_cutout at 'enable' module)
   default_cutout: europe-2023-sarah3-era5   #####
-  nprocesses: 8
+  nprocesses: 16
   show_progress: false
   cutouts:
     # use 'base' to determine geographical bounds and time span from config
@@ -199,12 +197,12 @@ renewable:
     cutout: default
     resource:
       method: wind
-      turbine: Vestas_V112_3MW   #####
+      turbine: Vestas_V112_3MW
       smooth: false
       add_cutout_windspeed: true
     resource_classes: 1
-    capacity_per_sqkm: 2.5   ##### Tecnology density: 10 MW/km2 , occupation factor of elegible land: 25%
-    correction_factor: 1   ##### 0.93
+    capacity_per_sqkm: 2.5 # 3   ##### Tecnology density: 10 MW/km2 , occupation factor of elegible land: 25%
+    correction_factor: 1 # 0.93   #####
     corine: false   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'
       # grid_codes: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32]
       # distance: 1000
@@ -220,12 +218,12 @@ renewable:
     cutout: default
     resource:
       method: wind
-      turbine: NREL_ReferenceTurbine_2020ATB_7MW   ##### NREL_ReferenceTurbine_5MW_offshore
+      turbine: NREL_ReferenceTurbine_2020ATB_12MW_offshore   #####
       smooth: false
       add_cutout_windspeed: true
     resource_classes: 1
     # ScholzPhd Tab 4.3.1: 10MW/km^2
-    capacity_per_sqkm: 10   #####
+    capacity_per_sqkm: 10 # 2   #####
     correction_factor: 0.8855   #####
     # proxy for wake losses
     # from 10.1016/j.energy.2018.08.153
@@ -353,11 +351,11 @@ load:
     time_shift_for_large_gaps: 1w
   manual_adjustments: true
   scaling_factor: 1.0
-  fixed_year: false # false or year (e.g. 2013)
+  fixed_year: false
   supplement_synthetic: true
   distribution_key:
-    gdp: 0.18   ##### 0.6
-    population: 0.82   ##### 0.4
+    gdp: 0.18 # 0.6   #####
+    population: 0.82 # 0.4   #####
 
 # docs
 # TODO: PyPSA-Eur merge issue in prepare_sector_network.py
@@ -376,10 +374,10 @@ pypsa_eur:
   - "DC_ic import"   ##### For Spanish interconnections
   Generator:
   - onwind
-  # - offwind-ac   #####
-  # - offwind-dc   #####
+  - offwind-ac
+  - offwind-dc
   - offwind-float
-  # - solar-hsat   #####
+  - solar-hsat
   - solar
   - ror
   - nuclear
@@ -462,13 +460,13 @@ existing_capacities:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#sector
 sector:
-  transport: false   #####
-  heating: false   #####
-  biomass: false   #####
-  industry: false   #####
-  shipping: false   #####
-  aviation: false   #####
-  agriculture: false   #####
+  transport: false # true   #####
+  heating: false # true   #####
+  biomass: false # true   #####
+  industry: false # true   #####
+  shipping: false # true   #####
+  aviation: false # true   #####
+  agriculture: false # true   #####
   fossil_fuels: true   ##### This is important to feed the CCGT links with gas
   district_heating:
     potential: 0.6
@@ -641,9 +639,6 @@ sector:
     tax_weighting: false
     construction_index: true
   tes: true
-  tes_tau:
-    decentral: 3
-    central: 180
   boilers: true
   resistive_heaters: true
   oil_boilers: false
@@ -659,9 +654,9 @@ sector:
     micro_chp: false # Only gas is used for micro_chp
   solar_thermal: true
   solar_cf_correction: 0.788457  # =  >>> 1/1.2683
-  methanation: false   ##### This creates Sabatier links
+  methanation: false # true   #####
   coal_cc: false
-  dac: false   #####
+  dac: false # true   #####
   co2_vent: false
   heat_vent:
     urban central: true
@@ -670,13 +665,13 @@ sector:
   marginal_cost_heat_vent: 0.02
   allam_cycle_gas: false
   hydrogen_fuel_cell: true
-  hydrogen_turbine: false
-  SMR: false   ##### This adds a link with 'p3', which used to break 'make_summary.py' (?)
-  SMR_cc: false   ##### This adds a link with 'p3', which used to break 'make_summary.py' (?)
-  regional_oil_demand: false
+  hydrogen_turbine: true
+  SMR: false # true   #####
+  SMR_cc: false # true   #####
+  regional_oil_demand: false # true   #####
   regional_coal_demand: false
   regional_co2_sequestration_potential:
-    enable: false
+    enable: false # true   #####
     attribute:
     - conservative estimate Mt
     - conservative estimate GAS Mt
@@ -689,22 +684,22 @@ sector:
   co2_sequestration_potential:
     2020: 0
     2025: 0
-    2030: 0   ##### 40
-    2035: 0   ##### 100
-    2040: 0   ##### 180
-    2045: 0   ##### 250
-    2050: 0   ##### 250
-  co2_sequestration_cost: 9999   ##### 30
+    2030: 0 # 40   #####
+    2035: 0 # 100   #####
+    2040: 0 # 180   #####
+    2045: 0 # 250   #####
+    2050: 0 # 250   #####
+  co2_sequestration_cost: 9999 # 30   #####
   co2_sequestration_lifetime: 50
-  co2_spatial: false
-  co2_network: false
+  co2_spatial: false # true   #####
+  co2_network: false # true   #####
   co2_network_cost_factor: 1
   cc_fraction: 0.9
   hydrogen_underground_storage: true
   hydrogen_underground_storage_locations:
-  - onshore  # more than 50 km from sea   #####
-  - nearshore    # within 50 km of sea
-  - offshore   #####
+  - onshore    # more than 50 km from sea
+  - nearshore      # within 50 km of sea
+    # - offshore
   methanol:
     regional_methanol_demand: false
     methanol_reforming: false
@@ -713,11 +708,11 @@ sector:
     methanol_to_power:
       ccgt: false
       ccgt_cc: false
-      ocgt: false
+      ocgt: false # true   #####
       allam: false
-    biomass_to_methanol: false
+    biomass_to_methanol: false # true   #####
     biomass_to_methanol_cc: false
-  ammonia: false
+  ammonia: false # true   #####
   min_part_load_fischer_tropsch: 0.5
   min_part_load_methanolisation: 0.3
   min_part_load_methanation: 0.3
@@ -728,7 +723,7 @@ sector:
   use_fuel_cell_waste_heat: 1
   use_electrolysis_waste_heat: 0.25
   electricity_transmission_grid: true
-  electricity_distribution_grid: false   #####
+  electricity_distribution_grid: false # true   #####
   electricity_grid_connection: true
   transmission_efficiency:
     enable:
@@ -748,22 +743,22 @@ sector:
     electricity distribution grid:
       efficiency_static: 0.97
   H2_network: true
-  gas_network: false   ##### true
+  gas_network: false # true   #####
   H2_retrofit: false
   H2_retrofit_capacity_per_CH4: 0.6
   gas_network_connectivity_upgrade: 1
-  gas_distribution_grid: false   ##### true
+  gas_distribution_grid: false # true   #####
   gas_distribution_grid_cost_factor: 1.0
-  biomass_spatial: false   ##### true
+  biomass_spatial: false # true   #####
   biomass_transport: false
-  biogas_upgrading: false   ##### true
+  biogas_upgrading: false # true   #####
   biogas_upgrading_cc: false
   conventional_generation:   ##### Conversion from generator to link @ "prepare_sector_network.py"
-    # OCGT: gas   #####
-    CCGT: gas   #####
-  biomass_to_liquid: false   ##### true
+    OCGT: gas
+    CCGT: gas
+  biomass_to_liquid: false # true   #####
   biomass_to_liquid_cc: false
-  electrobiofuels: false   ##### true
+  electrobiofuels: false # true   #####
   biosng: false
   biosng_cc: false
   bioH2: false
@@ -898,8 +893,8 @@ industry:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#costs
 costs:
-  year: 2030   #####
-  version: v0.13.2
+  year: 2030 # 2050   #####
+  version: v0.13.3
   social_discountrate: 0.02
   fill_values:
     FOM: 0
@@ -910,6 +905,7 @@ costs:
     lifetime: 25
     "CO2 intensity": 0
     "discount rate": 0.07
+    "standing losses": 0
   overwrites: {}
   marginal_cost:
     solar: 0.01
@@ -931,7 +927,7 @@ costs:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
 clustering:
-  mode: administrative   ##### busmap
+  mode: busmap   ##### administrative
   administrative:
     level: 2   ##### from 0 to 3 for NUTS-x
   focus_weights: false
@@ -1018,8 +1014,8 @@ solving:
     SAFE: false
 
   solver:
-    name: cbc   ##### gurobi
-    options: cbc-default   ##### gurobi-default
+    name: cbc # gurobi   #####
+    options: cbc-default # gurobi-default   #####
 
   solver_options:
     highs-default:
@@ -1041,7 +1037,7 @@ solving:
       dual_feasibility_tolerance: 1e-5
       random_seed: 123
     gurobi-default:
-      threads: 16
+      threads: 16 # 32   #####
       method: 2 # barrier
       crossover: 0
       BarConvTol: 1.e-5
@@ -1095,6 +1091,6 @@ solving:
     atol: 1_000_000
     rtol: 0.01
 
-  mem_mb: 30000 #memory in MB; 20 GB enough for 50+B+I+H2; 100 GB for 181+B+I+H2
-  memory_logging_frequency: 30 # in seconds
-  runtime: 6h #runtime in humanfriendly style https://humanfriendly.readthedocs.io/en/latest/
+  mem_mb: 30000 # 128000   ##### memory in MB; 20 GB enough for 50+B+I+H2; 100 GB for 181+B+I+H2
+  memory_logging_frequency: 5 # in seconds
+  runtime: 6h # 48h #runtime in humanfriendly style https://humanfriendly.readthedocs.io/en/latest/   #####
