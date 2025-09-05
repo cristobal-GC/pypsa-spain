@@ -290,6 +290,12 @@ conventional:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#lines
 lines:
   types:
+    63.: 94-AL1/15-ST1A 20.0
+    66.: 94-AL1/15-ST1A 20.0
+    90.: 184-AL1/30-ST1A 110.0
+    110.: 184-AL1/30-ST1A 110.0
+    132.: 243-AL1/39-ST1A 110.0
+    150.: 243-AL1/39-ST1A 110.0
     220.: Al/St 240/40 2-bundle 220.0
     300.: Al/St 240/40 3-bundle 300.0
     330.: Al/St 240/40 3-bundle 300.0
@@ -369,7 +375,7 @@ pypsa_eur:
   - DC_ic   ##### For Spanish interconnections
   Link:
   - DC
-  - DC_ic   #####
+  - DC_ic   ##### For Spanish interconnections
   - "DC_ic export"   ##### For Spanish interconnections
   - "DC_ic import"   ##### For Spanish interconnections
   Generator:
@@ -684,11 +690,11 @@ sector:
   co2_sequestration_potential:
     2020: 0
     2025: 0
-    2030: 0 # 40   #####
-    2035: 0 # 100   #####
-    2040: 0 # 180   #####
-    2045: 0 # 250   #####
-    2050: 0 # 250   #####
+    2030: 40
+    2035: 100
+    2040: 180
+    2045: 250
+    2050: 250
   co2_sequestration_cost: 9999 # 30   #####
   co2_sequestration_lifetime: 50
   co2_spatial: false # true   #####
@@ -742,7 +748,7 @@ sector:
       compression_per_1000km: 0.01
     electricity distribution grid:
       efficiency_static: 0.97
-  H2_network: true
+  H2_network: true   #####
   gas_network: false # true   #####
   H2_retrofit: false
   H2_retrofit_capacity_per_CH4: 0.6
