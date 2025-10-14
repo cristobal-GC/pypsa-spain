@@ -6,7 +6,7 @@
 plotting:
   map:
     boundaries: [-14, 6.35, 35, 46.3]   ##### [-11, 30, 34, 71]
-    color_geomap:
+    geomap_colors:
       ocean: white
       land: white
   projection:
@@ -58,15 +58,15 @@ plotting:
     - AC
     - H2
     ##### - NH3
-    ##### - gas
+    - gas
     ##### - methanol
     ##### - oil
-    ##### - co2 stored
+    - co2 stored
     ##### - urban central heat
     utilisation_rate:
     - solar
-    ##### - solar rooftop
-    ##### - solar-hsat
+    - solar rooftop
+    - solar-hsat
     - onwind
     ##### - offwind-dc
     ##### - offwind-ac
@@ -88,23 +88,23 @@ plotting:
     ##### - urban central solid biomass CHP CC
     ##### - rural gas boiler
     ##### - urban central air heat pump
-    ##### - DAC
+    - DAC
     soc:
     - battery
     - H2 Store
-    ##### - co2 stored
-    ##### - gas
+    - co2 stored
+    - gas
     ##### - methanol
-    ##### - oil
+    - oil
     ##### - urban central water tanks
   balance_map:
     bus_carriers:
     - AC
     - H2
-    ##### - gas
-    ##### - oil
+    - gas
+    - oil
     ##### - methanol
-    ##### - co2 stored
+    - co2 stored
     ##### - urban central heat
     AC:
       unit: TWh
