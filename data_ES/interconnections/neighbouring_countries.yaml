@@ -19,7 +19,7 @@ FR:
     p_nom_max: inf
     p_max_pu: 1
     p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030.csv
+  generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030_cutout2023.csv
 
   load_name: FR_load
   load_params:
@@ -50,7 +50,7 @@ PT:
     p_nom_max: inf
     p_max_pu: 1
     p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030.csv
+  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030_cutout2023.csv
 
 
   load_name: PT_load
