@@ -11,6 +11,7 @@ Release Notes
 Upcoming Release
 ================
 
+* A flexible and simple model for green hydrogen valleys through configurable, discrete hydrogen demands.
 
 * Land elegibility based on the Spanish Environmental Sensitivity Index (ISA) (see details `here <https://pypsa-spain.readthedocs.io/en/latest/ISA_index.html>`__).
 
