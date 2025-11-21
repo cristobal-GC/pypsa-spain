@@ -8,8 +8,11 @@
 Release Notes
 ##########################################
 
+
 Upcoming Release
 ================
+
+* New functionality ``network_local_focus'': Allows increasing the clustering resolution within a selected region (NUTS2 or NUTS3), so that a larger share of the total clusters is allocated there.
 
 * A flexible and simple model for green hydrogen valleys through configurable, discrete hydrogen demands.
 

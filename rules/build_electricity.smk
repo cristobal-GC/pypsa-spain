@@ -657,6 +657,7 @@ rule cluster_network:
         length_factor=config_provider("lines", "length_factor"),
         cluster_mode=config_provider("clustering", "mode"),
         copperplate_regions=config_provider("clustering", "copperplate_regions"),
+        network_local_focus=config_provider("pypsa_spain", "network_local_focus"),   #####
     input:
         unpack(input_custom_busmap),
         network=resources("networks/base_s.nc"),
@@ -675,6 +676,8 @@ rule cluster_network:
             else []
         ),
         load=resources("electricity_demand_base_s.nc"),
+        nuts2_ES='data_ES/nuts/NUTS2_ES.geojson',   #####
+        nuts3_ES='data_ES/nuts/NUTS3_ES.geojson',   #####
     output:
         network=resources("networks/base_s_{clusters}.nc"),
         regions_onshore=resources("regions_onshore_base_s_{clusters}.geojson"),

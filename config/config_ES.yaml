@@ -45,6 +45,10 @@ pypsa_spain:
   H2_valley_demands:
     enable: true
     file: data_ES/H2/H2_valley_demands.yaml
+  network_local_focus:
+    enable: true
+    region_NUTS: 'ES511'
+    k_focus: 20
 
 
 

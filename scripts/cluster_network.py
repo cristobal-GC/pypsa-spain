@@ -68,6 +68,7 @@ import warnings
 from functools import reduce
 
 import geopandas as gpd
+from shapely.geometry import Point   ##### for PyPSA-Spain 'focus_network'
 import linopy
 import numpy as np
 import pandas as pd
@@ -102,9 +103,9 @@ def normed(x):
     return (x / x.sum()).fillna(0.0)
 
 
-def weighting_for_country(df: pd.DataFrame, weights: pd.Series) -> pd.Series:
+def weighting_for_country(df: pd.DataFrame, weights: pd.Series, k_focus) -> pd.Series:   ##### include k_focus
     w = normed(weights.reindex(df.index, fill_value=0))
-    return (w * (100 / w.max())).clip(lower=1).astype(int)
+    return (w * (100*k_focus / w.max())).clip(lower=1).astype(int)   ##### PyPSA-Spain, multiply 100 with k_focus to allow deeper weight differences
 
 
 def busmap_from_shapes(
@@ -369,7 +370,7 @@ def busmap_for_n_clusters(
         )
         if len(x) == 1:
             return pd.Series(prefix + "0", index=x.index)
-        weight = weighting_for_country(x, cluster_weights)
+        weight = weighting_for_country(x, cluster_weights, k_focus)
 
         if algorithm == "kmeans":
             return prefix + busmap_by_kmeans(
@@ -611,6 +612,10 @@ if __name__ == "__main__":
     mode = params.mode
     solver_name = snakemake.config["solving"]["solver"]["name"]
 
+    #####
+    network_local_focus = params.network_local_focus
+
+
     n = pypsa.Network(snakemake.input.network)
     buses_prev, lines_prev, links_prev = len(n.buses), len(n.lines), len(n.links)
 
@@ -620,6 +625,60 @@ if __name__ == "__main__":
         .to_pandas()
         .reindex(n.buses.index, fill_value=0.0)
     )
+
+
+
+
+    
+    #################### PyPSA-Spain: focus_network
+    #
+    # The goal here is to increase the load in buses within a specific region. This is done by replacing
+    # the bus load with k_focus times the maximun bus load.  
+    # Loads are later converted into weights between 1 and 100, here 100 is also multiplied by k_focus
+    #    
+
+    if network_local_focus['enable']:
+
+        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Clustering network with focus on: {network_local_focus['region_NUTS']}")
+
+        k_focus = network_local_focus['k_focus']
+        region_NUTS = network_local_focus['region_NUTS'] 
+
+
+        ### Buses to geo points
+        buses = n.buses.copy()
+        buses_gdf = gpd.GeoDataFrame(buses,
+                                    geometry=[Point(xy) for xy in zip(buses.x, buses.y)],
+                                    crs="EPSG:4326"   # ajusta si tu network está en otro CRS
+                                    )
+        
+        ### Load region
+        if len(region_NUTS)==4:
+            NUTS_ES = gpd.read_file(snakemake.input.nuts2_ES)
+        elif len(region_NUTS)==5:
+            NUTS_ES = gpd.read_file(snakemake.input.nuts3_ES)
+        
+        region = NUTS_ES.loc[NUTS_ES["NUTS_ID"] == region_NUTS].to_crs(buses_gdf.crs)
+
+        ### Buses in region
+        buses_region = buses_gdf.index[buses_gdf.within(region.union_all())]   # union_all: more robust if multi-polygon
+
+        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Selected buses in {network_local_focus['region_NUTS']}: {len(buses_region)}")
+
+        ### Modify load, clip a minimum value
+        #load[buses_region] = load[buses_region].clip(lower=5000*load.max())
+        load[buses_region] = load[buses_region] + k_focus*load.max()
+
+    else:
+        k_focus = 1
+    #
+    #
+    #
+    ####################
+
+
+
+
 
     if snakemake.wildcards.clusters == "all":
         # Fast-path if no clustering is necessary

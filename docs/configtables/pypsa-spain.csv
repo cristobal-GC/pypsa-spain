@@ -21,3 +21,10 @@ ISA_class,,,
 -- enable,bool,"{true, false}","Allows to use the Spanish 'Indice de Sostenibilidad Ambiental' for solar and onwind land elegibility."
 ISA_{carrier},,,
 -- grid_codes,-,"{4,3,2,1,0}","Level 0 means highest ambiental sensitivity, level 4 means lowest. For example, to set sensitivity threshold 2, select {4, 3, 2}"
+H2_valley_demands,,,
+-- enable,bool,"{true, false}","Allows to include discrete H2 demands."
+-- file,-,str,"Path of the file with the definition of the discrete H2 demands."
+network_local_focus,,,
+-- enable,bool,"{true, false}","Allows to cluster the network with more focus on a specific region NUTS2 or NUTS3. Clustering mode should be set to `busmap`."
+-- region_NUTS,-,str,"NUTS 2 or NUTS 3 code of the region."
+-- k_focus,-,int/float,"Intensity of the weighting applied to the focus region. Higher values increase the weights of its buses, leading the clustering algorithm to allocate more clusters there. Very large values may increase runtime."
