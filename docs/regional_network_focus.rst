@@ -16,16 +16,13 @@ The following figures show the obtained clusterd networks with 50 clusters focus
 The parameter *k_focus* defines the intensity of the weighting applied to the focus region.
 
 
-.. image:: img/network_ES21_k_100_50.png
-    :width: 100%
-    :align: center
++---------------------------------------------+---------------------------------------------+
+| .. image:: img/network_ES21_k_100_50.png    | .. image:: img/network_ES24_k_100_50.png    |
+|    :width: 100%                             |    :width: 100%                             |
++---------------------------------------------+---------------------------------------------+
 
 
-.. image:: img/Inetwork_ES24_k_100_50.png
-    :width: 100%
-    :align: center
-    
-    
+
 
 
 

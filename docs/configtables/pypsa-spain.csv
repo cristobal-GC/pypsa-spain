@@ -25,6 +25,6 @@ H2_valley_demands,,,
 -- enable,bool,"{true, false}","Allows to include discrete H2 demands."
 -- file,-,str,"Path of the file with the definition of the discrete H2 demands."
 regional_network_focus,,,
--- enable,bool,"{true, false}","Allows to cluster the network with more focus on a specific region NUTS-2 or NUTS-3. Clustering mode should be set to `busmap`, and cluster algorithm to `kmeans`."
+-- enable,bool,"{true, false}","Allows to cluster the network with more focus on a specific region NUTS-2 or NUTS-3. Clustering mode should be set to `busmap`, and cluster algorithm to `k-means`."
 -- region_NUTS,-,str,"NUTS-2 or NUTS-3 code of the region."
 -- k_focus,-,int/float,"Intensity of the weighting applied to the focus region. Higher values increase the weights of its buses, leading the clustering algorithm to allocate more clusters there. Very large values may increase runtime."
