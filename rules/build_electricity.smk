@@ -657,7 +657,7 @@ rule cluster_network:
         length_factor=config_provider("lines", "length_factor"),
         cluster_mode=config_provider("clustering", "mode"),
         copperplate_regions=config_provider("clustering", "copperplate_regions"),
-        network_local_focus=config_provider("pypsa_spain", "network_local_focus"),   #####
+        regional_network_focus=config_provider("pypsa_spain", "regional_network_focus"),   #####
     input:
         unpack(input_custom_busmap),
         network=resources("networks/base_s.nc"),

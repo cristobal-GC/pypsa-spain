@@ -12,9 +12,18 @@ Release Notes
 Upcoming Release
 ================
 
-* New functionality ``network_local_focus'': Allows increasing the clustering resolution within a selected region (NUTS2 or NUTS3), so that a larger share of the total clusters is allocated there.
+
+
+
+PyPSA-Spain v2025.11.0 (25th November 2025)
+===========================================
+
+
+* New functionality ``regional_network_focus``: Allows increasing the clustering resolution within a selected region (NUTS-2 or NUTS-3), so that a larger share of the total clusters is allocated there (see details `here <https://pypsa-spain.readthedocs.io/en/latest/regional_network_focus.html>`__).
 
 * A flexible and simple model for green hydrogen valleys through configurable, discrete hydrogen demands.
+
+* The interconnection model with PT and FR has been upgraded (see details `here <https://pypsa-spain.readthedocs.io/en/latest/interconnections.html>`__).
 
 * Land elegibility based on the Spanish Environmental Sensitivity Index (ISA) (see details `here <https://pypsa-spain.readthedocs.io/en/latest/ISA_index.html>`__).
 

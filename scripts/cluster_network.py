@@ -613,7 +613,7 @@ if __name__ == "__main__":
     solver_name = snakemake.config["solving"]["solver"]["name"]
 
     #####
-    network_local_focus = params.network_local_focus
+    regional_network_focus = params.regional_network_focus
 
 
     n = pypsa.Network(snakemake.input.network)
@@ -637,12 +637,12 @@ if __name__ == "__main__":
     # Loads are later converted into weights between 1 and 100, here 100 is also multiplied by k_focus
     #    
 
-    if network_local_focus['enable']:
+    if regional_network_focus['enable']:
 
-        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Clustering network with focus on: {network_local_focus['region_NUTS']}")
+        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Clustering network with focus on: {regional_network_focus['region_NUTS']}")
 
-        k_focus = network_local_focus['k_focus']
-        region_NUTS = network_local_focus['region_NUTS'] 
+        k_focus = regional_network_focus['k_focus']
+        region_NUTS = regional_network_focus['region_NUTS'] 
 
 
         ### Buses to geo points
@@ -663,7 +663,7 @@ if __name__ == "__main__":
         ### Buses in region
         buses_region = buses_gdf.index[buses_gdf.within(region.union_all())]   # union_all: more robust if multi-polygon
 
-        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Selected buses in {network_local_focus['region_NUTS']}: {len(buses_region)}")
+        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Selected buses in {regional_network_focus['region_NUTS']}: {len(buses_region)}")
 
         ### Modify load, clip a minimum value
         #load[buses_region] = load[buses_region].clip(lower=5000*load.max())
