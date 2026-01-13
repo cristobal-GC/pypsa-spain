@@ -12,7 +12,6 @@ run:
   disable_progressbar: true
   shared_resources:
     policy: false
-  shared_cutouts: true
 
 scenario:
   clusters:
@@ -64,7 +63,6 @@ renewable:
   offwind-float:
     max_depth: false
     min_depth: false
-
 
 clustering:
   exclude_carriers: ["OCGT", "offwind-ac", "coal"]

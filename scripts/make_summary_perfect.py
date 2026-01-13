@@ -13,8 +13,13 @@ import pypsa
 from pypsa.descriptors import get_active_assets
 from six import iteritems
 
-from scripts._helpers import set_scenario_config
-from scripts.add_electricity import load_costs
+try:
+    from numpy import trapezoid
+except ImportError:
+    # before numpy 2.0
+    from numpy import trapz as trapezoid
+
+from scripts._helpers import load_costs, set_scenario_config
 from scripts.make_summary import (
     assign_carriers,
     assign_locations,
@@ -141,7 +146,7 @@ def calculate_cumulative_cost():
         for cluster in cumulative_cost.index.get_level_values(level=0).unique():
             for sector_opts in cumulative_cost.index.get_level_values(level=1).unique():
                 cumulative_cost.loc[(cluster, sector_opts, "cumulative cost"), r] = (
-                    np.trapz(
+                    trapezoid(
                         cumulative_cost.loc[
                             idx[cluster, sector_opts, planning_horizons], r
                         ].values,
@@ -727,12 +732,7 @@ if __name__ == "__main__":
 
     print(networks_dict)
 
-    nyears = 1
-    costs_db = load_costs(
-        snakemake.input.costs,
-        snakemake.config["costs"],
-        nyears=nyears,
-    )
+    costs_db = load_costs(snakemake.input.costs)
 
     df = make_summaries(networks_dict)
 
