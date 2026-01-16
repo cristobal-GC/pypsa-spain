@@ -270,9 +270,9 @@ rule determine_availability_matrix:
         ISA_class=config_provider("pypsa_spain","ISA_class"), #####
     input:
         unpack(input_ua_md_availability_matrix),
-        corine=ancient(f"{rules.retrieve_corine.output['tif_file']}"),
+        corine=ancient(rules.retrieve_corine.output["tif_file"]),
         natura=lambda w: (
-            f"{NATURA_DATASET["folder"]}/natura.tiff"
+            f"{NATURA_DATASET['folder']}/natura.tiff"
             if config_provider("renewable", w.technology, "natura")(w)
             else []
         ),
@@ -402,7 +402,7 @@ rule build_hydro_profile:
         country_shapes=resources("country_shapes.geojson"),
         eia_hydro_generation="data/eia_hydro_annual_generation.csv",
         eia_hydro_capacity="data/eia_hydro_annual_capacity.csv",
-        era5_runoff=f"{COUNTRY_RUNOFF_DATASET["folder"]}/era5-runoff-per-country.csv",
+        era5_runoff=f"{COUNTRY_RUNOFF_DATASET['folder']}/era5-runoff-per-country.csv",
         cutout=lambda w: input_cutout(
             w, config_provider("renewable", "hydro", "cutout")(w)
         ),
