@@ -4,6 +4,8 @@
 
 
 rule build_electricity_demand:
+    message:
+        "Building electricity demand time series"
     params:
         snapshots=config_provider("snapshots"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
@@ -30,6 +32,8 @@ rule build_electricity_demand:
 
 
 rule build_powerplants:
+    message:
+        "Building powerplant list for {wildcards.clusters} clusters"
     params:
         powerplants_filter=config_provider("electricity", "powerplants_filter"),
         custom_powerplants=config_provider("electricity", "custom_powerplants"),
@@ -71,6 +75,8 @@ def input_base_network(w):
 
 
 rule base_network:
+    message:
+        "Building base network"
     params:
         countries=config_provider("countries"),
         snapshots=config_provider("snapshots"),
@@ -103,6 +109,8 @@ rule base_network:
 
 
 rule build_osm_boundaries:
+    message:
+        "Building OSM boundaries for {wildcards.country}"
     input:
         json=f"{OSM_BOUNDARIES_DATASET['folder']}/{{country}}_adm1.json",
         eez=ancient(rules.retrieve_eez.output["gpkg"]),
@@ -118,6 +126,8 @@ rule build_osm_boundaries:
 
 
 rule build_bidding_zones:
+    message:
+        "Building bidding zones"
     params:
         countries=config_provider("countries"),
         remove_islands=config_provider(
@@ -141,6 +151,8 @@ rule build_bidding_zones:
 
 
 rule build_shapes:
+    message:
+        "Building geographical shapes"
     params:
         config_provider("clustering", "mode"),
         countries=config_provider("countries"),
@@ -179,6 +191,8 @@ rule build_shapes:
 if CUTOUT_DATASET["source"] in ["build"]:
 
     rule build_cutout:
+        message:
+            "Building cutout data for {wildcards.cutout}"
         params:
             cutouts=config_provider("atlite", "cutouts"),
         output:
@@ -195,6 +209,8 @@ if CUTOUT_DATASET["source"] in ["build"]:
 
 
 rule build_ship_raster:
+    message:
+        "Building ship density raster"
     input:
         ship_density=rules.retrieve_ship_raster.output["zip_file"],
         cutout=lambda w: input_cutout(w),
@@ -211,6 +227,8 @@ rule build_ship_raster:
 
 
 rule determine_availability_matrix_MD_UA:
+    message:
+        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
     params:
         renewable=config_provider("renewable"),
     input:
@@ -265,6 +283,8 @@ def input_ua_md_availability_matrix(w):
 
 
 rule determine_availability_matrix:
+    message:
+        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
     params:
         renewable=config_provider("renewable"),
         ISA_class=config_provider("pypsa_spain","ISA_class"), #####
@@ -319,6 +339,8 @@ rule determine_availability_matrix:
 
 
 rule build_renewable_profiles:
+    message:
+        "Building renewable profiles for {wildcards.clusters} clusters and {wildcards.technology} technology"
     params:
         snapshots=config_provider("snapshots"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
@@ -353,6 +375,8 @@ rule build_renewable_profiles:
 
 
 rule build_monthly_prices:
+    message:
+        "Building monthly fuel and CO2 prices"
     input:
         co2_price_raw="data/validation/emission-spot-primary-market-auction-report-2019-data.xls",
         fuel_price_raw="data/validation/energy-price-trends-xlsx-5619002.xlsx",
@@ -393,6 +417,8 @@ if COUNTRY_RUNOFF_DATASET["source"] == "build":
 
 
 rule build_hydro_profile:
+    message:
+        "Building hydropower profile"
     params:
         hydro=config_provider("renewable", "hydro"),
         countries=config_provider("countries"),
@@ -419,6 +445,8 @@ rule build_hydro_profile:
 
 
 rule build_line_rating:
+    message:
+        "Building dynamic line ratings"
     params:
         snapshots=config_provider("snapshots"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
@@ -441,6 +469,8 @@ rule build_line_rating:
 
 
 rule build_transmission_projects:
+    message:
+        "Building transmission projects"
     params:
         transmission_projects=config_provider("transmission_projects"),
         line_factor=config_provider("lines", "length_factor"),
@@ -474,6 +504,8 @@ rule build_transmission_projects:
 
 
 rule add_transmission_projects_and_dlr:
+    message:
+        "Adding transmission projects and dynamic line ratings"
     params:
         transmission_projects=config_provider("transmission_projects"),
         dlr=config_provider("lines", "dynamic_line_rating"),
@@ -520,6 +552,8 @@ def input_class_regions(w):
 
 
 rule build_electricity_demand_base:
+    message:
+        "Building electricity demand time series for base network"
     params:
         distribution_key=config_provider("load", "distribution_key"),
         electricity_demand=config_provider("pypsa_spain", "electricity_demand"),   #####
@@ -541,6 +575,8 @@ rule build_electricity_demand_base:
 
 
 rule build_hac_features:
+    message:
+        "Aggregate all rastered cutout data to base regions Voronoi cells."
     params:
         snapshots=config_provider("snapshots"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
@@ -583,6 +619,8 @@ rule process_cost_data:
 
 
 rule simplify_network:
+    message:
+        "Simplifying network"
     params:
         countries=config_provider("countries"),
         mode=config_provider("clustering", "mode"),
@@ -638,6 +676,8 @@ def input_custom_busmap(w):
 
 
 rule cluster_network:
+    message:
+        "Clustering network to {wildcards.clusters} clusters"
     params:
         countries=config_provider("countries"),
         mode=config_provider("clustering", "mode"),
@@ -719,6 +759,8 @@ def input_conventional(w):
 
 
 rule add_electricity:
+    message:
+        "Adding electricity to network with {wildcards.clusters} clusters"
     params:
         line_length_factor=config_provider("lines", "length_factor"),
         link_length_factor=config_provider("links", "length_factor"),
@@ -771,6 +813,8 @@ rule add_electricity:
 
 
 rule prepare_network:
+    message:
+        "Preparing network for model with {wildcards.clusters} clusters and options {wildcards.opts}"
     params:
         time_resolution=config_provider("clustering", "temporal", "resolution_elec"),
         links=config_provider("links"),
@@ -811,6 +855,8 @@ if (
 ):
 
     rule clean_osm_data:
+        message:
+            "Cleaning raw OSM data for {wildcards.country}"
         input:
             cables_way=expand(
                 f"{OSM_DATASET['folder']}/{{country}}/cables_way.json",
@@ -851,6 +897,8 @@ if (
             "../scripts/clean_osm_data.py"
 
     rule build_osm_network:
+        message:
+            "Building OSM network"
         params:
             countries=config_provider("countries"),
             voltages=config_provider("electricity", "voltages"),
@@ -889,6 +937,8 @@ if (
 if config["electricity"]["base_network"] == "tyndp":
 
     rule build_tyndp_network:
+        message:
+            "Building TYNDP network"
         params:
             countries=config_provider("countries"),
         input:
