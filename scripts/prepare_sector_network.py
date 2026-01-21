@@ -1922,6 +1922,16 @@ def add_storage_and_grids(
         logger.info(
             "Add natural gas infrastructure, incl. LNG terminals, production, storage and entry-points."
         )
+
+        add_carrier_buses(
+            n=n,
+            carrier="gas",
+            costs=costs,
+            spatial=spatial,
+            options=options,
+            cf_industry=None,
+        )
+
         gas_pipes = pd.read_csv(clustered_gas_network_file, index_col=0)
 
         if options["H2_retrofit"]:
@@ -4553,6 +4563,17 @@ def add_industry(
     - Process emission handling
     """
     logger.info("Add industrial demand")
+
+    # Ensure the gas carrier bus exists before adding any gas-for-industry links.
+    add_carrier_buses(
+        n=n,
+        carrier="gas",
+        costs=costs,
+        spatial=spatial,
+        options=options,
+        cf_industry=None,
+    )
+
     # add oil buses for shipping, aviation and naptha for industry
     add_carrier_buses(
         n,
@@ -4577,6 +4598,12 @@ def add_industry(
 
     # 1e6 to convert TWh to MWh
     industrial_demand = pd.read_csv(industrial_demand_file, index_col=0) * 1e6 * nyears
+
+    if not options["biomass"]:
+        raise ValueError(
+            "Industry demand includes solid biomass, but `sector.biomass` is disabled. "
+            "Enable `sector: {biomass: true}` in config."
+        )
 
     n.add(
         "Bus",
