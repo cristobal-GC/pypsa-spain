@@ -274,35 +274,66 @@ if (JRC_IDEES_DATASET := dataset_version("jrc_idees"))["source"] in [
 
 
 
-##### Retrieve Spanish "Indice de Sensibilidad Ambiental" (ISA)
-if config["enable"]["retrieve"]:
+#################### Retrieve Spanish "Indice de Sensibilidad Ambiental" (ISA)
+#
+#
+#
 
-    rule retrieve_ISA:
+if (ISA_ONWIND_DATASET := dataset_version("isa_onwind"))["source"] in [
+    "primary",
+    "archive",
+]:
+
+    rule retrieve_isa_onwind:
+        message:
+            "Retrieving ISA index from MITECO for onwind carrier"
         input:
-            eol=storage("https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_EOL_clasificada_2024.zip"),
-            ftv=storage("https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_FTV_clasificada_2024.zip"),
+            zip_file=storage(ISA_ONWIND_DATASET["url"]),
         output:
-            ISA_eol="data_ES/ISA/Clas_ISA_eol_pb.tiff",
-            ISA_ftv="data_ES/ISA/Clas_ISA_ftv_pb.tiff",
-        params:
-            zip_paths={
-                "eol": "data_ES/ISA/Zonificacion_EOL_clasificada_2024.zip",
-                "ftv": "data_ES/ISA/Zonificacion_FTV_clasificada_2024.zip",
-            },
+            tiff_file="data_ES/ISA/Clas_ISA_eol_pb.tiff", # f"{ISA_ONWIND_DATASET['folder']}/Clas_ISA_eol_pb.tiff",            
         run:
-            import os
-            from zipfile import ZipFile
             from pathlib import Path
-            suffixes = ["eol", "ftv"]
-            for suffix in suffixes:
-                input_file = getattr(input, suffix)
-                zip_path = params.zip_paths[suffix]
-                os.rename(input_file, zip_path)
-                with ZipFile(zip_path, "r") as zip_ref:
-                    filename = f"Clas_ISA_{suffix}_pb.tiff"
-                    zip_ref.extract(filename, Path(zip_path).parent)
-                    extracted = Path(zip_path).parent / filename
-                os.remove(zip_path)
+            import os            
+           
+            # Check output folder does exist
+            Path(output["tiff_file"]).parent.mkdir(parents=True, exist_ok=True)
+
+            # Open zip and get TIFF file
+            with ZipFile(input["zip_file"], "r") as zf:
+                tiff_name_in_zip = "Clas_ISA_eol_pb.tiff"
+                with zf.open(tiff_name_in_zip) as src, open(output["tiff_file"], "wb") as dst:
+                    dst.write(src.read())
+
+
+if (ISA_SOLAR_DATASET := dataset_version("isa_solar"))["source"] in [
+    "primary",
+    "archive",
+]:
+
+    rule retrieve_isa_solar:
+        message:
+            "Retrieving ISA index from MITECO for solar carrier"
+        input:
+            zip_file=storage(ISA_SOLAR_DATASET["url"]),
+        output:
+            tiff_file="data_ES/ISA/Clas_ISA_ftv_pb.tiff", # f"{ISA_SOLAR_DATASET['folder']}/Clas_ISA_ftv_pb.tiff",
+        run:
+            from pathlib import Path
+            import os            
+
+            # Check output folder does exist
+            Path(output["tiff_file"]).parent.mkdir(parents=True, exist_ok=True)
+
+            # Open zip and get TIFF file
+            with ZipFile(input["zip_file"], "r") as zf:
+                tiff_name_in_zip = "Clas_ISA_ftv_pb.tiff"
+                with zf.open(tiff_name_in_zip) as src, open(output["tiff_file"], "wb") as dst:
+                    dst.write(src.read())
+
+#
+#
+#
+####################
 
 
 
