@@ -111,15 +111,14 @@ enable:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#co2-budget
 co2_budget:
-  # 2020: 0.720 # average emissions of 2019 to 2021 relative to 1990, CO2 excl LULUCF, EEA data, European Environment Agency. (2023a). Annual European Union greenhouse gas inventory 1990–2021 and inventory report 2023 - CRF Table. https://unfccc.int/documents/627830
-  # 2025: 0.648 # With additional measures (WAM) projection, CO2 excl LULUCF, European Environment Agency. (2023e). Member States’ greenhouse gas (GHG) emission projections 2023. https://www.eea.europa.eu/en/datahub/datahubitem-view/4b8d94a4-aed7-4e67-a54c-0623a50f48e8
-  # 2030: 0.450 # 55% reduction by 2030 (Ff55)
+#  2020: 0.72
+#  2025: 0.648
+#  2030: 0.45
+#  2035: 0.25
+#  2040: 0.1
+#  2045: 0.05
+#  2050: 0.0
   2030: 0.183   ##### CO2 Emissions for power system simulation: 11.986 MtCO2 (2030): PNIEC final version 2024 / 11.221 MtCO2 (2030): PNIEC 2nd draft 2023   #####   Total CO2 emissions in Spain 1990: 65.5754 MtCO2
-  # 2035: 0.250
-  # 2040: 0.100 # 90% by 2040
-  # 2045: 0.050
-  # 2050: 0.000 # climate-neutral by 2050
-
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#electricity
 electricity:
@@ -145,21 +144,6 @@ electricity:
   max_hours:
     battery: 6
     H2: 168
-  extendable_carriers:   #####
-    Generator:
-    - solar
-#    - "solar-hsat"
-    - onwind
-#    - "offwind-ac"
-#    - "offwind-dc"
-    - "offwind-float"
-#    - OCGT
-    - CCGT
-    StorageUnit: []
-    Store:
-    - battery
-    - H2
-    Link: []
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)   #####
   custom_powerplants: false
   everywhere_powerplants: []
@@ -1260,6 +1244,18 @@ solving:
       GPUMode: 1
       PDLPTol: 1.0e-05
       Crossover: 0
+    "xpress-default":
+      threads: 8
+      lpflags: 4
+      crossover: 0
+      bargaptarget: 1.0e-05
+      baralg: 2
+    "xpress-gpu":
+      lpflags: 4
+      crossover: 0
+      baralg: 4
+      barhggpu: 1
+      barhgreltol: 1.0e-05
     "cbc-default": {}
     "glpk-default": {}
   check_objective:
@@ -1419,6 +1415,12 @@ data:
     source: archive
     version: latest
   jrc_ardeco:
+    source: archive
+    version: latest
+  bidding_zones_electricitymaps:
+    source: archive
+    version: latest
+  bidding_zones_entsoepy:
     source: archive
     version: latest
 
