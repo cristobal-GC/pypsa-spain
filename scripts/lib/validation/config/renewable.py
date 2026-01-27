@@ -85,7 +85,8 @@ class _OnwindConfig(BaseModel):
     correction_factor: float = Field(
         1.0, description="Correction factor for capacity factor time series."
     )
-    corine: _CorineConfig = Field(
+#    corine: _CorineConfig = Field(
+    corine: bool | _CorineConfig = Field(
         default_factory=lambda: _CorineConfig(
             grid_codes=[
                 12,

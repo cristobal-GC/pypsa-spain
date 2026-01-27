@@ -322,9 +322,13 @@ rule determine_availability_matrix:
         cutout=lambda w: input_cutout(
             w, config_provider("renewable", w.technology, "cutout")(w)
         ),
-        ISA_onwind=ancient("data_ES/ISA/Clas_ISA_eol_pb.tiff"),          ##### Spanish "Indice de Sensibilidad Ambiental" for onwind (eol)
-        ISA_solar=ancient("data_ES/ISA/Clas_ISA_ftv_pb.tiff"),           ##### Spanish "Indice de Sensibilidad Ambiental" for solar (ftv)
-        ISA_solar_hsat=ancient("data_ES/ISA/Clas_ISA_ftv_pb.tiff"),      ##### Spanish "Indice de Sensibilidad Ambiental" for solar-hsat (same as solar)
+        ISA=lambda w: ancient(                      ##### Spanish "Indice de Sensibilidad Ambiental"
+            "data_ES/ISA/Clas_ISA_eol_pb.tiff"
+            if w.technology == "onwind"
+            else "data_ES/ISA/Clas_ISA_ftv_pb.tiff"
+            if w.technology in ("solar", "solar-hsat")
+            else []
+        ),
     output:
         resources("availability_matrix_{clusters}_{technology}.nc"),
     log:
