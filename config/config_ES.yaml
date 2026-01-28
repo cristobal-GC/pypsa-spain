@@ -9,14 +9,14 @@ version: v2025.07.0
 
 # docs in https://pypsa-spain.readthedocs.io/
 pypsa_spain:
-  q2q_transform:
+  q2q_transform:   ##### See https://github.com/cristobal-GC/Q2Q_repository for details
     enable: true
-    onwind: data_ES/q2q/q2q_onwind_europe_2023_NUTS3_v2.pkl
+    onwind: data_ES/q2q/q2q_onwind_REF_v2.pkl
     offwind-ac: ''
     offwind-dc: ''
     offwind-float: ''
-    solar: data_ES/q2q/q2q_solar_europe_2023_NUTS3_v1.pkl
-    solar-hsat: ''
+    solar: data_ES/q2q/q2q_solar_REF_v1.pkl
+    solar-hsat: data_ES/q2q/q2q_solar-hsat_REF_v1.pkl
   electricity_demand:
     enable: true
     annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
