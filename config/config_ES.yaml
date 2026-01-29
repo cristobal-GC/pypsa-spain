@@ -32,9 +32,6 @@ pypsa_spain:
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
       # solar-hsat: data_ES/esios/esios_solar_capacity_2023.csv   ##### Update either solar or solar-hsat
-  costs_update:
-    enable: true
-    costs_update_file: 'data_ES/costs/costs_updates.csv'
   ISA_class:
     enable: true
     ISA_onwind:

@@ -495,9 +495,7 @@ if (COSTS_DATASET := dataset_version("costs"))["source"] in [
 
     rule retrieve_cost_data:
         message:
-            "Retrieving cost data for {wildcards.planning_horizons}"
-        params:
-             costs_update=config_provider("pypsa_spain", "costs_update"),   ########## PyPSA-Spain update
+            "Retrieving cost data for {wildcards.planning_horizons}"        
         input:
             costs=storage(COSTS_DATASET["url"] + "/costs_{planning_horizons}.csv"),
         output:
