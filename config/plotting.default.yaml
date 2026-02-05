@@ -46,7 +46,7 @@ plotting:
     carrier_groups:
       electricity:
       - AC
-      - low voltage
+      ##### - low voltage
     #####   heat:
     #####   - urban central heat
     #####   - urban decentral heat
@@ -65,7 +65,7 @@ plotting:
     - gas
     ##### - methanol
     ##### - oil
-    - co2 stored
+    ##### - co2 stored
     ##### - urban central heat
     utilisation_rate:
     - solar
@@ -96,19 +96,19 @@ plotting:
     soc:
     - battery
     - H2 Store
-    - co2 stored
+    ##### - co2 stored
     - gas
     ##### - methanol
-    - oil
+    ##### - oil
     ##### - urban central water tanks
   balance_map:
     bus_carriers:
     - AC
-    - co2_stored
+    ##### - co2_stored
     - gas
     - H2
     ##### - methanol
-    - oil 
+    ##### - oil 
     ##### - urban central heat
     AC:
       cmap: Greens
@@ -256,12 +256,12 @@ plotting:
   balance_map_interactive:
     bus_carriers:
     - AC
-    - co2_stored
+    ##### - co2_stored
     - gas
     - H2
-    - methanol
-    - oil
-    - urban_central_heat
+    ##### - methanol
+    ##### - oil
+    ##### - urban_central_heat
     AC:
       cmap: Greens
       region_unit: €/MWh
