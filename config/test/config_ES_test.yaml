@@ -9,14 +9,14 @@ version: v2025.07.0
 
 # docs in https://pypsa-spain.readthedocs.io/
 pypsa_spain:
-  q2q_transform:
+  q2q_transform:   ##### See https://github.com/cristobal-GC/Q2Q_repository for details
     enable: true
-    onwind: data_ES/q2q/q2q_onwind_europe_2023_NUTS3_v2.pkl
+    onwind: data_ES/q2q/q2q_onwind_REF_v2.pkl
     offwind-ac: ''
     offwind-dc: ''
     offwind-float: ''
-    solar: data_ES/q2q/q2q_solar_europe_2023_NUTS3_v1.pkl
-    solar-hsat: ''
+    solar: data_ES/q2q/q2q_solar_REF_v1.pkl
+    solar-hsat: data_ES/q2q/q2q_solar-hsat_REF_v1.pkl
   electricity_demand:
     enable: true
     annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
@@ -27,7 +27,7 @@ pypsa_spain:
     nc_ES_file: data_ES/interconnections/neighbouring_countries.yaml
     ic_ES_file: data_ES/interconnections/interconnections.yaml
   update_elec_capacities:
-    enable: true
+    enable: false
     carriers_to_update:
       onwind: data_ES/esios/esios_onwind_capacity_2023.csv
       solar: data_ES/esios/esios_solar_capacity_2023.csv
@@ -90,10 +90,10 @@ scenario:
   sector_opts:
   - ""
   planning_horizons:
-  - 2050
+  - 2030
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#countries
-countries:   #####
+countries:
 - ES
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
@@ -140,8 +140,29 @@ electricity:
     contingency: 4000
   max_hours:
     battery: 6
+    "li-ion": 6
+    lfp: 6
+    vanadium: 10
+    lair: 12
+    pair: 24
+    "iron-air": 100
     H2: 168
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)   #####
+  extendable_carriers:
+    Generator:
+    - solar
+#    - "solar-hsat"
+    - onwind
+#    - "offwind-ac"
+#    - "offwind-dc"
+    - "offwind-float"
+#    - OCGT
+    - CCGT
+    StorageUnit: []
+    Store:
+    - battery
+    - H2
+    Link: []
+  powerplants_filter: "(DateOut >= 2024 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)"   ##### Check the nuclear phase-out plan in Spain
   custom_powerplants: false
   everywhere_powerplants: []
   conventional_carriers:   #####
@@ -217,36 +238,36 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 3   ##### Tecnology density: ~10 MW/km2
     correction_factor: 1.0
-    corine:   ##### Ignored when using the Spanish 'Indice de Sensibilidad Ambiental'
-      grid_codes:
-      - 12
-      - 13
-      - 14
-      - 15
-      - 16
-      - 17
-      - 18
-      - 19
-      - 20
-      - 21
-      - 22
-      - 23
-      - 24
-      - 25
-      - 26
-      - 27
-      - 28
-      - 29
-      - 31
-      - 32
-      distance: 1000.0
-      distance_grid_codes:
-      - 1
-      - 2
-      - 3
-      - 4
-      - 5
-      - 6
+    corine: false   ##### 'false' when using the Spanish ISA ('Indice de Sensibilidad Ambiental')
+#      grid_codes:
+#      - 12
+#      - 13
+#      - 14
+#      - 15
+#      - 16
+#      - 17
+#      - 18
+#      - 19
+#      - 20
+#      - 21
+#      - 22
+#      - 23
+#      - 24
+#      - 25
+#      - 26
+#      - 27
+#      - 28
+#      - 29
+#      - 31
+#      - 32
+#      distance: 1000.0
+#      distance_grid_codes:
+#      - 1
+#      - 2
+#      - 3
+#      - 4
+#      - 5
+#      - 6
     luisa: false
     natura: false # true   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'
     excluder_resolution: 100
@@ -332,30 +353,30 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 5.1   ##### Tecnology density: ~50 MW/km2
     correction_factor: 1.0
-    corine:   ##### Ignored when using the Spanish 'Indice de Sensibilidad Ambiental'
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-    - 9
-    - 10
-    - 11
-    - 12
-    - 13
-    - 14
-    - 15
-    - 16
-    - 17
-    - 18
-    - 19
-    - 20
-    - 26
-    - 31
-    - 32
+    corine: false   ##### 'false' when using the Spanish ISA ('Indice de Sensibilidad Ambiental')
+#    - 1
+#    - 2
+#    - 3
+#    - 4
+#    - 5
+#    - 6
+#    - 7
+#    - 8
+#    - 9
+#    - 10
+#    - 11
+#    - 12
+#    - 13
+#    - 14
+#    - 15
+#    - 16
+#    - 17
+#    - 18
+#    - 19
+#    - 20
+#    - 26
+#    - 31
+#    - 32
     luisa: false
     natura: false   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'
     excluder_resolution: 100
@@ -372,30 +393,30 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 4.43
     correction_factor: 1.0
-    corine:   ##### Ignored when using the Spanish 'Indice de Sensibilidad Ambiental'
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-    - 9
-    - 10
-    - 11
-    - 12
-    - 13
-    - 14
-    - 15
-    - 16
-    - 17
-    - 18
-    - 19
-    - 20
-    - 26
-    - 31
-    - 32
+    corine: false   ##### 'false' when using the Spanish ISA ('Indice de Sensibilidad Ambiental')
+#    - 1
+#    - 2
+#    - 3
+#    - 4
+#    - 5
+#    - 6
+#    - 7
+#    - 8
+#    - 9
+#    - 10
+#    - 11
+#    - 12
+#    - 13
+#    - 14
+#    - 15
+#    - 16
+#    - 17
+#    - 18
+#    - 19
+#    - 20
+#    - 26
+#    - 31
+#    - 32
     luisa: false
     natura: false   ##### Using the Spanish 'Indice de Sensibilidad Ambiental'
     excluder_resolution: 100
@@ -486,7 +507,7 @@ transformers:
 load:
   fill_gaps:
     enable: true
-    interpolate_limit: 3
+    interpolate_limit: 6
     time_shift_for_large_gaps: 1w
   manual_adjustments: true
   scaling_factor: 1.0
@@ -892,6 +913,7 @@ sector:
     biomass_to_methanol: false # true   #####
     biomass_to_methanol_cc: false
   ammonia: false # true   #####
+  min_part_load_electrolysis: 0
   min_part_load_fischer_tropsch: 0.5
   min_part_load_methanolisation: 0.3
   min_part_load_methanation: 0.3
@@ -903,6 +925,7 @@ sector:
   use_electrolysis_waste_heat: 0.25
   electricity_transmission_grid: true
   electricity_distribution_grid: false # true   #####
+  electricity_distribution_grid_cost_factor: 1.0
   electricity_grid_connection: true
   transmission_efficiency:
     enable:
@@ -1288,6 +1311,9 @@ data:
   gem_europe_gas_tracker:
     source: archive
     version: latest
+  gem_gcct:
+    source: archive
+    version: latest
   co2stop:
     source: archive
     version: latest
@@ -1326,6 +1352,15 @@ data:
     version: latest
   synthetic_electricity_demand:
     source: primary
+    version: latest
+  opsd_electricity_demand:
+    source: archive
+    version: latest
+  entsoe_electricity_demand:
+    source: archive
+    version: latest
+  neso_electricity_demand:
+    source: archive
     version: latest
   copernicus_land_cover:
     source: primary

@@ -1,9 +1,9 @@
 name: Release
 
 on:
-  push:
-    tags:
-    - v*.*.*
+#  push:
+#    tags:
+#    - v*.*.*
 
 env:
   PREPARATION_COMMIT: '[github-actions.ci] prepare release ${{ github.ref_name }}'
