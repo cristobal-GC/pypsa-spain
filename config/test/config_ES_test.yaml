@@ -1141,7 +1141,7 @@ clustering:
     buses: {}
   temporal:
     resolution_elec: false
-    resolution_sector: 168H   #####
+    resolution_sector: 720H   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#adjustments
 adjustments:
