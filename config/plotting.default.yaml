@@ -62,7 +62,7 @@ plotting:
     - AC
     - H2
     ##### - NH3
-    - gas
+    ##### - gas
     ##### - methanol
     ##### - oil
     ##### - co2 stored
@@ -105,7 +105,7 @@ plotting:
     bus_carriers:
     - AC
     ##### - co2_stored
-    - gas
+    ##### - gas
     - H2
     ##### - methanol
     ##### - oil 
@@ -257,7 +257,7 @@ plotting:
     bus_carriers:
     - AC
     ##### - co2_stored
-    - gas
+    ##### - gas
     - H2
     ##### - methanol
     ##### - oil
