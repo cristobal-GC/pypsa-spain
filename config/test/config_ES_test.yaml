@@ -84,7 +84,7 @@ foresight: overnight
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#scenario
 scenario:
   clusters:   ##### Recommended for Spain: NUTS3 / 35-50 nodes
-  - 8
+  - 5
   opts:
   - ""
   sector_opts:
@@ -99,7 +99,7 @@ countries:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
 snapshots:   #####
   start: "2023-01-01"
-  end: "2024-01-01"
+  end: "2023-01-07"
   inclusive: left
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#enable
@@ -194,7 +194,7 @@ electricity:
   autarky:
     enable: false
     by_country: false
-  transmission_limit: vopt   #####
+  transmission_limit: v1.1   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#atlite
 atlite:
@@ -1141,7 +1141,7 @@ clustering:
     buses: {}
   temporal:
     resolution_elec: false
-    resolution_sector: 720H   #####
+    resolution_sector: 24H   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#adjustments
 adjustments:
@@ -1198,8 +1198,8 @@ solving:
     BAU: false
     SAFE: false
   solver:
-    name: gurobi
-    options: "gurobi-default"
+    name: highs
+    options: "highs-simplex"
   solver_options:
     "highs-default":
       threads: 1
@@ -1284,7 +1284,7 @@ solving:
     atol: 1000000
     rtol: 0.01
   oetc:
-  mem_mb: 128000
+  mem_mb: 4000 # 128000
   memory_logging_frequency: 5
   runtime: 48h
 
