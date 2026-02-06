@@ -4,6 +4,7 @@ on:
 #  push:
 #    tags:
 #    - v*.*.*
+  workflow_dispatch:  #
 
 env:
   PREPARATION_COMMIT: '[github-actions.ci] prepare release ${{ github.ref_name }}'

@@ -99,7 +99,7 @@ countries:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
 snapshots:   #####
   start: "2023-01-01"
-  end: "2023-01-07"
+  end: "2024-01-01"
   inclusive: left
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#enable
@@ -1141,7 +1141,7 @@ clustering:
     buses: {}
   temporal:
     resolution_elec: false
-    resolution_sector: 24H   #####
+    resolution_sector: 720H   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#adjustments
 adjustments:
