@@ -609,7 +609,7 @@ def attach_conventional_generators(
     if unit_commitment is not None:
         committable_attrs = ppl.carrier.isin(unit_commitment).to_frame("committable")
         for attr in unit_commitment.index:
-            default = n.component_attrs["Generator"].loc[attr, "default"]
+            default = n.components["Generator"].defaults.loc[attr, "default"]
             committable_attrs[attr] = ppl.carrier.map(unit_commitment.loc[attr]).fillna(
                 default
             )
@@ -964,7 +964,7 @@ def attach_storageunits(
     n: pypsa.Network,
     costs: pd.DataFrame,
     buses_i: list,
-    extendable_carriers: dict,
+    extendable_carriers: list,
     max_hours: dict,
 ):
     """
@@ -978,7 +978,7 @@ def attach_storageunits(
         DataFrame containing the cost data.
     buses_i : list
         List of high voltage electricity buses.
-    extendable_carriers : dict
+    extendable_carriers : list
         List of extendable storage units carrier names.
     max_hours : dict
         Dictionary of maximum hours for storage units.
@@ -1029,7 +1029,7 @@ def attach_stores(
     n: pypsa.Network,
     costs: pd.DataFrame,
     buses_i: list,
-    extendable_carriers: dict,
+    extendable_carriers: list,
 ):
     """
     Attach stores to the network.
@@ -1042,7 +1042,7 @@ def attach_stores(
         DataFrame containing the cost data.
     buses_i : list
         List of high voltage electricity buses.
-    extendable_carriers : dict
+    extendable_carriers : list
         List of extendable storage carrier names.
     """
     available_carriers = get_available_storage_carriers(extendable_carriers)
@@ -1422,7 +1422,7 @@ if __name__ == "__main__":
 
     if params.conventional["dynamic_fuel_price"]:
         fuel_price = pd.read_csv(
-            snakemake.input.fuel_price, index_col=0, header=0, parse_dates=True
+            snakemake.input.fuel_price, index_col=0, parse_dates=True
         )
         fuel_price = fuel_price.reindex(n.snapshots).ffill()
     else:
