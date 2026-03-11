@@ -604,7 +604,7 @@ rule build_electricity_demand_base:
         gb_excel=rules.retrieve_desnz_electricity_consumption.output["xlsx"],
         gb_geojson=rules.retrieve_ons_lad.output["geojson"],
         nuts3=resources("nuts3_shapes.geojson"),
-        nuts2021=rules.retrieve_eu_nuts_2021.output["shapes_all"],   #####
+        nutsall=rules.retrieve_eu_nuts_2021.output["shapes_all"],   #####
         load=resources("electricity_demand.csv"),
     output:
         resources("electricity_demand_base_s.nc"),
