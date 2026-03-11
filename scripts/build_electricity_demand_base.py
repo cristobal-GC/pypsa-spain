@@ -266,7 +266,7 @@ def upsample_load_vPyPSA_Spain(
     gb_excel_fn: str,
     gb_geojson_fn: str,
     nuts3_fn: str,
-    nuts2021_fn: str,
+    nutsall_fn: str,
     distribution_key: dict[str, float],
 ) -> xr.DataArray:
     """
@@ -298,7 +298,7 @@ def upsample_load_vPyPSA_Spain(
         Path to GB local authority GeoJSON.
     nuts3_fn : str
         Path to NUTS3 shapes with GDP/population for fallback distribution keys.
-    nuts2021_fn : str
+    nutsall_fn : str
         Path to NUTS 2021 GeoJSON with 'NUTS_ID' column.
     distribution_key : dict[str, float]
         Weights for GDP/population in distribution calculation (e.g. {"gdp": 0.6, "pop": 0.4}).
@@ -325,15 +325,15 @@ def upsample_load_vPyPSA_Spain(
     )
 
     # Step 3: Load NUTS geometries indexed by NUTS_ID.
-    nuts = gpd.read_file(nuts2021_fn)
-    if "NUTS_ID" not in nuts.columns:
+    nutsall = gpd.read_file(nutsall_fn)
+    if "NUTS_ID" not in nutsall.columns:
         raise KeyError(
-            f"Column 'NUTS_ID' not found in {nuts2021_fn}. "
-            f"Available columns: {list(nuts.columns)}"
+            f"Column 'NUTS_ID' not found in {nutsall_fn}. "
+            f"Available columns: {list(nutsall.columns)}"
         )
-    nuts = nuts[["NUTS_ID", "geometry"]].copy()
-    nuts["NUTS_ID"] = nuts["NUTS_ID"].astype(str).str.upper()
-    nuts = nuts.set_index("NUTS_ID").to_crs(gdf_regions.crs)
+    nutsall = nutsall[["NUTS_ID", "geometry"]].copy()
+    nutsall["NUTS_ID"] = nutsall["NUTS_ID"].astype(str).str.upper()
+    nutsall = nutsall.set_index("NUTS_ID").to_crs(gdf_regions.crs)
 
     # Step 4: Prepare bus representative points and output container.
     bus_points = gdf_regions.geometry.representative_point()
@@ -351,14 +351,14 @@ def upsample_load_vPyPSA_Spain(
             )
             continue
 
-        if nuts_id not in nuts.index:
+        if nuts_id not in nutsall.index:
             logger.warning(
                 f"NUTS code '{nuts_id}' from column '{col}' not found in NUTS geometry file. Skipping."
             )
             continue
 
         # Select buses inside the NUTS region (fallback to intersects).
-        region_geom = nuts.at[nuts_id, "geometry"]
+        region_geom = nutsall.at[nuts_id, "geometry"]
         bus_mask = bus_points.within(region_geom)
 
         if not bus_mask.any():
@@ -435,7 +435,7 @@ if __name__ == "__main__":
             gb_excel_fn=snakemake.input.gb_excel,
             gb_geojson_fn=snakemake.input.gb_geojson,
             nuts3_fn=snakemake.input.nuts3,
-            nuts2021_fn=snakemake.input.nuts2021,
+            nutsall_fn=snakemake.input.nutsall,
             distribution_key=params.distribution_key,
         )
 
