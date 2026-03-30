@@ -162,7 +162,7 @@ electricity:
     - battery
     - H2
     Link: []
-  powerplants_filter: "(DateOut >= 2024 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)"   ##### Check the nuclear phase-out plan in Spain
+  powerplants_filter: "(DateOut >= 2025 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)"   ##### Check the nuclear phase-out plan in Spain
   custom_powerplants: false
   everywhere_powerplants: []
   conventional_carriers:   #####
@@ -184,13 +184,15 @@ electricity:
   - hydro
   estimate_renewable_capacities:
     enable: true
-    from_gem: true
-    year: 2020
+    from_powerplantmatching: true
+    from_irenastat: false
+    year: 2024
     expansion_limit: false
     technology_mapping:
       Offshore: "offwind-float" # offwind-ac   #####
       Onshore: onwind
       PV: solar
+  estimate_battery_capacities: false
   autarky:
     enable: false
     by_country: false
@@ -201,6 +203,7 @@ atlite:
   default_cutout: "europe-2023-sarah3-era5"   #####
   nprocesses: 16
   show_progress: false
+  plot_availability_matrix: false
   cutouts:
     "europe-1940-2024-era5":
       module: era5
@@ -1151,7 +1154,16 @@ adjustments:
 solving:
   options:
     clip_p_max_pu: 0.01
-    load_shedding: false
+    load_shedding:
+      enable: false
+      default_cost: 100000
+      all_carriers: true
+      carriers: {}
+    load_sinks:
+      enable: false
+      default_cost: 100000
+      all_carriers: false
+      carriers: {}
     curtailment_mode: false
     noisy_costs: true
     skip_iterations: true
