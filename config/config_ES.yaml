@@ -927,10 +927,14 @@ sector:
   transmission_efficiency:
     enable:
     - DC
+    - DC_ic   ##### to reverse the link between border node and neighbouring country node
     - H2 pipeline
     - gas pipeline
     - electricity distribution grid
     DC:
+      efficiency_static: 0.98
+      efficiency_per_1000km: 0.977
+    DC_ic:
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
     H2 pipeline:

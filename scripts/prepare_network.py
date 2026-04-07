@@ -492,8 +492,8 @@ if __name__ == "__main__":
         attach_interconnections_ES(n, ic_dic)
 
 
-        ##### Define the load level of the neighbouring countries (as the addition of all the abroad import links capacities
-        # This ensures that, if required, cheap imports can cover all the demand in the neighbouring country
+        ##### Define the load level of the neighbouring countries (as the addition of all the abroad export links capacities
+        # This ensures that, if required, exports can cover all the demand in the neighbouring country
         ## read ic data
         file = interconnections['nc_ES_file']
         with open(file, 'r') as archivo:
@@ -501,7 +501,7 @@ if __name__ == "__main__":
 
             for kk, vv in nc_dic.items():
                 ########## Add neighbouring country load_t
-                n.loads_t['p_set'][vv['load_name']] = n.links.filter(like=kk, axis=0).filter(like='import', axis=0)['p_nom'].sum()
+                n.loads_t['p_set'][vv['load_name']] = n.links.filter(like=kk, axis=0).filter(like='export', axis=0)['p_nom'].sum()
     #
     #
     ########################################
