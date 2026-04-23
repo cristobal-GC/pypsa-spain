@@ -19,7 +19,7 @@ pypsa_spain:
     solar-hsat: data_ES/q2q/q2q_solar-hsat_REF_v1.pkl
   electricity_demand:
     enable: true
-    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
+    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs -> requires 90 TWh , generates 1.62 MtH2 aprox.) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs -> requires 82 TWh , generates 1.45 MtH2 aprox.) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS3_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
@@ -42,7 +42,7 @@ pypsa_spain:
       grid_codes: [4, 3]
     ISA_offwind_float: False   ##### ISA is only for land
   H2_valley_demands:
-    enable: true
+    enable: false   ##### If enabled, remove the electricity for H2 included in the electricity demand to avoid double counting.
     file: data_ES/H2/H2_valley_demands.yaml
   regional_network_focus:
     enable: false
@@ -84,7 +84,7 @@ foresight: overnight
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#scenario
 scenario:
   clusters:   ##### Recommended for Spain: NUTS3 / 35-50 nodes
-  - 8
+  - 5
   opts:
   - ""
   sector_opts:
@@ -183,7 +183,7 @@ electricity:
   - "offwind-float"
   - hydro
   estimate_renewable_capacities:
-    enable: true
+    enable: true   #####
     from_powerplantmatching: true
     from_irenastat: false
     year: 2024
@@ -332,7 +332,7 @@ renewable:
     natura: true
     ship_threshold: 400
     max_depth: 1000.0   #####
-    min_depth: 60.0   #####
+    min_depth: 50.0   #####
     max_shore_distance:
     min_shore_distance:
     excluder_resolution: 200
