@@ -5,6 +5,7 @@
 master
 
 .env
+.venv
 
 .snakemake*
 .ipynb_checkpoints
