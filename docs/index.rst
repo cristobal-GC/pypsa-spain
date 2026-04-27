@@ -37,6 +37,7 @@ Find the details of PyPSA-Spain v.0.0.0 in the `seminal paper <https://doi.org/1
    ISA_index
    interconnections
    regional_network_focus
+   H2_imports_exports
 
 .. toctree::
    :hidden:

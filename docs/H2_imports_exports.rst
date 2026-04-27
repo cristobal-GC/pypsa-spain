@@ -54,6 +54,15 @@ The characteristics of each cross-border point are defined in the file reference
 - **BarMar** (export): a 2 MtH2/year hydrogen pipeline export to France through the Mediterranean corridor (Barcelona area).
 
 
+.. figure:: img/H2_imports_exports_map.png
+  :width: 85%
+  :align: center
+  :alt: Map of H2 import and export border points in PyPSA-Spain
+
+
+
+
+
 Modelling assumptions and limitations
 ========================================
 
@@ -61,5 +70,6 @@ The current implementation deliberately abstracts away physical losses on the bo
 
 - The link uses ``efficiency = 1`` and is not subject to the compression losses applied to internal H2 pipelines (which act on the carrier ``H2 pipeline``).
 - The link capacity is fixed (``p_nom_extendable = False``) and equal to the constant power required to satisfy the annual amount, ensuring the link never becomes a binding constraint.
+
 
 
