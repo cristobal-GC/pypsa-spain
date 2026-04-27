@@ -732,6 +732,9 @@ plotting:
     DC_ic: "#8a1caf"   ##### For Spanish ics
     DC_ic export:  "#9B30FF"   ##### For Spanish ics
     DC_ic import:  "#A020F0"   ##### For Spanish ics
+    H2_ic: "#bf13a0"   ##### For Spanish H2 ics
+    H2_ic export: "#9b1f86"   ##### For Spanish H2 ics
+    H2_ic import: "#db8ccd"   ##### For Spanish H2 ics
     load: "#dd2e23"
     waste CHP: '#e3d37d'
     waste CHP CC: '#e3d3ff'

@@ -6300,7 +6300,79 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
 
         ########## Add H2 load
         n.add('Load', vv['load_name'], **vv['load_params'])
-        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / 8760  # 1e6 tH2 ~ 33.33e6 MWh
+        ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
+        total_hours = n.snapshot_weightings.generators.sum()
+        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+#
+#
+########################################
+
+
+
+######################################## PyPSA-Spain
+#
+# Functions to add H2 imports and exports through cross-border points
+#
+
+def attach_H2_imports_exports(n, H2_imports_exports_dic):
+
+    ##### Register H2_ic carriers (border H2, import direction, export direction)
+    for c in ['H2_ic', 'H2_ic import', 'H2_ic export']:
+        if c not in n.carriers.index:
+            n.add('Carrier', name=c)
+
+    ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
+    total_hours = n.snapshot_weightings.generators.sum()
+
+    for kk, vv in H2_imports_exports_dic.items():
+
+        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 import/export {vv["type"]} for {kk}')
+
+
+        ########## Identify the closest H2 bus on the Spanish network:
+        ### Select candidates: H2 buses in peninsular Spain
+        candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
+        # But remove those with 'FR' and 'PT' in the search
+        if candidates.empty:
+            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        ### Compute distances
+        x0 = vv['bus_params']['x']
+        y0 = vv['bus_params']['y']
+        distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
+        ### Find closest bus
+        closest_bus_index = distances.idxmin()
+
+
+        ########## Add border H2 bus
+        n.add('Bus', vv['bus_name'], **vv['bus_params'])
+
+
+        ########## Compute constant power for full annual amount [MW]
+        p_set = vv['annual_amount'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+
+
+        if vv['type'] == 'import':
+
+            ########## Add must-run H2 generator on the border bus (p_min_pu = p_max_pu = 1 set in YAML)
+            n.add('Generator', vv['generator_name'], p_nom=p_set, **vv['generator_params'])
+
+            ########## Add link from border bus to the closest H2 bus
+            vv['link_params']['bus1'] = closest_bus_index
+            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
+
+        elif vv['type'] == 'export':
+
+            ########## Add H2 load on the border bus, with constant p_set
+            n.add('Load', vv['load_name'], **vv['load_params'])
+            n.loads_t['p_set'][vv['load_name']] = p_set
+
+            ########## Add link from the closest H2 bus to the border bus
+            vv['link_params']['bus0'] = closest_bus_index
+            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
+
+        else:
+            raise ValueError(f"Unknown H2 imports/exports type '{vv['type']}' for {kk}. Expected 'import' or 'export'.")
 #
 #
 ########################################
@@ -6458,6 +6530,19 @@ if __name__ == "__main__":
             H2_valley_demands_dic = yaml.safe_load(archivo)
 
         attach_H2_valley_demands(n, H2_valley_demands_dic)
+
+
+    ##### Add H2 imports/exports through cross-border points
+    H2_imports_exports = snakemake.params.H2_imports_exports
+
+    if H2_imports_exports['enable']:
+
+        ## read file data
+        file = H2_imports_exports['file']
+        with open(file, 'r') as archivo:
+            H2_imports_exports_dic = yaml.safe_load(archivo)
+
+        attach_H2_imports_exports(n, H2_imports_exports_dic)
     #
     #
     ########################################

@@ -44,6 +44,9 @@ pypsa_spain:
   H2_valley_demands:
     enable: false   ##### If enabled, remove the electricity for H2 included in the electricity demand to avoid double counting.
     file: data_ES/H2/H2_valley_demands.yaml
+  H2_imports_exports:
+    enable: false   ##### If enabled, defines H2 imports/exports through cross-border points (must-run generator/load + link to closest H2 bus).
+    file: data_ES/H2/H2_imports_exports.yaml
   regional_network_focus:
     enable: false
     region_NUTS: 'ES511'
