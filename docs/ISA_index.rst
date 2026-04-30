@@ -70,5 +70,6 @@ For a deeper analysis on the wind powe potential in Spain restricted to low sens
 
 
 .. bibliography::
+  :filter: docname in docnames
 
 
