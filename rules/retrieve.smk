@@ -353,6 +353,44 @@ if (ISA_SOLAR_DATASET := dataset_version("isa_solar"))["source"] in [
 
 
 
+#################### Retrieve Spanish municipality-level population data from MITECO
+#
+#
+#
+
+if (POP_ES_MUNICIPALITIES_DATASET := dataset_version("pop_ES_municipalities"))["source"] in [
+    "primary",
+    "archive",
+]:
+
+    rule retrieve_pop_ES_municipalities:
+        message:
+            "Retrieving Spanish municipality-level population data from MITECO"
+        input:
+            zip_file=storage(POP_ES_MUNICIPALITIES_DATASET["url"]),
+        output:
+            shp_file="data_ES/pop/2023/CifraPob2023.shp",
+            shx_file="data_ES/pop/2023/CifraPob2023.shx",
+            dbf_file="data_ES/pop/2023/CifraPob2023.dbf",
+            prj_file="data_ES/pop/2023/CifraPob2023.prj",
+        run:
+            from pathlib import Path
+
+            # Check output folder does exist
+            output_folder = Path(output["shp_file"]).parent
+            output_folder.mkdir(parents=True, exist_ok=True)
+
+            # Open zip and extract shapefile components
+            with ZipFile(input["zip_file"], "r") as zf:
+                zf.extractall(output_folder)
+
+#
+#
+#
+####################
+
+
+
 if (EU_NUTS2013_DATASET := dataset_version("eu_nuts2013"))["source"] in [
     "primary",
     "archive",

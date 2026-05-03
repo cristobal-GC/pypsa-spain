@@ -51,7 +51,10 @@ pypsa_spain:
     enable: false
     region_NUTS: 'ES511'
     k_focus: 50
-
+  pop_layouts_HR:
+    enable: true
+    file: data_ES/pop/2023/CifraPob2023.shp
+    urban_fraction: 0.806
 
 
 
@@ -71,7 +74,7 @@ remote:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#run
 run:
   prefix: ""   #####
-  name: ""   #####
+  name: "pop_layout"   #####
   scenarios:
     enable: false
     file: config/scenarios.yaml
@@ -152,12 +155,12 @@ electricity:
     H2: 168
   extendable_carriers:
     Generator:
-    - solar
+#    - solar
 #    - "solar-hsat"
     - onwind
 #    - "offwind-ac"
 #    - "offwind-dc"
-    - "offwind-float"
+#    - "offwind-float"
 #    - OCGT
     - CCGT
     StorageUnit: []
@@ -178,12 +181,12 @@ electricity:
 #  - geothermal
   - biomass
   renewable_carriers:   #####
-  - solar
+#  - solar
 #  - "solar-hsat"
   - onwind
 #  - "offwind-ac"
 #  - "offwind-dc"
-  - "offwind-float"
+#  - "offwind-float"
   - hydro
   estimate_renewable_capacities:
     enable: true   #####
@@ -1309,6 +1312,9 @@ data:
     source: primary
     version: latest
   isa_solar:   ##### PyPSA-Spain
+    source: primary
+    version: latest
+  pop_ES_municipalities:   ##### PyPSA-Spain
     source: primary
     version: latest
   hotmaps_industrial_sites:
