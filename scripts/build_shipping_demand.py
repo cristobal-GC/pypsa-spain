@@ -8,6 +8,7 @@ ports.
 
 import json
 import logging
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
@@ -41,6 +42,14 @@ if __name__ == "__main__":
 
     # filter global port data by European ports
     european_ports = ports[ports.within(scope)]
+
+    ##### PyPSA-Spain
+    #
+    # Export filtered ports next to the shipping demand output.
+    ports_geojson = Path(snakemake.output[0]).with_name("european_ports.geojson")
+    european_ports.to_file(ports_geojson, driver="GeoJSON")
+    #
+    #####
 
     # assign ports to nearest region
     p = european_ports.to_crs(3857)
