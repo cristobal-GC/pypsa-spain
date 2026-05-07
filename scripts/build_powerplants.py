@@ -236,6 +236,24 @@ if __name__ == "__main__":
         .replace({"Solid Biomass": "Bioenergy", "Biogas": "Bioenergy"})
     )
 
+    #################### PyPSA-Spain: add nuclear phase-out calendar in Spain
+    #
+    #
+    logger.warning(f"########## PyPSA-Spain [build_powerplants]: adding nuclear phase-out calendar in Spain.")
+
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Almaraz 1"), "DateOut"] = 2027
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Almaraz 2"), "DateOut"] = 2028
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Cofrentes"), "DateOut"] = 2030
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Asco 1"), "DateOut"] = 2030
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Asco 2"), "DateOut"] = 2032
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Vandellos 2"), "DateOut"] = 2033
+    ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Trillo 1"), "DateOut"] = 2035
+    #
+    #
+    ####################
+
+
+
     ppl_query = snakemake.params.powerplants_filter
     if isinstance(ppl_query, str):
         ppl.query(ppl_query, inplace=True)
