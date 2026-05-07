@@ -795,7 +795,7 @@ rule build_eurostat_balances:
     benchmark:
         benchmarks("build_eurostat_balances")
     script:
-        "../scripts/build_eurostat_balances.py"
+        scripts("build_eurostat_balances.py")
 
 
 rule build_swiss_energy_balances:
@@ -1599,6 +1599,7 @@ rule prepare_sector_network:
             "sector", "district_heating", "temperature_limited_stores"
         ),
         H2_valley_demands=config_provider("pypsa_spain","H2_valley_demands"),   #####
+        H2_imports_exports=config_provider("pypsa_spain","H2_imports_exports"),   #####
     input:
         unpack(input_profile_offwind),
         unpack(input_heat_source_power),

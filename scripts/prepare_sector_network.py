@@ -668,13 +668,15 @@ def remove_elec_base_techs(n: pypsa.Network, carriers_to_keep: dict) -> None:
         Dictionary specifying which carriers to keep for each component type
         e.g. {'Generator': ['hydro'], 'StorageUnit': ['PHS']}
     """
-    for c in n.iterate_components(carriers_to_keep):
+    for c in n.components[list(carriers_to_keep.keys())]:
+        if c.static.empty:
+            continue
         to_keep = carriers_to_keep[c.name]
-        to_remove = pd.Index(c.df.carrier.unique()).symmetric_difference(to_keep)
+        to_remove = pd.Index(c.static.carrier.unique()).symmetric_difference(to_keep)
         if to_remove.empty:
             continue
         logger.info(f"Removing {c.list_name} with carrier {list(to_remove)}")
-        names = c.df.index[c.df.carrier.isin(to_remove)]
+        names = c.static.index[c.static.carrier.isin(to_remove)]
         n.remove(c.name, names)
         n.carriers.drop(to_remove, inplace=True, errors="ignore")
 
@@ -696,7 +698,23 @@ def patch_electricity_network(n, costs, carriers_to_keep, profiles, landfall_len
     update_wind_solar_costs(
         n, costs, landfall_lengths=landfall_lengths, profiles=profiles
     )
-    n.loads["carrier"] = "electricity"
+    
+    ########## PyPSA-Spain: set carrier="electricity" only to spanish loads, not FR/PT loads
+    ### Original in PyPSA-Eur:
+    # n.loads["carrier"] = "electricity"
+    ### Modified for PyPSA-Spain:
+    es_mask = n.loads.index.str.contains("ES")
+    ic_mask = n.loads.index.str.contains("FR") | n.loads.index.str.contains("PT")
+    n.loads.loc[es_mask, "carrier"] = "electricity"
+    n.loads.loc[ic_mask, "carrier"] = "electricity_ic"
+    ic_loads = n.loads.index[ic_mask].tolist()
+    ### log:
+    if ic_loads:
+        logger.info(
+            f"########## [PyPSA-Spain] Assigned carrier 'electricity_ic' to interconnection loads (FR/PT): {ic_loads}"
+        )
+    #####
+
     n.buses["location"] = n.buses.index
     n.buses["unit"] = "MWh_el"
     # remove trailing white space of load index until new PyPSA version after v0.18.
@@ -1590,7 +1608,20 @@ def insert_electricity_distribution_grid(
 
     # this catches regular electricity load and "industry electricity" and
     # "agriculture machinery electric" and "agriculture electricity"
-    loads = n.loads.index[n.loads.carrier.str.contains("electric")]
+
+    ########## PyPSA-Spain: exclude 'electricity_ic' (interconnection loads, FR/PT)
+    ### since they are not connected to the Spanish low-voltage distribution grid
+    loads = n.loads.index[
+        n.loads.carrier.str.contains("electric") & (n.loads.carrier != "electricity_ic")
+    ]
+    ### log
+    excluded_ic_loads = n.loads.index[n.loads.carrier == "electricity_ic"].tolist()
+    if excluded_ic_loads:
+        logger.info(
+            f"########## [PyPSA-Spain] Excluded interconnection loads (carrier 'electricity_ic') from low-voltage bus reassignment: {excluded_ic_loads}"
+        )
+    #####
+
     n.loads.loc[loads, "bus"] += " low voltage"
 
     bevs = n.links.index[n.links.carrier == "BEV charger"]
@@ -5741,8 +5772,10 @@ def cluster_heat_buses(n):
     logger.info("Cluster residential and service heat buses.")
     components = ["Bus", "Carrier", "Generator", "Link", "Load", "Store"]
 
-    for c in n.iterate_components(components):
-        df = c.df
+    for c in n.components[components]:
+        if c.static.empty:
+            continue
+        df = c.static
         cols = df.columns[df.columns.str.contains("bus") | (df.columns == "carrier")]
 
         # rename columns and index
@@ -5759,7 +5792,7 @@ def cluster_heat_buses(n):
         agg = define_clustering(df.columns, aggregate_dict)
         df = df.groupby(level=0).agg(agg, numeric_only=False)
         # time-varying data
-        pnl = c.pnl
+        pnl = c.dynamic
         agg = define_clustering(pd.Index(pnl.keys()), aggregate_dict)
         for k in pnl.keys():
 
@@ -5769,10 +5802,10 @@ def cluster_heat_buses(n):
             pnl[k] = pnl[k].T.groupby(renamer).agg(agg[k], numeric_only=False).T
 
         # remove unclustered assets of service/residential
-        to_drop = c.df.index.difference(df.index)
+        to_drop = c.static.index.difference(df.index)
         n.remove(c.name, to_drop)
         # add clustered assets
-        to_add = df.index.difference(c.df.index)
+        to_add = df.index.difference(c.static.index)
         n.add(c.name, df.loc[to_add].index, **df.loc[to_add])
 
 
@@ -5814,9 +5847,9 @@ def set_temporal_aggregation(n, resolution, snapshot_weightings):
         m.snapshot_weightings = snapshot_weightings
 
         # Aggregation all time-varying data.
-        for c in n.iterate_components():
+        for c in n.components:
             pnl = getattr(m, c.list_name + "_t")
-            for k, df in c.pnl.items():
+            for k, df in c.dynamic.items():
                 if not df.empty:
                     if c.list_name == "stores" and k == "e_max_pu":
                         pnl[k] = df.groupby(aggregation_map).min()
@@ -6267,7 +6300,79 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
 
         ########## Add H2 load
         n.add('Load', vv['load_name'], **vv['load_params'])
-        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / 8760  # 1e6 tH2 ~ 33.33e6 MWh
+        ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
+        total_hours = n.snapshot_weightings.generators.sum()
+        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+#
+#
+########################################
+
+
+
+######################################## PyPSA-Spain
+#
+# Functions to add H2 imports and exports through cross-border points
+#
+
+def attach_H2_imports_exports(n, H2_imports_exports_dic):
+
+    ##### Register H2_ic carriers (border H2, import direction, export direction)
+    for c in ['H2_ic', 'H2_ic import', 'H2_ic export']:
+        if c not in n.carriers.index:
+            n.add('Carrier', name=c)
+
+    ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
+    total_hours = n.snapshot_weightings.generators.sum()
+
+    for kk, vv in H2_imports_exports_dic.items():
+
+        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 import/export {vv["type"]} for {kk}')
+
+
+        ########## Identify the closest H2 bus on the Spanish network:
+        ### Select candidates: H2 buses in peninsular Spain
+        candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
+        # But remove those with 'FR' and 'PT' in the search
+        if candidates.empty:
+            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='H2'), ['x', 'y']]
+        ### Compute distances
+        x0 = vv['bus_params']['x']
+        y0 = vv['bus_params']['y']
+        distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
+        ### Find closest bus
+        closest_bus_index = distances.idxmin()
+
+
+        ########## Add border H2 bus
+        n.add('Bus', vv['bus_name'], **vv['bus_params'])
+
+
+        ########## Compute constant power for full annual amount [MW]
+        p_set = vv['annual_amount'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+
+
+        if vv['type'] == 'import':
+
+            ########## Add must-run H2 generator on the border bus (p_min_pu = p_max_pu = 1 set in YAML)
+            n.add('Generator', vv['generator_name'], p_nom=p_set, **vv['generator_params'])
+
+            ########## Add link from border bus to the closest H2 bus
+            vv['link_params']['bus1'] = closest_bus_index
+            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
+
+        elif vv['type'] == 'export':
+
+            ########## Add H2 load on the border bus, with constant p_set
+            n.add('Load', vv['load_name'], **vv['load_params'])
+            n.loads_t['p_set'][vv['load_name']] = p_set
+
+            ########## Add link from the closest H2 bus to the border bus
+            vv['link_params']['bus0'] = closest_bus_index
+            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
+
+        else:
+            raise ValueError(f"Unknown H2 imports/exports type '{vv['type']}' for {kk}. Expected 'import' or 'export'.")
 #
 #
 ########################################
@@ -6425,6 +6530,19 @@ if __name__ == "__main__":
             H2_valley_demands_dic = yaml.safe_load(archivo)
 
         attach_H2_valley_demands(n, H2_valley_demands_dic)
+
+
+    ##### Add H2 imports/exports through cross-border points
+    H2_imports_exports = snakemake.params.H2_imports_exports
+
+    if H2_imports_exports['enable']:
+
+        ## read file data
+        file = H2_imports_exports['file']
+        with open(file, 'r') as archivo:
+            H2_imports_exports_dic = yaml.safe_load(archivo)
+
+        attach_H2_imports_exports(n, H2_imports_exports_dic)
     #
     #
     ########################################

@@ -228,15 +228,6 @@ if __name__ == "__main__":
     configure_logging(snakemake)
     set_scenario_config(snakemake)
 
-
-
-
-#################### PyPSA-Spain: First, compute load as usual in PyPSA-Eur
-# If requested, the rewrite with PyPSA-Spain code
-#
-#
-#
-#
     snapshots = get_snapshots(
         snakemake.params.snapshots, snakemake.params.drop_leap_day
     )
@@ -341,8 +332,10 @@ if __name__ == "__main__":
     # need to reindex load time series to target year
     if fixed_year:
         load.index = load.index.map(lambda t: t.replace(year=snapshots.year[0]))
-#
-#
+
+
+
+#################### PyPSA-Spain: Before saving, replace with PyPSA-Spain methodology
 #
 #
 #
@@ -402,11 +395,7 @@ if __name__ == "__main__":
 #
 #
 #
-#
-#
 ####################
-
-
 
 
 

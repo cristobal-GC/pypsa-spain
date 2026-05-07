@@ -43,6 +43,8 @@ rule build_powerplants:
         countries=config_provider("countries"),
     input:
         network=resources("networks/base_s_{clusters}.nc"),
+        regions_onshore=resources("regions_onshore_base_s_{clusters}.geojson"),
+        regions_offshore=resources("regions_offshore_base_s_{clusters}.geojson"),
         powerplants=rules.retrieve_powerplants.output["powerplants"],
         custom_powerplants="data/custom_powerplants.csv",
     output:
@@ -235,8 +237,16 @@ rule determine_availability_matrix_MD_UA:
         renewable=config_provider("renewable"),
     input:
         copernicus=rules.download_copernicus_land_cover.output["tif"],
-        wdpa=rules.retrieve_wdpa.output["gpkg"],
-        wdpa_marine=rules.retrieve_wdpa_marine.output["gpkg"],
+        wdpa=lambda w: (
+            rules.retrieve_wdpa.output["gpkg"]
+            if config_provider("renewable", w.technology, "natura")(w)
+            else []
+        ),
+        wdpa_marine=lambda w: (
+            rules.retrieve_wdpa_marine.output["gpkg"]
+            if config_provider("renewable", w.technology, "natura")(w)
+            else []
+        ),
         gebco=lambda w: (
             rules.retrieve_gebco.output["gebco"]
             if config_provider("renewable", w.technology)(w).get("max_depth")
@@ -289,6 +299,7 @@ rule determine_availability_matrix:
         "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
     params:
         renewable=config_provider("renewable"),
+        plot_availability_matrix=config_provider("atlite", "plot_availability_matrix"),
         ISA_class=config_provider("pypsa_spain","ISA_class"), #####
     input:
         unpack(input_ua_md_availability_matrix),
@@ -298,7 +309,11 @@ rule determine_availability_matrix:
             if config_provider("renewable", w.technology, "natura")(w)
             else []
         ),
-        luisa=rules.retrieve_luisa_land_cover.output["tif"],
+        luisa=lambda w: (
+            rules.retrieve_luisa_land_cover.output["tif"]
+            if config_provider("renewable", w.technology, "luisa")(w)
+            else []
+        ),
         gebco=ancient(
             lambda w: (
                 rules.retrieve_gebco.output["gebco"]
@@ -397,7 +412,7 @@ rule build_co2_prices:
     resources:
         mem_mb=5000,
     script:
-        "../scripts/build_co2_prices.py"
+        scripts("build_co2_prices.py")
 
 
 rule build_fossil_fuel_prices:
@@ -580,11 +595,16 @@ rule build_electricity_demand_base:
         "Building electricity demand time series for base network"
     params:
         distribution_key=config_provider("load", "distribution_key"),
+        substation_only=config_provider("load", "substation_only"),
         electricity_demand=config_provider("pypsa_spain", "electricity_demand"),   #####
     input:
         base_network=resources("networks/base_s.nc"),
         regions=resources("regions_onshore_base_s.geojson"),
+        raster=rules.retrieve_electricity_demand_energy_atlas.output["tif"],
+        gb_excel=rules.retrieve_desnz_electricity_consumption.output["xlsx"],
+        gb_geojson=rules.retrieve_ons_lad.output["geojson"],
         nuts3=resources("nuts3_shapes.geojson"),
+        nutsall=rules.retrieve_eu_nuts_2021.output["shapes_all"],   #####
         load=resources("electricity_demand.csv"),
     output:
         resources("electricity_demand_base_s.nc"),
@@ -921,7 +941,7 @@ rule clean_osm_data:
     resources:
         mem_mb=4000,
     script:
-        "../scripts/clean_osm_data.py"
+        scripts("clean_osm_data.py")
 
 
 rule build_osm_network:
@@ -963,7 +983,7 @@ rule build_osm_network:
     resources:
         mem_mb=4000,
     script:
-        "../scripts/build_osm_network.py"
+        scripts("build_osm_network.py")
 
 
 rule build_tyndp_network:
@@ -996,4 +1016,4 @@ rule build_tyndp_network:
     resources:
         mem_mb=4000,
     script:
-        "../scripts/build_tyndp_network.py"
+        scripts("build_tyndp_network.py")

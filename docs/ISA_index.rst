@@ -50,6 +50,8 @@ See more details on the ISA index `here <https://www.miteco.gob.es/en/calidad-y-
 
 **PyPSA-Spain** allows land elegibility to be defined according to the ISA index (see `config <https://pypsa-spain.readthedocs.io/en/latest/configuration.html>`__ section).
 
+
+
 The following figures show the potential capacity computed with PyPSA-Spain according to different ISA levels and NUTS 2 regions. For example, *High* means that eligible land includes ISA levels 2, 3 and 4. The horizontal lines indicate the installed capacity of the corresponding technology in 2025, and the target for 2030 as defined in the Spanish National Energy and Climate Plan (NECP). Energy densities of 10 MW/km2 and 50 MW/km2 were assumed for wind power and solar PV, respectively. A land occupation factor of 25% was assumed, meaning that only this percentage of eligible land was considered when determining the potential capacity.
 
 
@@ -64,6 +66,10 @@ The following figures show the potential capacity computed with PyPSA-Spain acco
     
     
 
+For a deeper analysis on the wind powe potential in Spain restricted to low sensitivity areas, see :cite:`GallegoCastillo2026a`.
 
+
+.. bibliography::
+  :filter: docname in docnames
 
 

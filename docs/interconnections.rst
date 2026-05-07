@@ -45,6 +45,7 @@ The characteristics of these elements are defined in the file `data_ES/interconn
 
 
 .. bibliography::
+  :filter: docname in docnames
 
 
 

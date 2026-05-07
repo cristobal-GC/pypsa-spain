@@ -1,0 +1,64 @@
+
+########## Import from Portugal: CelZa
+
+CelZa:
+
+  type: import
+  annual_amount: 0.75   ### H2 annual amount in MtH2 [1e6 tons ~ 33.33 TWh]
+
+  bus_name: ES H2 CelZa
+  bus_params:
+    x: -6.47559
+    y: 41.67117
+    carrier: H2_ic
+    unit: MWh_LHV
+
+  generator_name: CelZa_gen
+  generator_params:
+    carrier: H2_ic
+    bus: ES H2 CelZa
+    p_nom_extendable: False
+    p_min_pu: 1   ### must-run
+    p_max_pu: 1   ### must-run
+    # p_nom is set in <prepare_sector_network.py> from annual_amount
+    # This is the proper way to impose 'must-run' for n.optimize(), not through p_set. p_set is used in n.pf()
+
+  link_name: CelZa link
+  link_params:
+    bus0: ES H2 CelZa
+    bus1:                 ### to be determined in <prepare_sector_network.py> (the closest H2 bus)
+    carrier: H2_ic import
+    p_nom_extendable: False
+    efficiency: 1
+    # p_nom is set in <prepare_sector_network.py> from annual_amount
+
+
+
+########## Export to France: BarMar
+
+BarMar:
+
+  type: export
+  annual_amount: 2   ### H2 annual amount in MtH2  [1e6 tons ~ 33.33 TWh]
+
+  bus_name: ES H2 BarMar
+  bus_params:
+    x: 2.15825
+    y: 41.33729
+    carrier: H2_ic
+    unit: MWh_LHV
+
+  load_name: BarMar_load
+  load_params:
+    carrier: H2_ic
+    bus: ES H2 BarMar
+    # p_set is set in <prepare_sector_network.py> from annual_amount
+
+  link_name: BarMar link
+  link_params:
+    bus0:                 ### to be determined in <prepare_sector_network.py> (the closest H2 bus)
+    bus1: ES H2 BarMar
+    carrier: H2_ic export
+    p_nom_extendable: False
+    efficiency: 1
+    # p_nom is set in <prepare_sector_network.py> from annual_amount

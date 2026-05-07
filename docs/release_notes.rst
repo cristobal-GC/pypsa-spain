@@ -12,6 +12,7 @@ Release Notes
 Upcoming Release
 ================
 
+* New functionality ``H2_imports_exports``: Allows the imposition of H2 imports and exports at an arbitrary number of border points. The default values represent the CelZa and BarMar H2 interconnections, which belong to the H2med project and have been approved as PCIs.
 
 
 
@@ -49,3 +50,4 @@ This is the first release of PyPSA-Spain. The details are described in the semin
 
 
 .. bibliography::
+  :filter: docname in docnames
