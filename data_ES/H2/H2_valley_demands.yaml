@@ -3,9 +3,9 @@ H2 valley 0:
 
   valley_name: H2_valley_0
   valley_params:
-    x: -4.0 
-    y: 41.3
-    demand: 0.4   ### H2 annual demand [1e6 tons ~ 33.33 TWh]
+    x: -3.56      # Barajas Airport
+    y: 40.49
+    demand: 0.0315  # Mt/yr
 
   load_name: H2_valley_0_demand
   load_params:
@@ -18,11 +18,102 @@ H2 valley 1:
 
   valley_name: H2_valley_1
   valley_params:
-    x: -2.7 
-    y: 38.0
-    demand: 0.2   ### H2 annual demand [1e6 tons ~ 33.33 TWh]
+    x: 2.08     # El Prat Airport
+    y: 41.30
+    demand: 0.0315  # Mt/yr
 
   load_name: H2_valley_1_demand
   load_params:
     carrier: H2
     bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 2:
+
+  valley_name: H2_valley_2
+  valley_params:
+    x: -5.69     # Valle Leonés del Hidrógeno Verde (centroid)
+    y: 42.66
+    demand: 0.02545475627  # Mt/yr
+
+  load_name: H2_valley_2_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 3:
+
+  valley_name: H2_valley_3
+  valley_params:
+    x: 0.23     # HyBERUS Project (centroid)
+    y: 41.19
+    demand: 0.051  # Mt/yr
+
+  load_name: H2_valley_3_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 4:
+
+  valley_name: H2_valley_4
+  valley_params:
+    x: -0.27     # Catalina project
+    y: 39.68
+    demand: 0.01829513173  # Mt/yr
+
+  load_name: H2_valley_4_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 5:
+
+  valley_name: H2_valley_5
+  valley_params:
+    x: -8.45     # Valle del Hidrógeno de A Coruña (centroid)
+    y: 43.34
+    demand: 0.01420208813  # Mt/yr
+
+  load_name: H2_valley_5_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 6:
+
+  valley_name: H2_valley_6
+  valley_params:
+    x: -6.89     # ONUBA project
+    y: 37.22
+    demand: 0.02551926594  # Mt/yr
+
+  load_name: H2_valley_6_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+
+H2 valley 7:
+
+  valley_name: H2_valley_7
+  valley_params:
+    x: 1.20     # T-HYNET project
+    y: 41.18
+    demand: 0.006528757925  # Mt/yr
+
+  load_name: H2_valley_7_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
