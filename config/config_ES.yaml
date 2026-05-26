@@ -51,6 +51,9 @@ pypsa_spain:
     enable: false
     region_NUTS: 'ES511'
     k_focus: 50
+  industry_scenario:
+    enable: false
+    industry_scenario_file: data_ES/industry/industrial_production_per_country_alternative.csv
 
 
 
