@@ -1155,8 +1155,14 @@ rule build_industrial_production_per_country_tomorrow:
     params:
         industry=config_provider("industry"),
     input:
-        industrial_production_per_country=resources(
-            "industrial_production_per_country.csv"
+        ##### PyPSA-Spain: allow for alternative industry scenarios
+        # industrial_production_per_country=resources(
+        #    "industrial_production_per_country.csv"
+        industrial_production_per_country=lambda w: (
+            config_provider("pypsa_spain", "industry_scenario", "industry_scenario_file")(w)
+            if config_provider("pypsa_spain", "industry_scenario", "enable", default=False)(w)
+            else resources("industrial_production_per_country.csv")
+        #####
         ),
     output:
         industrial_production_per_country_tomorrow=resources(

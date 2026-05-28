@@ -55,6 +55,10 @@ pypsa_spain:
     enable: true
     file: data_ES/pop/2023/pop_ES_2023_LR.geojson
     urban_fraction: 0.806
+  industry_scenario:
+    enable: false
+    industry_scenario_file: data_ES/industry/industrial_production_per_country_alternative.csv
+
 
 
 
@@ -155,12 +159,12 @@ electricity:
     H2: 168
   extendable_carriers:
     Generator:
-#    - solar
+    - solar
 #    - "solar-hsat"
     - onwind
 #    - "offwind-ac"
 #    - "offwind-dc"
-#    - "offwind-float"
+    - "offwind-float"
 #    - OCGT
     - CCGT
     StorageUnit: []
@@ -181,12 +185,12 @@ electricity:
 #  - geothermal
   - biomass
   renewable_carriers:   #####
-#  - solar
+  - solar
 #  - "solar-hsat"
   - onwind
 #  - "offwind-ac"
 #  - "offwind-dc"
-#  - "offwind-float"
+  - "offwind-float"
   - hydro
   estimate_renewable_capacities:
     enable: true   #####
@@ -1312,9 +1316,6 @@ data:
     source: primary
     version: latest
   isa_solar:   ##### PyPSA-Spain
-    source: primary
-    version: latest
-  pop_ES_municipalities:   ##### PyPSA-Spain
     source: primary
     version: latest
   hotmaps_industrial_sites:
