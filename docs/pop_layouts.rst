@@ -21,7 +21,7 @@ Procedure
 
 When the feature is enabled, the script overrides the three default ``pop_layout_{total,urban,rural}.nc`` files using the following steps:
 
-1. Load the municipality shapefile (``CifraPob2023.shp``), which contains 2023 population (``pob_23``) for each Spanish municipality.
+1. Load the municipality boundary dataset (``pop_ES_2023_LR.geojson``, retrieved from Zenodo, EPSG:4258), which contains the resident population as of 1 January 2023 (``pob_23``) for each Spanish municipality. The geometries are reprojected to EPSG:4326 to align with the cutout grid.
 2. Compute the population density of each municipality as :math:`\rho_m = \text{pob\_23}_m / A_m`, where :math:`A_m` is the municipal area in km² computed in the ETRS89 / LAEA Europe projection (EPSG:3035).
 3. Sort municipalities by density in descending order and tag the highest-density ones as **urban** until their cumulative population reaches the configured target urban fraction :math:`f_{\text{urban}}` of the national population. The remaining municipalities are classified as **rural**. The boundary density (i.e. the lowest density still classified as urban) is reported in the log and shown as a horizontal line in the diagnostic step plot.
 4. The script also logs, for reference, the World Bank urbanisation rate for Spain (used by the default PyPSA-Eur procedure) alongside the value taken from the configuration, so that the user can see how their choice compares to the official statistic.
@@ -43,7 +43,7 @@ Per-region aggregation
 
 The default PyPSA-Eur ``build_clustered_population_layouts`` rule aggregates the cell-level layouts to the clustered model regions using an indicator matrix :math:`I[r, c] = A(c \cap r) / A(c)`, which implicitly assumes that population is uniformly distributed over the entire cell. For coastal cells this is a poor assumption: population is concentrated in the onshore sliver covered by municipalities, while the rest of the cell lies offshore and is also outside the onshore region. As a result, part of the population deposited on those slivers is silently dropped and the per-region totals fall short of the cell-level totals.
 
-When ``pop_layouts_HR.enable`` is active, PyPSA-Spain bypasses the cell intermediation in ``build_clustered_population_layouts``: it loads the urban / rural classification from the two CSV files, retrieves each municipality's geometry from the original shapefile (joined by ``codmun_ine``), and aggregates populations to clustered regions through an area-weighted indicator matrix
+When ``pop_layouts_HR.enable`` is active, PyPSA-Spain bypasses the cell intermediation in ``build_clustered_population_layouts``: it loads the urban / rural classification from the two CSV files, retrieves each municipality's geometry from the original GeoJSON (joined by ``codmun_ine``), and aggregates populations to clustered regions through an area-weighted indicator matrix
 
 .. math::
 
@@ -61,7 +61,7 @@ The functionality is enabled in the ``pypsa_spain`` module of ``config/config_ES
 
    pop_layouts_HR:
      enable: true
-     file: data_ES/pop/2023/CifraPob2023.shp
+     file: data_ES/pop/2023/pop_ES_2023_LR.geojson
      urban_fraction: 0.6
 
 The ``urban_fraction`` parameter sets the target share of the national population to be classified as urban (e.g. ``0.6`` means that the 60% of the population living in the highest-density municipalities is treated as urban).

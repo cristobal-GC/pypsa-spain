@@ -353,7 +353,7 @@ if (ISA_SOLAR_DATASET := dataset_version("isa_solar"))["source"] in [
 
 
 
-#################### Retrieve Spanish municipality-level population data from MITECO
+#################### Retrieve Spanish municipality-level population data from Zenodo
 #
 #
 #
@@ -365,24 +365,17 @@ if (POP_ES_MUNICIPALITIES_DATASET := dataset_version("pop_ES_municipalities"))["
 
     rule retrieve_pop_ES_municipalities:
         message:
-            "Retrieving Spanish municipality-level population data from MITECO"
+            "Retrieving Spanish municipality-level population data from Zenodo"
         input:
-            zip_file=storage(POP_ES_MUNICIPALITIES_DATASET["url"]),
+            geojson=storage(POP_ES_MUNICIPALITIES_DATASET["url"]),
         output:
-            shp_file="data_ES/pop/2023/CifraPob2023.shp",
-            shx_file="data_ES/pop/2023/CifraPob2023.shx",
-            dbf_file="data_ES/pop/2023/CifraPob2023.dbf",
-            prj_file="data_ES/pop/2023/CifraPob2023.prj",
+            geojson="data_ES/pop/2023/pop_ES_2023_LR.geojson",
         run:
             from pathlib import Path
 
-            # Check output folder does exist
-            output_folder = Path(output["shp_file"]).parent
-            output_folder.mkdir(parents=True, exist_ok=True)
-
-            # Open zip and extract shapefile components
-            with ZipFile(input["zip_file"], "r") as zf:
-                zf.extractall(output_folder)
+            # Ensure output folder exists
+            Path(output["geojson"]).parent.mkdir(parents=True, exist_ok=True)
+            copy2(input["geojson"], output["geojson"])
 
 #
 #

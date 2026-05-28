@@ -130,7 +130,10 @@ if __name__ == "__main__":
             f"({snakemake.input.pop_municipalities})"
         )
 
-        municipalities = gpd.read_file(snakemake.input.pop_municipalities)
+        # Source file is published in EPSG:4258 (ETRS89 geographic). Align with
+        # the cutout grid CRS (EPSG:4326, WGS84 lat/lon) before any intersection
+        # against grid_cells so compute_indicatormatrix operates in a single CRS.
+        municipalities = gpd.read_file(snakemake.input.pop_municipalities).to_crs(4326)
 
         # Drop municipalities outside the cutout footprint (Canarias, Ceuta,
         # Melilla) so their population is not silently lost when projecting to
@@ -341,7 +344,7 @@ if __name__ == "__main__":
         muni_plot.assign(density_clip=density_for_plot).plot(
             ax=ax,
             column="density_clip",
-            cmap="viridis",
+            cmap="YlOrRd",
             norm=LogNorm(
                 vmin=max(density_for_plot.min(), 1e-1),
                 vmax=density_for_plot.max(),

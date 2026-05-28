@@ -53,7 +53,7 @@ pypsa_spain:
     k_focus: 50
   pop_layouts_HR:
     enable: true
-    file: data_ES/pop/2023/CifraPob2023.shp
+    file: data_ES/pop/2023/pop_ES_2023_LR.geojson
     urban_fraction: 0.806
 
 
@@ -74,7 +74,7 @@ remote:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#run
 run:
   prefix: ""   #####
-  name: "pop_layout"   #####
+  name: ""   #####
   scenarios:
     enable: false
     file: config/scenarios.yaml
