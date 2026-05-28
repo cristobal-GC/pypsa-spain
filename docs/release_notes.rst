@@ -14,6 +14,8 @@ Upcoming Release
 
 * New functionality ``H2_imports_exports``: Allows the imposition of H2 imports and exports at an arbitrary number of border points. The default values represent the CelZa and BarMar H2 interconnections, which belong to the H2med project and have been approved as PCIs.
 
+* New functionality ``pop_layouts_HR``: High-resolution population layouts built from ~8,100 Spanish municipalities, replacing the default PyPSA-Eur procedure that assumes uniform population within each NUTS3 region. The urban/rural split is driven by a user-configurable target urban population fraction (default value based on the World Bank urbanisation rate), and the cluster-level aggregation is performed directly from municipal geometries to avoid the population losses that the default cell-based approach incurs in coastal regions. Diagnostic maps and density plots are produced as part of the rule (see details `here <https://pypsa-spain.readthedocs.io/en/latest/pop_layouts.html>`__).
+
 
 
 PyPSA-Spain v2025.11.0 (25th November 2025)

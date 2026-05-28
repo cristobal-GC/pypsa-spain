@@ -21,15 +21,15 @@ Procedure
 
 When the feature is enabled, the script overrides the three default ``pop_layout_{total,urban,rural}.nc`` files using the following steps:
 
-1. Load the municipality boundary dataset (``pop_ES_2023_LR.geojson``, retrieved from Zenodo, EPSG:4258), which contains the resident population as of 1 January 2023 (``pob_23``) for each Spanish municipality. The geometries are reprojected to EPSG:4326 to align with the cutout grid.
-2. Compute the population density of each municipality as :math:`\rho_m = \text{pob\_23}_m / A_m`, where :math:`A_m` is the municipal area in km² computed in the ETRS89 / LAEA Europe projection (EPSG:3035).
+1. Load the municipality boundary dataset (``pop_ES_2023_LR.geojson``, retrieved from Zenodo), which contains the resident population as of 1 January 2023 (``pob_23``) for each Spanish municipality.
+2. Compute the population density of each municipality as :math:`\rho_m = \text{pob2023}_m / A_m`, where :math:`A_m` is the municipal area in km² computed in the ETRS89 / LAEA Europe projection (EPSG:3035).
 3. Sort municipalities by density in descending order and tag the highest-density ones as **urban** until their cumulative population reaches the configured target urban fraction :math:`f_{\text{urban}}` of the national population. The remaining municipalities are classified as **rural**. The boundary density (i.e. the lowest density still classified as urban) is reported in the log and shown as a horizontal line in the diagnostic step plot.
 4. The script also logs, for reference, the World Bank urbanisation rate for Spain (used by the default PyPSA-Eur procedure) alongside the value taken from the configuration, so that the user can see how their choice compares to the official statistic.
 5. For each cutout grid cell, distribute every municipality's population homogeneously across its area and accumulate the contributions intersecting the cell. This is computed via the atlite indicator matrix:
 
    .. math::
 
-      p^{\text{cell}}_i = \sum_m \frac{A(c_i \cap m)}{A_m} \cdot \text{pob\_23}_m
+      p^{\text{cell}}_i = \sum_m \frac{A(c_i \cap m)}{A_m} \cdot \text{pob2023}_m
 
    The same expression yields ``pop_layout_total``, ``pop_layout_urban`` and ``pop_layout_rural`` by summing over all, only urban, or only rural municipalities respectively.
 
@@ -62,9 +62,9 @@ The functionality is enabled in the ``pypsa_spain`` module of ``config/config_ES
    pop_layouts_HR:
      enable: true
      file: data_ES/pop/2023/pop_ES_2023_LR.geojson
-     urban_fraction: 0.6
+     urban_fraction: 0.806
 
-The ``urban_fraction`` parameter sets the target share of the national population to be classified as urban (e.g. ``0.6`` means that the 60% of the population living in the highest-density municipalities is treated as urban).
+The ``urban_fraction`` parameter sets the target share of the national population to be classified as urban (e.g. ``0.806`` means that the 80.6% of the population living in the highest-density municipalities is treated as urban).
 
 When ``enable: false``, the script falls back to the default NUTS3-based PyPSA-Eur layouts and the input shapefile is not required.
 
@@ -83,7 +83,7 @@ When the feature is active, the rule also produces four diagnostic figures under
 Modelling assumptions and limitations
 ========================================
 
-- Population is assumed to be homogeneously distributed within each municipality. This is a much weaker assumption than the NUTS3 default, but it still ignores intra-municipal density gradients (e.g. urban core vs. peripheral neighbourhoods within a single municipality).
+- Population is assumed to be homogeneously distributed within each municipality.
 - The urban/rural classification is driven by a user-supplied target population fraction (``urban_fraction``). This replaces the World Bank urbanisation rate used by the default PyPSA-Eur procedure and lets the user explore the sensitivity of results to different urban shares without changing the geographic data.
 - Only Spanish municipalities are covered. If the cutout extends beyond Spain, grid cells outside the municipal coverage receive zero population in all three layouts.
 - Municipalities in **Canarias**, **Ceuta** and **Melilla** are excluded from the high-resolution layout, since they fall outside the cutout footprint used for the modelled system. Their population is therefore not represented in the per-cell or per-region outputs when the high-resolution mode is active.
