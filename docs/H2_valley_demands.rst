@@ -14,24 +14,31 @@ PyPSA-Spain includes a functionality to model geolocalised annual hydrogen deman
 The required elements are added during the rule ``prepare_sector_network``, after the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the H2 valleys, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
 
 
+The repository ships with several template YAML files that can be used out of the box or as a starting point for custom scenarios:
+
+- ``data_ES/H2/H2_valley_demands.yaml`` — built from the IDAE resolution (July 2024) that awarded the first call of the Spanish incentive programme for renewable hydrogen production and consumption projects (clusters or valleys). For details, see `PR #18 <https://github.com/cristobal-GC/pypsa-spain/pull/18>`__.
+- ``data_ES/H2/H2_valley_demands_CfI_2030.yaml`` and ``data_ES/H2/H2_valley_demands_CfI_2040.yaml`` — built from the results of the *Call for Interest* process launched by Enagás in September 2023 (results presented in January 2024), providing H2 demand projections for 2030 and 2040 respectively. For details, see `PR #21 <https://github.com/cristobal-GC/pypsa-spain/pull/21>`__.
+
+The figures below show the H2 valleys defined in the IDAE template (left) and in the Enagás *Call for Interest* template for 2030 (right):
+
++-----------------------------------------------+-----------------------------------------------+
+| .. image:: img/H2_valley_demands.png          | .. image:: img/H2_valley_demands_CfI_2030.png |
+|    :width: 100%                               |    :width: 100%                               |
++-----------------------------------------------+-----------------------------------------------+
+
+
+
 Model components
 ========================
 
-For each H2 valley, the following element is added to the network:
-
-- a **fixed H2 load** with carrier ``H2``, attached to the closest H2 bus of the Spanish network and consuming a constant power such that the total annual consumption equals the configured amount of hydrogen.
-
-The closest H2 bus is identified at runtime based on Euclidean distance between the H2 valley coordinates and the H2 buses in peninsular Spain.
-
-The annual hydrogen amount is converted to a constant power setpoint using:
+For each H2 valley, a **fixed H2 load** is attached to the closest H2 bus of the Spanish network. The closest H2 bus is identified at runtime based on Euclidean distance between the H2 valley coordinates and the H2 buses in peninsular Spain.
+The annual hydrogen mass is converted to a constant H2 power setpoint via a pure unit change (mass → energy through the H2 lower heating value):
 
 .. math::
 
-   p = \frac{\text{annual\_amount} \cdot 33.33 \times 10^6}{\sum_t w_t} \quad [\text{MW}]
+   p_{\text{H2}} = \frac{\text{annual\_amount} \cdot 33.33 \times 10^6}{\sum_t w_t} \quad [\text{MW}_{\text{H2}}]
 
-where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution).
-
-The constant load is imposed by directly setting ``loads_t.p_set`` for the load.
+where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution). The constant H2 load is imposed by directly setting ``loads_t.p_set`` for the load.
 
 
 Configuration
@@ -49,15 +56,9 @@ The characteristics of each H2 valley are defined in the file referenced above. 
 
 .. note::
 
-   When this functionality is enabled, the electricity demand associated with H2 production should be removed from the regular electricity demand input to avoid double counting.
+   Because the load is placed on the **H2 bus** (not on the electrical bus), the electricity needed to produce that hydrogen is computed endogenously by the optimiser via the electrolysers. To avoid double counting, any share of electricity demand that was originally intended for H2 production must be removed from the regular electricity demand input.
 
 
-The following figure shows the H2 valleys defined in the template file included in the repository. A more detailed description of these example valleys is provided in `PR #18 <https://github.com/cristobal-GC/pypsa-spain/pull/18>`__.
-
-.. figure:: img/H2_valley_demands.png
-  :width: 85%
-  :align: center
-  :alt: Map of H2 valley demands in PyPSA-Spain
 
 
 
