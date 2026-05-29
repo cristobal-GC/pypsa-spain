@@ -11,7 +11,7 @@ rule build_electricity_demand:
         drop_leap_day=config_provider("enable", "drop_leap_day"),
         countries=config_provider("countries"),
         load=config_provider("load"),
-        electricity_demand=config_provider("pypsa_spain", "electricity_demand"),   #####
+        electricity_demand=config_provider("pypsa_spain", "electricity_demand", default={"enable": False}),   #####
     input:
         opsd=rules.retrieve_electricity_demand_opsd.output["csv"],
         neso=rules.retrieve_electricity_demand_neso.output["csv"],
@@ -300,7 +300,7 @@ rule determine_availability_matrix:
     params:
         renewable=config_provider("renewable"),
         plot_availability_matrix=config_provider("atlite", "plot_availability_matrix"),
-        ISA_class=config_provider("pypsa_spain","ISA_class"), #####
+        ISA_class=config_provider("pypsa_spain","ISA_class", default={"enable": False}), #####
     input:
         unpack(input_ua_md_availability_matrix),
         corine=ancient(rules.retrieve_corine.output["tif_file"]),
@@ -366,7 +366,7 @@ rule build_renewable_profiles:
         snapshots=config_provider("snapshots"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
         renewable=config_provider("renewable"),
-        q2q_transform=config_provider("pypsa_spain","q2q_transform"), #####        
+        q2q_transform=config_provider("pypsa_spain","q2q_transform", default={"enable": False}), #####        
     input:
         availability_matrix=resources("availability_matrix_{clusters}_{technology}.nc"),
         offshore_shapes=resources("offshore_shapes.geojson"),
@@ -596,7 +596,7 @@ rule build_electricity_demand_base:
     params:
         distribution_key=config_provider("load", "distribution_key"),
         substation_only=config_provider("load", "substation_only"),
-        electricity_demand=config_provider("pypsa_spain", "electricity_demand"),   #####
+        electricity_demand=config_provider("pypsa_spain", "electricity_demand", default={"enable": False}),   #####
     input:
         base_network=resources("networks/base_s.nc"),
         regions=resources("regions_onshore_base_s.geojson"),
@@ -739,7 +739,7 @@ rule cluster_network:
         length_factor=config_provider("lines", "length_factor"),
         cluster_mode=config_provider("clustering", "mode"),
         copperplate_regions=config_provider("clustering", "copperplate_regions"),
-        regional_network_focus=config_provider("pypsa_spain", "regional_network_focus"),   #####
+        regional_network_focus=config_provider("pypsa_spain", "regional_network_focus", default={"enable": False}),   #####
     input:
         unpack(input_custom_busmap),
         network=resources("networks/base_s.nc"),
@@ -821,7 +821,7 @@ rule add_electricity:
         ),
         aggregation_strategies=config_provider("clustering", "aggregation_strategies"),
         exclude_carriers=config_provider("clustering", "exclude_carriers"),
-        update_elec_capacities=config_provider("pypsa_spain", "update_elec_capacities"),   #####        
+        update_elec_capacities=config_provider("pypsa_spain", "update_elec_capacities", default={"enable": False}),   #####        
     input:
         unpack(input_profile_tech),
         unpack(input_class_regions),
@@ -873,7 +873,7 @@ rule prepare_network:
         autarky=config_provider("electricity", "autarky", default={}),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
         transmission_limit=config_provider("electricity", "transmission_limit"),
-        interconnections=config_provider("pypsa_spain","interconnections"),   #####
+        interconnections=config_provider("pypsa_spain","interconnections", default={"enable": False}),   #####
     input:
         resources("networks/base_s_{clusters}_elec.nc"),
         costs=lambda w: resources(
