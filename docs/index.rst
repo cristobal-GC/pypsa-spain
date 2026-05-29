@@ -39,6 +39,7 @@ Find the details of PyPSA-Spain v.0.0.0 in the `seminal paper <https://doi.org/1
    regional_network_focus
    H2_valley_demands
    H2_imports_exports
+   pop_layouts
 
 .. toctree::
    :hidden:

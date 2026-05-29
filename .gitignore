@@ -57,6 +57,7 @@ data/costs_*.csv
 !/data/custom_costs.csv
 
 data_ES/ISA/
+data_ES/pop/
 
 dask-worker-space/
 publications.jrc.ec.europa.eu/

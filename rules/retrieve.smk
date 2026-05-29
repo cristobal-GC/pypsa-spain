@@ -353,6 +353,37 @@ if (ISA_SOLAR_DATASET := dataset_version("isa_solar"))["source"] in [
 
 
 
+#################### Retrieve Spanish municipality-level population data from Zenodo
+#
+#
+#
+
+if (POP_ES_MUNICIPALITIES_DATASET := dataset_version("pop_ES_municipalities"))["source"] in [
+    "primary",
+    "archive",
+]:
+
+    rule retrieve_pop_ES_municipalities:
+        message:
+            "Retrieving Spanish municipality-level population data from Zenodo"
+        input:
+            geojson=storage(POP_ES_MUNICIPALITIES_DATASET["url"]),
+        output:
+            geojson="data_ES/pop/2023/pop_ES_2023_LR.geojson",
+        run:
+            from pathlib import Path
+
+            # Ensure output folder exists
+            Path(output["geojson"]).parent.mkdir(parents=True, exist_ok=True)
+            copy2(input["geojson"], output["geojson"])
+
+#
+#
+#
+####################
+
+
+
 if (EU_NUTS2013_DATASET := dataset_version("eu_nuts2013"))["source"] in [
     "primary",
     "archive",

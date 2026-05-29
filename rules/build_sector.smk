@@ -6,14 +6,27 @@
 rule build_population_layouts:
     message:
         "Building population layout data (total, urban, rural) from NUTS3 shapes and World Bank statistics"
+    params:
+        pop_layouts_HR=config_provider("pypsa_spain", "pop_layouts_HR"),
     input:
         nuts3_shapes=resources("nuts3_shapes.geojson"),
         urban_percent=rules.retrieve_worldbank_urban_population.output["csv"],
         cutout=lambda w: input_cutout(w),
+        pop_municipalities=lambda w: (
+            config_provider("pypsa_spain", "pop_layouts_HR", "file")(w)
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
     output:
         pop_layout_total=resources("pop_layout_total.nc"),
         pop_layout_urban=resources("pop_layout_urban.nc"),
         pop_layout_rural=resources("pop_layout_rural.nc"),
+        pop_map_urban=resources("pop/map_urban.png"),
+        pop_map_rural=resources("pop/map_rural.png"),
+        pop_map_density=resources("pop/map_density.png"),
+        pop_density_steps=resources("pop/density_steps.png"),
+        pop_municipalities_urban=resources("pop/municipalities_urban.csv"),
+        pop_municipalities_rural=resources("pop/municipalities_rural.csv"),
     log:
         logs("build_population_layouts.log"),
     resources:
@@ -28,12 +41,29 @@ rule build_population_layouts:
 rule build_clustered_population_layouts:
     message:
         "Clustering population layouts for {wildcards.clusters} clusters"
+    params:
+        pop_layouts_HR=config_provider("pypsa_spain", "pop_layouts_HR"),
     input:
         pop_layout_total=resources("pop_layout_total.nc"),
         pop_layout_urban=resources("pop_layout_urban.nc"),
         pop_layout_rural=resources("pop_layout_rural.nc"),
         regions_onshore=resources("regions_onshore_base_s_{clusters}.geojson"),
         cutout=lambda w: input_cutout(w),
+        pop_municipalities_urban=lambda w: (
+            resources("pop/municipalities_urban.csv")
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
+        pop_municipalities_rural=lambda w: (
+            resources("pop/municipalities_rural.csv")
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
+        pop_municipalities=lambda w: (
+            config_provider("pypsa_spain", "pop_layouts_HR", "file")(w)
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
     output:
         clustered_pop_layout=resources("pop_layout_base_s_{clusters}.csv"),
     log:
@@ -68,12 +98,29 @@ rule build_clustered_solar_rooftop_potentials:
 rule build_simplified_population_layouts:
     message:
         "Building simplified population layouts for base scenario"
+    params:
+        pop_layouts_HR=config_provider("pypsa_spain", "pop_layouts_HR"),
     input:
         pop_layout_total=resources("pop_layout_total.nc"),
         pop_layout_urban=resources("pop_layout_urban.nc"),
         pop_layout_rural=resources("pop_layout_rural.nc"),
         regions_onshore=resources("regions_onshore_base_s.geojson"),
         cutout=lambda w: input_cutout(w),
+        pop_municipalities_urban=lambda w: (
+            resources("pop/municipalities_urban.csv")
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
+        pop_municipalities_rural=lambda w: (
+            resources("pop/municipalities_rural.csv")
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
+        pop_municipalities=lambda w: (
+            config_provider("pypsa_spain", "pop_layouts_HR", "file")(w)
+            if config_provider("pypsa_spain", "pop_layouts_HR", "enable")(w)
+            else []
+        ),
     output:
         clustered_pop_layout=resources("pop_layout_base_s.csv"),
     resources:
