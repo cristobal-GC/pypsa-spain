@@ -10,53 +10,84 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run-validation:
-    name: Run validation
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: self-hosted
-    outputs:
-      validation_failed: ${{ steps.check_validation.outputs.failed }}
-    steps:
-    - uses: lkstrp/pypsa-validator@v0.2.5
-      id: validation
-      continue-on-error: true
-      with:
-        step: run-self-hosted-validation
-        env_file: envs/environment.yaml
-        snakemake_config: config/test/config.validator.yaml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Check validation status
-      id: check_validation
-      run: |
-        if [[ "${{ steps.validation.outcome }}" == "failure" ]]; then
-          echo "failed=true" >> $GITHUB_OUTPUT
-        else
-          echo "failed=false" >> $GITHUB_OUTPUT
-        fi
-
-  create-report:
-    name: Create report
-    needs: run-validation
-    if: |
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      needs.run-validation.outputs.validation_failed != 'true'
+  ##### PyPSA-Spain: validation is reduced to a DAG-level dry-run (snakemake -n).
+  ##### The heavy "run-the-workflow-and-compare" validation is already covered
+  ##### upstream by PyPSA-Eur, so here we only check that the workflow graph
+  ##### builds correctly. config_ES.yaml is loaded as the default config in the
+  ##### Snakefile; config.validator.yaml overrides a few fields on the CLI.
+  dag-validation:
+    name: DAG dry-run
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
-    - uses: lkstrp/pypsa-validator@v0.2.5
+    - uses: actions/checkout@v6
+
+    - name: Setup Pixi
+      uses: prefix-dev/setup-pixi@v0.9.4
       with:
-        step: create-comment
-        snakemake_config: config/test/config.validator.yaml
-        # The path starting from prefix in config
-        # For plot results/<prefix>/<scenario>/<plot_name>.png pass
-        # <scenario>/<plot_name>.png
-        plots: >
-          "
-          graphs/energy.pdf
-          graphs/costs.pdf
-          graphs/balances-energy.pdf
-          graphs/balances-urban_central_heat.pdf
-          graphs/balances-urban_decentral_heat.pdf
-          graphs/balances-rural_heat.pdf
-          "
-        validator_key: ${{ secrets.VALIDATOR_KEY }}
+        pixi-version: v0.59.0
+        cache: true
+        cache-write: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+
+    - name: Dry-run DAG validation
+      run: |
+        pixi run snakemake -n all --configfile config/test/config.validator.yaml
+
+##### PyPSA-Spain: the original PyPSA-Eur pypsa-validator jobs are kept below
+##### (commented out) for visibility/diff against upstream. They run the full
+##### workflow on a self-hosted runner and post a comparison report. Re-enable
+##### if full validation is wanted again.
+#  run-validation:
+#    name: Run validation
+#    if: github.event.pull_request.head.repo.full_name == github.repository
+#    runs-on: self-hosted
+#    outputs:
+#      validation_failed: ${{ steps.check_validation.outputs.failed }}
+#    steps:
+#    - uses: lkstrp/pypsa-validator@v0.2.5
+#      id: validation
+#      continue-on-error: true
+#      with:
+#        step: run-self-hosted-validation
+#        env_file: envs/environment.yaml
+#        snakemake_config: config/test/config.validator.yaml
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    - name: Check validation status
+#      id: check_validation
+#      run: |
+#        if [[ "${{ steps.validation.outcome }}" == "failure" ]]; then
+#          echo "failed=true" >> $GITHUB_OUTPUT
+#        else
+#          echo "failed=false" >> $GITHUB_OUTPUT
+#        fi
+#
+#  create-report:
+#    name: Create report
+#    needs: run-validation
+#    if: |
+#      github.event.pull_request.head.repo.full_name == github.repository &&
+#      needs.run-validation.outputs.validation_failed != 'true'
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: lkstrp/pypsa-validator@v0.2.5
+#      with:
+#        step: create-comment
+#        snakemake_config: config/test/config.validator.yaml
+#        # The path starting from prefix in config
+#        # For plot results/<prefix>/<scenario>/<plot_name>.png pass
+#        # <scenario>/<plot_name>.png
+#        plots: >
+#          "
+#          graphs/energy.pdf
+#          graphs/costs.pdf
+#          graphs/balances-energy.pdf
+#          graphs/balances-urban_central_heat.pdf
+#          graphs/balances-urban_decentral_heat.pdf
+#          graphs/balances-rural_heat.pdf
+#          "
+#        validator_key: ${{ secrets.VALIDATOR_KEY }}

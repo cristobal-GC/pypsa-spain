@@ -32,6 +32,15 @@ if Path("config/config.yaml").exists():
     configfile: "config/config.yaml"
 
 
+##### PyPSA-Spain: 
+# load config_ES.yaml as the default config. Placed last so it
+# takes precedence over a local config/config.yaml, and loaded as a directive
+# (not via --configfile) so it is available when rules are parsed (e.g. the
+# module-level dataset_version() calls in retrieve.smk). Override on the CLI
+# with --configfile to adjust specific fields (as the validator CI does).
+configfile: "config/config_ES.yaml"
+
+
 validate_config(config)
 
 run = config["run"]
