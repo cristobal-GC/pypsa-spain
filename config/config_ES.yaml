@@ -15,11 +15,11 @@ pypsa_spain:
     offwind-ac: ''
     offwind-dc: ''
     offwind-float: ''
-    solar: data_ES/q2q/q2q_solar_REF_v1.pkl
-    solar-hsat: data_ES/q2q/q2q_solar-hsat_REF_v1.pkl
+    solar: ''
+    solar-hsat: ''
   electricity_demand:
     enable: true
-    annual_value: 344   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs -> requires 90 TWh , generates 1.62 MtH2 aprox.) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs -> requires 82 TWh , generates 1.45 MtH2 aprox.) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
+    annual_value: 270   ##### TWh / 344 (2030): PNIEC final version 2024 (11.98 GW ELYs -> requires 90 TWh , generates 1.62 MtH2 aprox.) / 316.5 (2030): PNIEC 2nd draft 2023 (10.88 GW ELYs -> requires 82 TWh , generates 1.45 MtH2 aprox.) / 263 (2030): PNIEC 1st draft 2022 (no ELYs) / 235.5 (2022) real data according to REE: https://www.sistemaelectrico-ree.es/informe-del-sistema-electrico/demanda/evolucion-demanda
     profiles: data_ES/electricity_demand/electricity_demand_profiles_NUTS3_by_economicSector_2022.csv
     percentages: data_ES/electricity_demand/electricity_demand_percentages_NUTS3_by_economicSector_2022.csv
   interconnections:
@@ -42,10 +42,10 @@ pypsa_spain:
       grid_codes: [4, 3]
     ISA_offwind_float: False   ##### ISA is only for land
   H2_valley_demands:
-    enable: false   ##### If enabled, remove the electricity for H2 included in the electricity demand to avoid double counting.
+    enable: true   ##### If enabled, remove the electricity for H2 included in the electricity demand to avoid double counting.
     file: data_ES/H2/H2_valley_demands.yaml
   H2_imports_exports:
-    enable: false   ##### If enabled, defines H2 imports/exports through cross-border points (must-run generator/load + link to closest H2 bus).
+    enable: true   ##### If enabled, defines H2 imports/exports through cross-border points (must-run generator/load + link to closest H2 bus).
     file: data_ES/H2/H2_imports_exports.yaml
   regional_network_focus:
     enable: false
