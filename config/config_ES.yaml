@@ -1318,6 +1318,9 @@ data:
   isa_solar:   ##### PyPSA-Spain
     source: primary
     version: latest
+  pop_ES_municipalities:   ##### PyPSA-Spain
+    source: primary
+    version: latest
   hotmaps_industrial_sites:
     source: archive
     version: latest
