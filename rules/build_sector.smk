@@ -1651,8 +1651,8 @@ rule prepare_sector_network:
         temperature_limited_stores=config_provider(
             "sector", "district_heating", "temperature_limited_stores"
         ),
-        H2_valley_demands=config_provider("pypsa_spain","H2_valley_demands"),   #####
-        H2_imports_exports=config_provider("pypsa_spain","H2_imports_exports"),   #####
+        H2_valley_demands=config_provider("pypsa_spain","H2_valley_demands", default={"enable": False}),   #####
+        H2_imports_exports=config_provider("pypsa_spain","H2_imports_exports", default={"enable": False}),   #####
     input:
         unpack(input_profile_offwind),
         unpack(input_heat_source_power),

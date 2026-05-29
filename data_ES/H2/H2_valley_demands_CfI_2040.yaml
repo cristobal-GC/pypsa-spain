@@ -1,0 +1,549 @@
+# Total H2 demand: 1.213129 Mt
+# This data was obtained from the results of the Call For Interest process of September 2023, presented by Enagás in January 2024.
+# See details at https://github.com/cristobal-GC/pypsa-spain/pull/21
+
+H2 valley 0:
+
+  valley_name: Guitiriz
+  valley_params:
+    x: -7.85619
+    y: 43.20657
+    demand: 0.011717  # Mt/yr
+
+  load_name: H2_valley_0_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 1:
+
+  valley_name: Llanera
+  valley_params:
+    x: -5.862
+    y: 43.45374
+    demand: 0.128259  # Mt/yr
+
+  load_name: H2_valley_1_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 2:
+
+  valley_name: Castropodame
+  valley_params:
+    x: -6.44269
+    y: 42.57852
+    demand: 0.032691  # Mt/yr
+
+  load_name: H2_valley_2_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 3:
+
+  valley_name: Valverde de la Virgen
+  valley_params:
+    x: -5.69325
+    y: 42.5722
+    demand: 0.004545  # Mt/yr
+
+  load_name: H2_valley_3_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 4:
+
+  valley_name: Benavente
+  valley_params:
+    x: -5.67988
+    y: 42.0046
+    demand: 0.001088  # Mt/yr
+
+  load_name: H2_valley_4_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 5:
+
+  valley_name: Coreses
+  valley_params:
+    x: -5.61793
+    y: 41.53457
+    demand: 0.000787  # Mt/yr
+
+  load_name: H2_valley_5_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 6:
+
+  valley_name: Cigales
+  valley_params:
+    x: -4.71485
+    y: 41.77385
+    demand: 0.058338  # Mt/yr
+
+  load_name: H2_valley_6_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 7:
+
+  valley_name: Aranda de Duero
+  valley_params:
+    x: -3.68517
+    y: 41.68994
+    demand: 0.002657  # Mt/yr
+
+  load_name: H2_valley_7_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 8:
+
+  valley_name: Los Rabanos
+  valley_params:
+    x: -2.46376
+    y: 41.68155
+    demand: 0.013417  # Mt/yr
+
+  load_name: H2_valley_8_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 9:
+
+  valley_name: Burgos
+  valley_params:
+    x: -3.68224
+    y: 42.35152
+    demand: 0.023  # Mt/yr
+
+  load_name: H2_valley_9_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 10:
+
+  valley_name: Almendralejo
+  valley_params:
+    x: -6.40938
+    y: 38.70831
+    demand: 0.034791  # Mt/yr
+
+  load_name: H2_valley_10_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 11:
+
+  valley_name: Palos de la Frontera
+  valley_params:
+    x: -6.89289
+    y: 37.19417
+    demand: 0.301656  # Mt/yr
+
+  load_name: H2_valley_11_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 12:
+
+  valley_name: Aznalcazar
+  valley_params:
+    x: -6.28343
+    y: 37.10759
+    demand: 0.02575  # Mt/yr
+
+  load_name: H2_valley_12_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 13:
+
+  valley_name: Villafranca de Córdoba
+  valley_params:
+    x: -4.55649
+    y: 37.95447
+    demand: 0.002531  # Mt/yr
+
+  load_name: H2_valley_13_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 14:
+
+  valley_name: La Carolina
+  valley_params:
+    x: -3.61542
+    y: 38.30703
+    demand: 0.008233  # Mt/yr
+
+  load_name: H2_valley_14_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 15:
+
+  valley_name: Arcos de la Frontera
+  valley_params:
+    x: -5.75463
+    y: 36.74351
+    demand: 0.018  # Mt/yr
+
+  load_name: H2_valley_15_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 16:
+
+  valley_name: San Roque
+  valley_params:
+    x: -5.35127
+    y: 36.25884
+    demand: 0.124906  # Mt/yr
+
+  load_name: H2_valley_16_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 17:
+
+  valley_name: Málaga
+  valley_params:
+    x: -4.42397
+    y: 36.76753
+    demand: 0.038436  # Mt/yr
+
+  load_name: H2_valley_17_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 18:
+
+  valley_name: Albolote
+  valley_params:
+    x: -3.65908
+    y: 37.30498
+    demand: 0.043309  # Mt/yr
+
+  load_name: H2_valley_18_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 19:
+
+  valley_name: Puertollano
+  valley_params:
+    x: -4.06079
+    y: 38.64915
+    demand: 0.008022  # Mt/yr
+
+  load_name: H2_valley_19_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 20:
+
+  valley_name: Chinchilla de Monte Aragón
+  valley_params:
+    x: -1.63613
+    y: 38.87595
+    demand: 0.039355  # Mt/yr
+
+  load_name: H2_valley_20_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 21:
+
+  valley_name: Mascaraque
+  valley_params:
+    x: -3.80233
+    y: 39.74515
+    demand: 0.022705  # Mt/yr
+
+  load_name: H2_valley_21_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 22:
+
+  valley_name: Zarza de Tajo
+  valley_params:
+    x: -3.12752
+    y: 40.028
+    demand: 0.00015  # Mt/yr
+
+  load_name: H2_valley_22_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 23:
+
+  valley_name: Getafe
+  valley_params:
+    x: -3.67338
+    y: 40.2992
+    demand: 0.0265  # Mt/yr
+
+  load_name: H2_valley_23_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 24:
+
+  valley_name: Torrelavega
+  valley_params:
+    x: -4.04108
+    y: 43.33601
+    demand: 0.03754  # Mt/yr
+
+  load_name: H2_valley_24_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 25:
+
+  valley_name: Cierbana
+  valley_params:
+    x: -3.08873
+    y: 43.30881
+    demand: 0.011815  # Mt/yr
+
+  load_name: H2_valley_25_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 26:
+
+  valley_name: Vitoria
+  valley_params:
+    x: -2.68798
+    y: 42.85031
+    demand: 0.001629  # Mt/yr
+
+  load_name: H2_valley_26_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 27:
+
+  valley_name: Aibar
+  valley_params:
+    x: -1.35479
+    y: 42.5927
+    demand: 0.01811  # Mt/yr
+
+  load_name: H2_valley_27_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 28:
+
+  valley_name: El Villar de Arnedo
+  valley_params:
+    x: -2.07163
+    y: 42.31288
+    demand: 0.00005  # Mt/yr
+
+  load_name: H2_valley_28_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 29:
+
+  valley_name: Zaragoza
+  valley_params:
+    x: -0.92757
+    y: 41.68075
+    demand: 0.010061  # Mt/yr
+
+  load_name: H2_valley_29_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 30:
+
+  valley_name: Caspe
+  valley_params:
+    x: -0.03265
+    y: 41.25529
+    demand: 0.00024  # Mt/yr
+
+  load_name: H2_valley_30_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 31:
+
+  valley_name: Barbastro
+  valley_params:
+    x: 0.12267
+    y: 42.03577
+    demand: 0.0009  # Mt/yr
+
+  load_name: H2_valley_31_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 32:
+
+  valley_name: Reus
+  valley_params:
+    x: 1.12009
+    y: 41.14876
+    demand: 0.051757  # Mt/yr
+
+  load_name: H2_valley_32_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 33:
+
+  valley_name: Sant Andreu de la Barca
+  valley_params:
+    x: 1.96376
+    y: 41.45127
+    demand: 0.021527  # Mt/yr
+
+  load_name: H2_valley_33_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 34:
+
+  valley_name: Villareal
+  valley_params:
+    x: -0.12882
+    y: 39.93309
+    demand: 0.027732  # Mt/yr
+
+  load_name: H2_valley_34_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 35:
+
+  valley_name: Paterna
+  valley_params:
+    x: -0.46756
+    y: 39.52396
+    demand: 0.052428  # Mt/yr
+
+  load_name: H2_valley_35_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 36:
+
+  valley_name: Montesa
+  valley_params:
+    x: -0.64131
+    y: 38.94124
+    demand: 0.00075  # Mt/yr
+
+  load_name: H2_valley_36_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 37:
+
+  valley_name: San Isidro
+  valley_params:
+    x: -0.84217
+    y: 38.17484
+    demand: 0.006482  # Mt/yr
+
+  load_name: H2_valley_37_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
+
+H2 valley 38:
+
+  valley_name: Cartagena
+  valley_params:
+    x: -0.98944
+    y: 37.63864
+    demand: 0.001265  # Mt/yr
+
+  load_name: H2_valley_38_demand
+  load_params:
+    carrier: H2
+    bus:          ### to be determined in <prepare_sector_network.py> (the closest one from the network)
+
