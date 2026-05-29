@@ -12,6 +12,13 @@ Release Notes
 Upcoming Release
 ================
 
+
+
+
+PyPSA-Spain v2026.05.0 (29th May 2026)
+===========================================
+
+
 * New functionality ``H2_imports_exports``: Allows the imposition of H2 imports and exports at an arbitrary number of border points. The default values represent the CelZa and BarMar H2 interconnections, which belong to the H2med project and have been approved as PCIs.
 
 * H2 valley demand templates: the repository now ships ready-to-use YAML templates for hydrogen valley demands — one built from the IDAE resolution awarding the first call of the Spanish renewable hydrogen incentive programme (`PR #18 <https://github.com/cristobal-GC/pypsa-spain/pull/18>`__), and one built from the Enagás *Call for Interest* process, with demand projections for 2030 and 2040 (`PR #21 <https://github.com/cristobal-GC/pypsa-spain/pull/21>`__). See details `here <https://pypsa-spain.readthedocs.io/en/latest/H2_valley_demands.html>`__.
