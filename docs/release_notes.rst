@@ -14,8 +14,13 @@ Upcoming Release
 
 * New functionality ``H2_imports_exports``: Allows the imposition of H2 imports and exports at an arbitrary number of border points. The default values represent the CelZa and BarMar H2 interconnections, which belong to the H2med project and have been approved as PCIs.
 
-* New functionality ``pop_layouts_HR``: High-resolution population layouts built from ~8,100 Spanish municipalities, replacing the default PyPSA-Eur procedure that assumes uniform population within each NUTS3 region. The urban/rural split is driven by a user-configurable target urban population fraction (default value based on the World Bank urbanisation rate), and the cluster-level aggregation is performed directly from municipal geometries to avoid the population losses that the default cell-based approach incurs in coastal regions. Diagnostic maps and density plots are produced as part of the rule (see details `here <https://pypsa-spain.readthedocs.io/en/latest/pop_layouts.html>`__).
+* The nuclear phase-out scenario has been hardcoded in the build_powerplants rule, as the DateOut field for nuclear power plants is missing (`PR #17 <https://github.com/cristobal-GC/pypsa-spain/pull/17>`__).
 
+* New functionality ``industry_scenario``: Allows feeding the ``build_industrial_production_per_country_tomorrow`` rule with a user-provided CSV file instead of the default ``industrial_production_per_country.csv``, enabling alternative industrial scenarios for Spain (`PR #19 <https://github.com/cristobal-GC/pypsa-spain/pull/19>`__).
+
+
+* New functionality ``pop_layouts_HR``: High-resolution population layouts built from ~8,100 Spanish municipalities, replacing the default PyPSA-Eur procedure that assumes uniform population within each NUTS3 region, see details `here <https://pypsa-spain.readthedocs.io/en/latest/pop_layouts.html>`__. (`PR #20 <https://github.com/cristobal-GC/pypsa-spain/pull/20>`__)
+* 
 
 
 PyPSA-Spain v2025.11.0 (25th November 2025)
