@@ -28,7 +28,15 @@ The choropleth of municipal population density (log scale) is shown below:
 .. image:: img/map_density.png
     :width: 100%
     :align: center
-    
+
+
+Data source and license
+========================
+
+The municipality-level population dataset used by this functionality is published on Zenodo (`record 20431328 <https://zenodo.org/records/20431328>`_). It is a processed dataset derived from the demographic data released by the Spanish Ministry for the Ecological Transition and the Demographic Challenge (MITECO, `Reto Demográfico — datos demográficos <https://www.miteco.gob.es/es/cartografia-y-sig/ide/descargas/reto-demografico/datos-demograficos.html>`_).
+
+The processed dataset on Zenodo is released under the Creative Commons Attribution 4.0 International (CC BY 4.0) license. The original MITECO source data are reused under their own terms; see the original publisher's `legal notice <https://www.miteco.gob.es/es/atencion-al-ciudadano/aviso-legal.html>`_ for details.
+
 
 Procedure
 ========================
