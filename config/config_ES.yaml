@@ -157,7 +157,7 @@ electricity:
     pair: 24
     "iron-air": 100
     H2: 168
-  extendable_carriers:
+  extendable_carriers:   ##### Add with p_nom = 0 if not in conventional_carriers
     Generator:
     - solar
 #    - "solar-hsat"
@@ -166,7 +166,7 @@ electricity:
 #    - "offwind-dc"
     - "offwind-float"
 #    - OCGT
-    - CCGT
+#    - CCGT
     StorageUnit: []
     Store:
     - battery
@@ -175,15 +175,15 @@ electricity:
   powerplants_filter: "(DateOut >= 2025 or DateOut != DateOut) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)"   ##### Check the nuclear phase-out plan in Spain
   custom_powerplants: false
   everywhere_powerplants: []
-  conventional_carriers:   #####
+  conventional_carriers:   ##### Add brownfield capacity
   - nuclear
 #  - oil
 #  - OCGT
-  - CCGT
+#  - CCGT
 #  - coal
 #  - lignite
 #  - geothermal
-  - biomass
+#  - biomass
   renewable_carriers:   #####
   - solar
 #  - "solar-hsat"
@@ -536,7 +536,7 @@ pypsa_eur:
   - DC_ic   ##### For Spanish interconnections
   - "DC_ic export"   ##### For Spanish interconnections
   - "DC_ic import"   ##### For Spanish interconnections
-  Generator:
+  Generator:   ##### These generators are not removed @ 'prepare_sector_network' (remove_elec_base_techs)
   - onwind
   - "offwind-ac"
   - "offwind-dc"
@@ -545,7 +545,7 @@ pypsa_eur:
   - solar
   - ror
   - nuclear
-  - biomass   #####
+#  - biomass   #####
   - DC_ic   ##### For Spanish interconnections
   StorageUnit:
   - PHS
@@ -587,7 +587,8 @@ biomass:
   share_unsustainable_use_retained:
     2020: 1
     2025: 1
-    2030: 0.66
+    # 2030: 0.66
+    2030: 1 # 0.66   ##### This is to not include unsustainalbe solid_biomass, that must be consumed (but no users in no-sector case)
     2035: 0.33
     2040: 0
     2045: 0
@@ -595,7 +596,8 @@ biomass:
   share_sustainable_potential_available:
     2020: 0
     2025: 0
-    2030: 0.33
+#    2030: 0.33
+    2030: 0 # 0.66   ##### This is to not include unsustainalbe solid_biomass, that must be consumed (but no users in no-sector case)
     2035: 0.66
     2040: 1
     2045: 1
@@ -652,7 +654,7 @@ existing_capacities:
 sector:
   transport: false # true   #####
   heating: false # true   #####
-  biomass: false # true   #####
+  biomass: true   #####
   industry: false # true   #####
   shipping: false # true   #####
   aviation: false # true   #####
@@ -964,10 +966,10 @@ sector:
   gas_distribution_grid_cost_factor: 1.0
   biomass_spatial: false # true   #####
   biomass_transport: false
-  biogas_upgrading: false # true   #####
+  biogas_upgrading: true   #####
   biogas_upgrading_cc: false
-  conventional_generation:   ##### Conversion from generator to link @ "prepare_sector_network.py"
-    OCGT: gas
+  conventional_generation:   ##### These generation techs are implemented as links @ "prepare_sector_network.py" (add_generation)
+    # OCGT: gas   #####
     CCGT: gas
   biomass_to_liquid: false # true   #####
   biomass_to_liquid_cc: false
