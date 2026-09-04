@@ -4,14 +4,6 @@
 
 
 rule build_electricity_demand:
-    message:
-        "Building electricity demand time series"
-    params:
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        countries=config_provider("countries"),
-        load=config_provider("load"),
-        electricity_demand=config_provider("pypsa_spain", "electricity_demand", default={"enable": False}),   #####
     input:
         opsd=rules.retrieve_electricity_demand_opsd.output["csv"],
         neso=rules.retrieve_electricity_demand_neso.output["csv"],
@@ -29,18 +21,21 @@ rule build_electricity_demand:
         benchmarks("build_electricity_demand")
     resources:
         mem_mb=5000,
+    params:
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        countries=config_provider("countries"),
+        load=config_provider("load"),
+        electricity_demand=config_provider(
+            "pypsa_spain", "electricity_demand", default={"enable": False}
+        ),  #####
+    message:
+        "Building electricity demand time series"
     script:
         scripts("build_electricity_demand.py")
 
 
 rule build_powerplants:
-    message:
-        "Building powerplant list for {wildcards.clusters} clusters"
-    params:
-        powerplants_filter=config_provider("electricity", "powerplants_filter"),
-        custom_powerplants=config_provider("electricity", "custom_powerplants"),
-        everywhere_powerplants=config_provider("electricity", "everywhere_powerplants"),
-        countries=config_provider("countries"),
     input:
         network=resources("networks/base_s_{clusters}.nc"),
         regions_onshore=resources("regions_onshore_base_s_{clusters}.geojson"),
@@ -56,6 +51,13 @@ rule build_powerplants:
     threads: 1
     resources:
         mem_mb=7000,
+    params:
+        powerplants_filter=config_provider("electricity", "powerplants_filter"),
+        custom_powerplants=config_provider("electricity", "custom_powerplants"),
+        everywhere_powerplants=config_provider("electricity", "everywhere_powerplants"),
+        countries=config_provider("countries"),
+    message:
+        "Building powerplant list for {wildcards.clusters} clusters"
     script:
         scripts("build_powerplants.py")
 
@@ -79,17 +81,6 @@ def input_base_network(w):
 
 
 rule base_network:
-    message:
-        "Building base network"
-    params:
-        countries=config_provider("countries"),
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        lines=config_provider("lines"),
-        links=config_provider("links"),
-        transformers=config_provider("transformers"),
-        clustering=config_provider("clustering", "mode"),
-        admin_levels=config_provider("clustering", "administrative"),
     input:
         unpack(input_base_network),
         nuts3_shapes=resources("nuts3_shapes.geojson"),
@@ -108,13 +99,22 @@ rule base_network:
     threads: 4
     resources:
         mem_mb=2000,
+    params:
+        countries=config_provider("countries"),
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        lines=config_provider("lines"),
+        links=config_provider("links"),
+        transformers=config_provider("transformers"),
+        clustering=config_provider("clustering", "mode"),
+        admin_levels=config_provider("clustering", "administrative"),
+    message:
+        "Building base network"
     script:
         scripts("base_network.py")
 
 
 rule build_osm_boundaries:
-    message:
-        "Building OSM boundaries for {wildcards.country}"
     input:
         json=f"{OSM_BOUNDARIES_DATASET['folder']}/{{country}}_adm1.json",
         eez=ancient(rules.retrieve_eez.output["gpkg"]),
@@ -125,21 +125,13 @@ rule build_osm_boundaries:
     threads: 1
     resources:
         mem_mb=1500,
+    message:
+        "Building OSM boundaries for {wildcards.country}"
     script:
         scripts("build_osm_boundaries.py")
 
 
 rule build_bidding_zones:
-    message:
-        "Building bidding zones"
-    params:
-        countries=config_provider("countries"),
-        remove_islands=config_provider(
-            "clustering", "build_bidding_zones", "remove_islands"
-        ),
-        aggregate_to_tyndp=config_provider(
-            "clustering", "build_bidding_zones", "aggregate_to_tyndp"
-        ),
     input:
         bidding_zones_entsoepy=f"{BIDDING_ZONES_ENTSOEPY_DATASET['folder']}/bidding_zones_entsoepy.geojson",
         bidding_zones_electricitymaps=f"{BIDDING_ZONES_ELECTRICITYMAPS_DATASET['folder']}/bidding_zones_electricitymaps.geojson",
@@ -150,18 +142,42 @@ rule build_bidding_zones:
     threads: 1
     resources:
         mem_mb=1500,
+    params:
+        countries=config_provider("countries"),
+        remove_islands=config_provider(
+            "clustering", "build_bidding_zones", "remove_islands"
+        ),
+        aggregate_to_tyndp=config_provider(
+            "clustering", "build_bidding_zones", "aggregate_to_tyndp"
+        ),
+    message:
+        "Building bidding zones"
     script:
         scripts("build_bidding_zones.py")
 
 
-rule build_shapes:
-    message:
-        "Building geographical shapes"
-    params:
-        config_provider("clustering", "mode"),
-        countries=config_provider("countries"),
+rule build_offshore_shapes:
     input:
         eez=ancient(rules.retrieve_eez.output["gpkg"]),
+    output:
+        offshore_shapes=resources("offshore_shapes.geojson"),
+    log:
+        logs("build_offshore_shapes.log"),
+    benchmark:
+        benchmarks("build_offshore_shapes")
+    threads: 1
+    resources:
+        mem_mb=1500,
+    params:
+        countries=config_provider("countries"),
+    message:
+        "Building offshore shapes"
+    script:
+        scripts("build_offshore_shapes.py")
+
+
+rule build_nuts3_shapes:
+    input:
         nuts3_2021=rules.retrieve_eu_nuts_2021.output["shapes_level_3"],
         ba_adm1=f"data/osm_boundaries/build/{OSM_BOUNDARIES_DATASET['version']}/BA_adm1.geojson",
         md_adm1=f"data/osm_boundaries/build/{OSM_BOUNDARIES_DATASET['version']}/MD_adm1.geojson",
@@ -169,6 +185,7 @@ rule build_shapes:
         xk_adm1=f"data/osm_boundaries/build/{OSM_BOUNDARIES_DATASET['version']}/XK_adm1.geojson",
         nuts3_gdp=rules.retrieve_jrc_ardeco.output["ardeco_gdp"],
         nuts3_pop=rules.retrieve_jrc_ardeco.output["ardeco_pop"],
+        offshore_shapes=resources("offshore_shapes.geojson"),
         bidding_zones=lambda w: (
             resources("bidding_zones.geojson")
             if config_provider("clustering", "mode")(w) == "administrative"
@@ -177,10 +194,29 @@ rule build_shapes:
         other_gdp=rules.retrieve_gdp_per_capita.output["gdp"],
         other_pop=rules.retrieve_population_count.output["tif"],
     output:
-        country_shapes=resources("country_shapes.geojson"),
-        offshore_shapes=resources("offshore_shapes.geojson"),
-        europe_shape=resources("europe_shape.geojson"),
         nuts3_shapes=resources("nuts3_shapes.geojson"),
+    log:
+        logs("build_nuts3_shapes.log"),
+    benchmark:
+        benchmarks("build_nuts3_shapes")
+    threads: 1
+    resources:
+        mem_mb=1500,
+    params:
+        countries=config_provider("countries"),
+    message:
+        "Building NUTS3 shapes"
+    script:
+        scripts("build_nuts3_shapes.py")
+
+
+rule build_shapes:
+    input:
+        nuts3_shapes=resources("nuts3_shapes.geojson"),
+        offshore_shapes=resources("offshore_shapes.geojson"),
+    output:
+        country_shapes=resources("country_shapes.geojson"),
+        europe_shape=resources("europe_shape.geojson"),
     log:
         logs("build_shapes.log"),
     benchmark:
@@ -188,6 +224,10 @@ rule build_shapes:
     threads: 1
     resources:
         mem_mb=1500,
+    params:
+        countries=config_provider("countries"),
+    message:
+        "Building country and Europe shapes"
     script:
         scripts("build_shapes.py")
 
@@ -195,10 +235,6 @@ rule build_shapes:
 if CUTOUT_DATASET["source"] in ["build"]:
 
     rule build_cutout:
-        message:
-            "Building cutout data for {wildcards.cutout}"
-        params:
-            cutouts=config_provider("atlite", "cutouts"),
         output:
             cutout=CUTOUT_DATASET["folder"] / "{cutout}.nc",
         log:
@@ -208,13 +244,15 @@ if CUTOUT_DATASET["source"] in ["build"]:
         threads: config["atlite"].get("nprocesses", 4)
         resources:
             mem_mb=config["atlite"].get("nprocesses", 4) * 1000,
+        params:
+            cutouts=config_provider("atlite", "cutouts"),
+        message:
+            "Building cutout data for {wildcards.cutout}"
         script:
             scripts("build_cutout.py")
 
 
 rule build_ship_raster:
-    message:
-        "Building ship density raster"
     input:
         ship_density=rules.retrieve_ship_raster.output["zip_file"],
         cutout=lambda w: input_cutout(w),
@@ -222,19 +260,17 @@ rule build_ship_raster:
         resources("shipdensity_raster.tif"),
     log:
         logs("build_ship_raster.log"),
-    resources:
-        mem_mb=5000,
     benchmark:
         benchmarks("build_ship_raster")
+    resources:
+        mem_mb=5000,
+    message:
+        "Building ship density raster"
     script:
         scripts("build_ship_raster.py")
 
 
 rule determine_availability_matrix_MD_UA:
-    message:
-        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
-    params:
-        renewable=config_provider("renewable"),
     input:
         copernicus=rules.download_copernicus_land_cover.output["tif"],
         wdpa=lambda w: (
@@ -268,8 +304,10 @@ rule determine_availability_matrix_MD_UA:
             w, config_provider("renewable", w.technology, "cutout")(w)
         ),
     output:
-        availability_matrix=resources(
-            "availability_matrix_MD-UA_{clusters}_{technology}.nc"
+        nc=resources("availability_matrix_MD-UA_{clusters}_{technology}.nc"),
+        plot=branch(
+            config["atlite"]["plot_availability_matrix"],
+            then=resources("availability_matrix_MD-UA_{clusters}_{technology}.png"),
         ),
     log:
         logs("determine_availability_matrix_MD_UA_{clusters}_{technology}.log"),
@@ -278,6 +316,11 @@ rule determine_availability_matrix_MD_UA:
     threads: config["atlite"].get("nprocesses", 4)
     resources:
         mem_mb=config["atlite"].get("nprocesses", 4) * 5000,
+    params:
+        renewable=config_provider("renewable"),
+        plot_availability_matrix=config_provider("atlite", "plot_availability_matrix"),
+    message:
+        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
     script:
         scripts("determine_availability_matrix_MD_UA.py")
 
@@ -295,12 +338,6 @@ def input_ua_md_availability_matrix(w):
 
 
 rule determine_availability_matrix:
-    message:
-        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
-    params:
-        renewable=config_provider("renewable"),
-        plot_availability_matrix=config_provider("atlite", "plot_availability_matrix"),
-        ISA_class=config_provider("pypsa_spain","ISA_class", default={"enable": False}), #####
     input:
         unpack(input_ua_md_availability_matrix),
         corine=ancient(rules.retrieve_corine.output["tif_file"]),
@@ -347,7 +384,11 @@ rule determine_availability_matrix:
             else []
         ),
     output:
-        resources("availability_matrix_{clusters}_{technology}.nc"),
+        nc=resources("availability_matrix_{clusters}_{technology}.nc"),
+        plot=branch(
+            config["atlite"]["plot_availability_matrix"],
+            then=resources("availability_matrix_{clusters}_{technology}.png"),
+        ),
     log:
         logs("determine_availability_matrix_{clusters}_{technology}.log"),
     benchmark:
@@ -355,18 +396,19 @@ rule determine_availability_matrix:
     threads: config["atlite"].get("nprocesses", 4)
     resources:
         mem_mb=config["atlite"].get("nprocesses", 4) * 5000,
+    params:
+        renewable=config_provider("renewable"),
+        plot_availability_matrix=config_provider("atlite", "plot_availability_matrix"),
+        ISA_class=config_provider(
+            "pypsa_spain", "ISA_class", default={"enable": False}
+        ),  #####
+    message:
+        "Determining availability matrix for {wildcards.clusters} clusters and {wildcards.technology} technology"
     script:
         scripts("determine_availability_matrix.py")
 
 
 rule build_renewable_profiles:
-    message:
-        "Building renewable profiles for {wildcards.clusters} clusters and {wildcards.technology} technology"
-    params:
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        renewable=config_provider("renewable"),
-        q2q_transform=config_provider("pypsa_spain","q2q_transform", default={"enable": False}), #####        
     input:
         availability_matrix=resources("availability_matrix_{clusters}_{technology}.nc"),
         offshore_shapes=resources("offshore_shapes.geojson"),
@@ -386,20 +428,25 @@ rule build_renewable_profiles:
         logs("build_renewable_profile_{clusters}_{technology}.log"),
     benchmark:
         benchmarks("build_renewable_profile_{clusters}_{technology}")
+    wildcard_constraints:
+        technology="(?!hydro).*",  # Any technology other than hydro
     threads: config["atlite"].get("nprocesses", 4)
     resources:
         mem_mb=config["atlite"].get("nprocesses", 4) * 5000,
-    wildcard_constraints:
-        technology="(?!hydro).*",  # Any technology other than hydro
+    params:
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        renewable=config_provider("renewable"),
+        q2q_transform=config_provider(
+            "pypsa_spain", "q2q_transform", default={"enable": False}
+        ),  #####
+    message:
+        "Building renewable profiles for {wildcards.clusters} clusters and {wildcards.technology} technology"
     script:
         scripts("build_renewable_profiles.py")
 
 
 rule build_co2_prices:
-    message:
-        "Building CO2 price time series"
-    params:
-        rolling_window=config_provider("costs", "emission_prices", "rolling_window"),
     input:
         csv=rules.retrieve_co2_prices.output["csv"],
     output:
@@ -411,15 +458,15 @@ rule build_co2_prices:
     threads: 1
     resources:
         mem_mb=5000,
+    params:
+        rolling_window=config_provider("costs", "emission_prices", "rolling_window"),
+    message:
+        "Building CO2 price time series"
     script:
         scripts("build_co2_prices.py")
 
 
 rule build_fossil_fuel_prices:
-    message:
-        "Building fossil fuel price time series"
-    params:
-        rolling_window=config_provider("conventional", "fuel_price_rolling_window"),
     input:
         fuel_price_raw=rules.retrieve_worldbank_commodity_prices.output["xlsx"],
     output:
@@ -431,6 +478,10 @@ rule build_fossil_fuel_prices:
     threads: 1
     resources:
         mem_mb=5000,
+    params:
+        rolling_window=config_provider("conventional", "fuel_price_rolling_window"),
+    message:
+        "Building fossil fuel price time series"
     script:
         scripts("build_monthly_prices.py")
 
@@ -456,13 +507,6 @@ if COUNTRY_RUNOFF_DATASET["source"] == "build":
 
 
 rule build_hydro_profile:
-    message:
-        "Building hydropower profile"
-    params:
-        hydro=config_provider("renewable", "hydro"),
-        countries=config_provider("countries"),
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
     input:
         country_shapes=resources("country_shapes.geojson"),
         eia_hydro_generation="data/eia_hydro_annual_generation.csv",
@@ -479,16 +523,18 @@ rule build_hydro_profile:
         benchmarks("build_hydro_profile")
     resources:
         mem_mb=5000,
+    params:
+        hydro=config_provider("renewable", "hydro"),
+        countries=config_provider("countries"),
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+    message:
+        "Building hydropower profile"
     script:
         scripts("build_hydro_profile.py")
 
 
 rule build_line_rating:
-    message:
-        "Building dynamic line ratings"
-    params:
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
     input:
         base_network=resources("networks/base.nc"),
         cutout=lambda w: input_cutout(
@@ -503,17 +549,16 @@ rule build_line_rating:
     threads: config["atlite"].get("nprocesses", 4)
     resources:
         mem_mb=config["atlite"].get("nprocesses", 4) * 1000,
+    params:
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+    message:
+        "Building dynamic line ratings"
     script:
         scripts("build_line_rating.py")
 
 
 rule build_transmission_projects:
-    message:
-        "Building transmission projects"
-    params:
-        transmission_projects=config_provider("transmission_projects"),
-        line_factor=config_provider("lines", "length_factor"),
-        s_max_pu=config_provider("lines", "s_max_pu"),
     input:
         base_network=resources("networks/base.nc"),
         offshore_shapes=resources("offshore_shapes.geojson"),
@@ -535,20 +580,20 @@ rule build_transmission_projects:
         logs("build_transmission_projects.log"),
     benchmark:
         benchmarks("build_transmission_projects")
+    threads: 1
     resources:
         mem_mb=4000,
-    threads: 1
+    params:
+        transmission_projects=config_provider("transmission_projects"),
+        line_factor=config_provider("lines", "length_factor"),
+        s_max_pu=config_provider("lines", "s_max_pu"),
+    message:
+        "Building transmission projects"
     script:
         scripts("build_transmission_projects.py")
 
 
 rule add_transmission_projects_and_dlr:
-    message:
-        "Adding transmission projects and dynamic line ratings"
-    params:
-        transmission_projects=config_provider("transmission_projects"),
-        dlr=config_provider("lines", "dynamic_line_rating"),
-        s_max_pu=config_provider("lines", "s_max_pu"),
     input:
         network=resources("networks/base.nc"),
         dlr=lambda w: (
@@ -576,6 +621,12 @@ rule add_transmission_projects_and_dlr:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        transmission_projects=config_provider("transmission_projects"),
+        dlr=config_provider("lines", "dynamic_line_rating"),
+        s_max_pu=config_provider("lines", "s_max_pu"),
+    message:
+        "Adding transmission projects and dynamic line ratings"
     script:
         scripts("add_transmission_projects_and_dlr.py")
 
@@ -591,12 +642,6 @@ def input_class_regions(w):
 
 
 rule build_electricity_demand_base:
-    message:
-        "Building electricity demand time series for base network"
-    params:
-        distribution_key=config_provider("load", "distribution_key"),
-        substation_only=config_provider("load", "substation_only"),
-        electricity_demand=config_provider("pypsa_spain", "electricity_demand", default={"enable": False}),   #####
     input:
         base_network=resources("networks/base_s.nc"),
         regions=resources("regions_onshore_base_s.geojson"),
@@ -614,17 +659,19 @@ rule build_electricity_demand_base:
         benchmarks("build_electricity_demand_base_s")
     resources:
         mem_mb=5000,
+    params:
+        distribution_key=config_provider("load", "distribution_key"),
+        substation_only=config_provider("load", "substation_only"),
+        electricity_demand=config_provider(
+            "pypsa_spain", "electricity_demand", default={"enable": False}
+        ),  #####
+    message:
+        "Building electricity demand time series for base network"
     script:
         scripts("build_electricity_demand_base.py")
 
 
 rule build_hac_features:
-    message:
-        "Aggregate all rastered cutout data to base regions Voronoi cells."
-    params:
-        snapshots=config_provider("snapshots"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        features=config_provider("clustering", "cluster_network", "hac_features"),
     input:
         cutout=lambda w: input_cutout(w),
         regions=resources("regions_onshore_base_s.geojson"),
@@ -637,14 +684,17 @@ rule build_hac_features:
     threads: config["atlite"].get("nprocesses", 4)
     resources:
         mem_mb=10000,
+    params:
+        snapshots=config_provider("snapshots"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        features=config_provider("clustering", "cluster_network", "hac_features"),
+    message:
+        "Aggregate all rastered cutout data to base regions Voronoi cells."
     script:
         scripts("build_hac_features.py")
 
 
 rule process_cost_data:
-    params:
-        costs=config_provider("costs"),
-        max_hours=config_provider("electricity", "max_hours"),
     input:
         network=resources("networks/base_s.nc"),
         costs=rules.retrieve_cost_data.output["costs"],
@@ -658,24 +708,14 @@ rule process_cost_data:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        costs=config_provider("costs"),
+        max_hours=config_provider("electricity", "max_hours"),
     script:
         scripts("process_cost_data.py")
 
 
 rule simplify_network:
-    message:
-        "Simplifying network"
-    params:
-        countries=config_provider("countries"),
-        mode=config_provider("clustering", "mode"),
-        administrative=config_provider("clustering", "administrative"),
-        simplify_network=config_provider("clustering", "simplify_network"),
-        cluster_network=config_provider("clustering", "cluster_network"),
-        aggregation_strategies=config_provider(
-            "clustering", "aggregation_strategies", default={}
-        ),
-        p_max_pu=config_provider("links", "p_max_pu", default=1.0),
-        p_min_pu=config_provider("links", "p_min_pu", default=-1.0),
     input:
         network=resources("networks/base_extended.nc"),
         regions_onshore=resources("regions_onshore.geojson"),
@@ -693,6 +733,19 @@ rule simplify_network:
     threads: 1
     resources:
         mem_mb=12000,
+    params:
+        countries=config_provider("countries"),
+        mode=config_provider("clustering", "mode"),
+        administrative=config_provider("clustering", "administrative"),
+        simplify_network=config_provider("clustering", "simplify_network"),
+        cluster_network=config_provider("clustering", "cluster_network"),
+        aggregation_strategies=config_provider(
+            "clustering", "aggregation_strategies", default={}
+        ),
+        p_max_pu=config_provider("links", "p_max_pu", default=1.0),
+        p_min_pu=config_provider("links", "p_min_pu", default=-1.0),
+    message:
+        "Simplifying network"
     script:
         scripts("simplify_network.py")
 
@@ -720,26 +773,6 @@ def input_custom_busmap(w):
 
 
 rule cluster_network:
-    message:
-        "Clustering network to {wildcards.clusters} clusters"
-    params:
-        countries=config_provider("countries"),
-        mode=config_provider("clustering", "mode"),
-        administrative=config_provider("clustering", "administrative"),
-        cluster_network=config_provider("clustering", "cluster_network"),
-        aggregation_strategies=config_provider(
-            "clustering", "aggregation_strategies", default={}
-        ),
-        focus_weights=config_provider("clustering", "focus_weights", default=None),
-        renewable_carriers=config_provider("electricity", "renewable_carriers"),
-        conventional_carriers=config_provider(
-            "electricity", "conventional_carriers", default=[]
-        ),
-        max_hours=config_provider("electricity", "max_hours"),
-        length_factor=config_provider("lines", "length_factor"),
-        cluster_mode=config_provider("clustering", "mode"),
-        copperplate_regions=config_provider("clustering", "copperplate_regions"),
-        regional_network_focus=config_provider("pypsa_spain", "regional_network_focus", default={"enable": False}),   #####
     input:
         unpack(input_custom_busmap),
         network=resources("networks/base_s.nc"),
@@ -773,6 +806,28 @@ rule cluster_network:
     threads: 1
     resources:
         mem_mb=10000,
+    params:
+        countries=config_provider("countries"),
+        mode=config_provider("clustering", "mode"),
+        administrative=config_provider("clustering", "administrative"),
+        cluster_network=config_provider("clustering", "cluster_network"),
+        aggregation_strategies=config_provider(
+            "clustering", "aggregation_strategies", default={}
+        ),
+        focus_weights=config_provider("clustering", "focus_weights", default=None),
+        renewable_carriers=config_provider("electricity", "renewable_carriers"),
+        conventional_carriers=config_provider(
+            "electricity", "conventional_carriers", default=[]
+        ),
+        max_hours=config_provider("electricity", "max_hours"),
+        length_factor=config_provider("lines", "length_factor"),
+        cluster_mode=config_provider("clustering", "mode"),
+        copperplate_regions=config_provider("clustering", "copperplate_regions"),
+        regional_network_focus=config_provider(
+            "pypsa_spain", "regional_network_focus", default={"enable": False}
+        ),  #####
+    message:
+        "Clustering network to {wildcards.clusters} clusters"
     script:
         scripts("cluster_network.py")
 
@@ -803,25 +858,6 @@ def input_conventional(w):
 
 
 rule add_electricity:
-    message:
-        "Adding electricity to network with {wildcards.clusters} clusters"
-    params:
-        line_length_factor=config_provider("lines", "length_factor"),
-        link_length_factor=config_provider("links", "length_factor"),
-        scaling_factor=config_provider("load", "scaling_factor"),
-        countries=config_provider("countries"),
-        snapshots=config_provider("snapshots"),
-        renewable=config_provider("renewable"),
-        electricity=config_provider("electricity"),
-        conventional=config_provider("conventional"),
-        foresight=config_provider("foresight"),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        consider_efficiency_classes=config_provider(
-            "clustering", "consider_efficiency_classes"
-        ),
-        aggregation_strategies=config_provider("clustering", "aggregation_strategies"),
-        exclude_carriers=config_provider("clustering", "exclude_carriers"),
-        update_elec_capacities=config_provider("pypsa_spain", "update_elec_capacities", default={"enable": False}),   #####        
     input:
         unpack(input_profile_tech),
         unpack(input_class_regions),
@@ -852,28 +888,32 @@ rule add_electricity:
     threads: 1
     resources:
         mem_mb=10000,
+    params:
+        line_length_factor=config_provider("lines", "length_factor"),
+        link_length_factor=config_provider("links", "length_factor"),
+        scaling_factor=config_provider("load", "scaling_factor"),
+        countries=config_provider("countries"),
+        snapshots=config_provider("snapshots"),
+        renewable=config_provider("renewable"),
+        electricity=config_provider("electricity"),
+        conventional=config_provider("conventional"),
+        foresight=config_provider("foresight"),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        consider_efficiency_classes=config_provider(
+            "clustering", "consider_efficiency_classes"
+        ),
+        aggregation_strategies=config_provider("clustering", "aggregation_strategies"),
+        exclude_carriers=config_provider("clustering", "exclude_carriers"),
+        update_elec_capacities=config_provider(
+            "pypsa_spain", "update_elec_capacities", default={"enable": False}
+        ),  #####
+    message:
+        "Adding electricity to network with {wildcards.clusters} clusters"
     script:
         scripts("add_electricity.py")
 
 
 rule prepare_network:
-    message:
-        "Preparing network for model with {wildcards.clusters} clusters and options {wildcards.opts}"
-    params:
-        time_resolution=config_provider("clustering", "temporal", "resolution_elec"),
-        links=config_provider("links"),
-        lines=config_provider("lines"),
-        co2base=config_provider("electricity", "co2base"),
-        co2limit_enable=config_provider("electricity", "co2limit_enable", default=False),
-        co2limit=config_provider("electricity", "co2limit"),
-        gaslimit_enable=config_provider("electricity", "gaslimit_enable", default=False),
-        gaslimit=config_provider("electricity", "gaslimit"),
-        emission_prices=config_provider("costs", "emission_prices"),
-        adjustments=config_provider("adjustments", "electricity"),
-        autarky=config_provider("electricity", "autarky", default={}),
-        drop_leap_day=config_provider("enable", "drop_leap_day"),
-        transmission_limit=config_provider("electricity", "transmission_limit"),
-        interconnections=config_provider("pypsa_spain","interconnections", default={"enable": False}),   #####
     input:
         resources("networks/base_s_{clusters}_elec.nc"),
         costs=lambda w: resources(
@@ -893,15 +933,30 @@ rule prepare_network:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        time_resolution=config_provider("clustering", "temporal", "resolution_elec"),
+        links=config_provider("links"),
+        lines=config_provider("lines"),
+        co2base=config_provider("electricity", "co2base"),
+        co2limit_enable=config_provider("electricity", "co2limit_enable", default=False),
+        co2limit=config_provider("electricity", "co2limit"),
+        gaslimit_enable=config_provider("electricity", "gaslimit_enable", default=False),
+        gaslimit=config_provider("electricity", "gaslimit"),
+        emission_prices=config_provider("costs", "emission_prices"),
+        adjustments=config_provider("adjustments", "electricity"),
+        autarky=config_provider("electricity", "autarky", default={}),
+        drop_leap_day=config_provider("enable", "drop_leap_day"),
+        transmission_limit=config_provider("electricity", "transmission_limit"),
+        interconnections=config_provider(
+            "pypsa_spain", "interconnections", default={"enable": False}
+        ),  #####
+    message:
+        "Preparing network for model with {wildcards.clusters} clusters and options {wildcards.opts}"
     script:
         scripts("prepare_network.py")
 
 
 rule clean_osm_data:
-    message:
-        "Cleaning raw OSM data for countries: " + ", ".join(config["countries"])
-    params:
-        voltages=config_provider("electricity", "voltages"),
     input:
         cables_way=expand(
             f"{OSM_DATASET['folder']}/{{country}}/cables_way.json",
@@ -940,19 +995,15 @@ rule clean_osm_data:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        voltages=config_provider("electricity", "voltages"),
+    message:
+        "Cleaning raw OSM data for countries: " + ", ".join(config["countries"])
     script:
         scripts("clean_osm_data.py")
 
 
 rule build_osm_network:
-    message:
-        "Building OSM network"
-    params:
-        countries=config_provider("countries"),
-        voltages=config_provider("electricity", "voltages"),
-        line_types=config_provider("lines", "types"),
-        under_construction=config_provider("osm_network_release", "under_construction"),
-        remove_after=config_provider("osm_network_release", "remove_after"),
     input:
         substations=resources(f"osm/clean/substations.geojson"),
         substations_polygon=resources(f"osm/clean/substations_polygon.geojson"),
@@ -982,15 +1033,19 @@ rule build_osm_network:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        countries=config_provider("countries"),
+        voltages=config_provider("electricity", "voltages"),
+        line_types=config_provider("lines", "types"),
+        under_construction=config_provider("osm_network_release", "under_construction"),
+        remove_after=config_provider("osm_network_release", "remove_after"),
+    message:
+        "Building OSM network"
     script:
         scripts("build_osm_network.py")
 
 
 rule build_tyndp_network:
-    message:
-        "Building TYNDP network"
-    params:
-        countries=config_provider("countries"),
     input:
         reference_grid=rules.retrieve_tyndp.output.reference_grid,
         buses=rules.retrieve_tyndp.output.nodes,
@@ -1015,5 +1070,9 @@ rule build_tyndp_network:
     threads: 1
     resources:
         mem_mb=4000,
+    params:
+        countries=config_provider("countries"),
+    message:
+        "Building TYNDP network"
     script:
         scripts("build_tyndp_network.py")
