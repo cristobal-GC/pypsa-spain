@@ -100,7 +100,8 @@ if __name__ == "__main__":
             sub = all_munis.loc[ids]
             pop_kinhab = sub["pob_23"].astype(float).values / 1e3
             # M shape: (n_regions, n_munis), entries area(intersect)/area(muni)
-            M = atlite.cutout.compute_indicatormatrix(sub.geometry, regions_3035)
+            # atlite looks up these shapes by position, not by index label
+            M = atlite.cutout.compute_indicatormatrix(list(sub.geometry), regions_3035)
             # Diagnostic: per-muni share of area covered by the union of regions
             # (1.0 = fully covered; <1.0 means part of the muni lies outside
             # regions_onshore, e.g., on small coastal slivers).
