@@ -3,7 +3,7 @@
 # yaml-language-server: $schema=./schema.default.json
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#version
-version: v2026.02.0
+version: v2026.08.0
 
 
 
@@ -87,6 +87,7 @@ run:
     policy: false
     exclude: []
   use_shadow_directory: false
+  default_target_rule: all
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#foresight
 foresight: overnight
@@ -99,7 +100,7 @@ scenario:
   - ""
   sector_opts:
   - ""
-  planning_horizons:
+  planning_horizons:   #####
   - 2030
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#countries
@@ -107,16 +108,16 @@ countries:
 - ES
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#snapshots
-snapshots:   #####
-  start: "2023-01-01"
-  end: "2024-01-01"
+snapshots:
+  start: "2013-01-01"
+  end: "2014-01-01"
   inclusive: left
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#enable
 enable:
   drop_leap_day: true
 
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#co2-budget
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#co2_budget
 co2_budget:
 #  2020: 0.72
 #  2025: 0.648
@@ -183,6 +184,7 @@ electricity:
 #  - coal
 #  - lignite
 #  - geothermal
+#  - waste
   - biomass
   renewable_carriers:   #####
   - solar
@@ -210,8 +212,8 @@ electricity:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#atlite
 atlite:
-  default_cutout: "europe-2023-sarah3-era5"   #####
-  nprocesses: 16
+  default_cutout: "europe-2013-sarah3-era5"   #####
+  nprocesses: 8   #####
   show_progress: false
   plot_availability_matrix: false
   cutouts:
@@ -609,7 +611,7 @@ solar_thermal:
     azimuth: 180.0
   cutout: default
 
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#existing-capacities
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#existing_capacities
 existing_capacities:
   grouping_years_power:
   - 1900
@@ -642,6 +644,7 @@ existing_capacities:
   - 2019
   threshold_capacity: 10
   default_heating_lifetime: 20
+  solar_rooftop_ratio: 0.5
   conventional_carriers:
   - lignite
   - coal
@@ -657,7 +660,7 @@ sector:
   shipping: false # true   #####
   aviation: false # true   #####
   agriculture: false # true   #####
-  fossil_fuels: true   ##### This is important to feed the CCGT links with gas
+  fossil_fuels: true
   district_heating:
     potential: 0.6
     progress:
@@ -881,7 +884,6 @@ sector:
   regional_co2_sequestration_potential:
     enable: false # true   #####
     attribute:
-    - conservative estimate Mt
     - conservative estimate GAS Mt
     - conservative estimate OIL Mt
     - conservative estimate aquifer Mt
@@ -897,12 +899,19 @@ sector:
     2040: 180
     2045: 250
     2050: 250
-  co2_sequestration_cost: 9999 # 30   #####
+  co2_sequestration_cost: 30
   co2_sequestration_lifetime: 50
   co2_spatial: false # true   #####
   co2_network: false # true   #####
   co2_network_cost_factor: 1
+  co2_network_liquefaction: false
   cc_fraction: 0.9
+  cc_capital_cost_factor:
+    gas: 2.0
+    biomass: 1.1
+    coal: 1.1
+    waste: 1.2
+    cement: 1.0
   hydrogen_underground_storage: true
   hydrogen_underground_storage_locations:
   - onshore
@@ -939,15 +948,19 @@ sector:
     - DC
     - DC_ic   ##### to reverse the link between border node and neighbouring country node
     - H2 pipeline
+    - H2 pipeline retrofitted
     - gas pipeline
     - electricity distribution grid
     DC:
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
-    DC_ic:
+    DC_ic:   ##### For Spanish interconnections
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
     H2 pipeline:
+      efficiency_per_1000km: 1
+      compression_per_1000km: 0.018
+    H2 pipeline retrofitted:
       efficiency_per_1000km: 1
       compression_per_1000km: 0.018
     gas pipeline:
@@ -956,7 +969,7 @@ sector:
     electricity distribution grid:
       efficiency_static: 0.97
   H2_network: true   #####
-  gas_network: false # true   #####
+  gas_network: true
   H2_retrofit: false
   H2_retrofit_capacity_per_CH4: 0.6
   gas_network_connectivity_upgrade: 1
@@ -964,7 +977,7 @@ sector:
   gas_distribution_grid_cost_factor: 1.0
   biomass_spatial: false # true   #####
   biomass_transport: false
-  biogas_upgrading: false # true   #####
+  biogas_upgrading: true
   biogas_upgrading_cc: false
   conventional_generation:   ##### Conversion from generator to link @ "prepare_sector_network.py"
     OCGT: gas
@@ -1139,6 +1152,7 @@ clustering:
     remove_stubs_across_borders: false
   cluster_network:
     algorithm: kmeans
+    allow_ac_dc_mixing_in_bus_clusters: false
     hac_features:
     - wnd100m
     - influx_direct
@@ -1240,6 +1254,13 @@ solving:
       primal_feasibility_tolerance: 1.0e-05
       dual_feasibility_tolerance: 1.0e-05
       random_seed: 123
+    "highs-hipo":
+      solver: hipo
+      parallel: 'on'
+      primal_feasibility_tolerance: 1.0e-05
+      dual_feasibility_tolerance: 1.0e-05
+      random_seed: 123
+      run_crossover: 'off'
     "gurobi-default":
       threads: 32
       method: 2
@@ -1249,6 +1270,7 @@ solving:
       AggFill: 0
       PreDual: 0
       GURO_PAR_BARDENSETHRESH: 200
+      IISMethod: 1
     "gurobi-numeric-focus":
       NumericFocus: 3
       method: 2
@@ -1312,6 +1334,8 @@ solving:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#data
 data:
+  version_files:
+  - data/versions.csv
   isa_onwind:   ##### PyPSA-Spain
     source: primary
     version: latest
