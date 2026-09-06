@@ -391,6 +391,10 @@ plotting:
     ac: "AC"
     dc: "DC"
     DC_ic: "Interconnections"   ##### For Spanish ics
+    DC_ic export: "Interconnections"   ##### For Spanish ics
+    DC_ic import: "Interconnections"   ##### For Spanish ics
+    DC_ic market export: "Electricity exports"   ##### For Spanish ics
+    DC_ic market import: "Electricity imports"   ##### For Spanish ics
 
   tech_colors:
     # wind
@@ -515,7 +519,6 @@ plotting:
     Electric load: '#110d63'
     electric demand: '#110d63'
     electricity: '#110d63'
-    electricity_ic: '#6a67a3'   ##### For Spanish ics
     industry electricity: '#2d2a66'
     industry new electricity: '#2d2a66'
     agriculture electricity: '#494778'
@@ -736,6 +739,8 @@ plotting:
     DC_ic: "#8a1caf"   ##### For Spanish ics
     DC_ic export:  "#9B30FF"   ##### For Spanish ics
     DC_ic import:  "#A020F0"   ##### For Spanish ics
+    DC_ic market export:  "#6a67a3"   ##### For Spanish ics
+    DC_ic market import:  "#b5a8d5"   ##### For Spanish ics
     H2_ic: "#bf13a0"   ##### For Spanish H2 ics
     H2_ic export: "#9b1f86"   ##### For Spanish H2 ics
     H2_ic import: "#db8ccd"   ##### For Spanish H2 ics

@@ -527,7 +527,6 @@ pypsa_eur:
   - DC_ic   ##### For Spanish interconnections
   Link:
   - DC
-  - DC_ic   ##### For Spanish interconnections
   - "DC_ic export"   ##### For Spanish interconnections
   - "DC_ic import"   ##### For Spanish interconnections
   Generator:
@@ -540,7 +539,8 @@ pypsa_eur:
   - ror
   - nuclear
   - biomass   #####
-  - DC_ic   ##### For Spanish interconnections
+  - "DC_ic market export"   ##### For Spanish interconnections
+  - "DC_ic market import"   ##### For Spanish interconnections
   StorageUnit:
   - PHS
   - hydro

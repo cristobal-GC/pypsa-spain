@@ -12,7 +12,9 @@ Release Notes
 Upcoming Release
 ================
 
+* The electricity interconnection model has been updated. Previous model included loads in neighbouring countries. Supplying those loadsincreased artificially the overall costs of the system. Now a pair of positive/negative generators are used, so that imports increase the total cost, and exports reduces it.
 
+* The electricity interconnection model has been updated. The previous model represented each neighbouring country with a bus carrying a large load, and supplying that foreign demand artificially increased the total system cost. Each border now carries a pair of market generators instead, one importing at the country price and one exporting at minus that price, so that imports increase the total cost and exports reduce it, and the objective function refers to the Spanish system alone. See details `here <https://pypsa-spain.readthedocs.io/en/latest/interconnections.html>`__).
 
 
 PyPSA-Spain v2026.05.0 (29th May 2026)
