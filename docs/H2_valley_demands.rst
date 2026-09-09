@@ -38,7 +38,7 @@ The annual hydrogen mass is converted to a constant H2 power setpoint via a pure
 
    p_{\text{H2}} = \frac{\text{annual\_amount} \cdot 33.33 \times 10^6}{\sum_t w_t} \quad [\text{MW}_{\text{H2}}]
 
-where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution). The constant H2 load is imposed by directly setting ``loads_t.p_set`` for the load.
+where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution). Since the value is the same for all snapshots, it is imposed through the static attribute ``loads.p_set``, rather than through the time-dependent ``loads_t.p_set``.
 
 
 Configuration

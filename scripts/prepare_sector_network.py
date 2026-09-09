@@ -6413,11 +6413,12 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
         vv['load_params']['bus'] = closest_bus_index
 
 
-        ########## Add H2 load
-        n.add('Load', vv['load_name'], **vv['load_params'])
+        ########## Add H2 load, with constant p_set
+        ### The p_set is static (not in loads_t), since it is the same for all snapshots
         ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
         total_hours = n.snapshot_weightings.generators.sum()
-        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        p_set = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        n.add('Load', vv['load_name'], p_set=p_set, **vv['load_params'])
 #
 #
 ########################################
@@ -6443,6 +6444,9 @@ def attach_H2_imports_exports(n, H2_imports_exports_dic):
 
         logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 import/export {vv["type"]} for {kk}')
 
+        if vv['type'] not in ['import', 'export']:
+            raise ValueError(f"Unknown H2 imports/exports type '{vv['type']}' for {kk}. Expected 'import' or 'export'.")
+
 
         ########## Identify the closest H2 bus on the Spanish network:
         ### Select candidates: H2 buses in peninsular Spain
@@ -6467,27 +6471,19 @@ def attach_H2_imports_exports(n, H2_imports_exports_dic):
         p_set = vv['annual_amount'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
 
 
+        ########## Add H2 load on the border bus, with constant p_set
+        ### The p_set is static (not in loads_t), since it is the same for all snapshots
+        ### Imports are modelled as a negative demand, so that demand statistics report the net balance between imports and exports
+        sign = -1 if vv['type'] == 'import' else 1
+        n.add('Load', vv['load_name'], p_set=sign*p_set, **vv['load_params'])
+
+
+        ########## Add link between the border bus and the closest H2 bus, in the direction of the flow
         if vv['type'] == 'import':
-
-            ########## Add must-run H2 generator on the border bus (p_min_pu = p_max_pu = 1 set in YAML)
-            n.add('Generator', vv['generator_name'], p_nom=p_set, **vv['generator_params'])
-
-            ########## Add link from border bus to the closest H2 bus
             vv['link_params']['bus1'] = closest_bus_index
-            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
-
-        elif vv['type'] == 'export':
-
-            ########## Add H2 load on the border bus, with constant p_set
-            n.add('Load', vv['load_name'], **vv['load_params'])
-            n.loads_t['p_set'][vv['load_name']] = p_set
-
-            ########## Add link from the closest H2 bus to the border bus
-            vv['link_params']['bus0'] = closest_bus_index
-            n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
-
         else:
-            raise ValueError(f"Unknown H2 imports/exports type '{vv['type']}' for {kk}. Expected 'import' or 'export'.")
+            vv['link_params']['bus0'] = closest_bus_index
+        n.add('Link', vv['link_name'], p_nom=p_set, **vv['link_params'])
 #
 #
 ########################################

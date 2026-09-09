@@ -20,8 +20,7 @@ Model components
 For each cross-border point, the following elements are added to the network:
 
 - a **border H2 bus** with carrier ``H2_ic`` and unit ``MWh_LHV``, located at the user-specified coordinates.
-- if the point represents an **import**: a must-run **generator** at the border bus, producing a constant power output such that the total annual production equals the configured amount of hydrogen.
-- if the point represents an **export**: a fixed **load** at the border bus, consuming a constant power such that the total annual consumption equals the configured amount of hydrogen.
+- a fixed **load** at the border bus, with a constant power such that the total annual energy equals the configured amount of hydrogen. Exports are modelled as a positive demand, and imports as a **negative demand**, so that demand statistics directly report the net balance between imports and exports.
 - a **link** between the border bus and the closest H2 bus of the Spanish network. The direction of the link reflects the flow direction (border → network for imports, network → border for exports). The link uses carrier ``H2_ic import`` or ``H2_ic export`` accordingly.
 
 The closest H2 bus is identified at runtime based on Euclidean distance between the border coordinates and the buses in peninsular Spain.
@@ -34,7 +33,7 @@ The annual hydrogen amount is converted to a constant power setpoint using:
 
 where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution).
 
-The must-run behaviour of the generator is enforced through ``p_min_pu = p_max_pu = 1`` and ``p_nom = p``. The constant load is imposed by directly setting ``loads_t.p_set`` for the load.
+Since the value is the same for all snapshots, it is imposed through the static attribute ``loads.p_set`` (i.e. :math:`+p` for exports and :math:`-p` for imports), rather than through the time-dependent ``loads_t.p_set``.
 
 
 Configuration

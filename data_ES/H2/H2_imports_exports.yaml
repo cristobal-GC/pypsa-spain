@@ -13,15 +13,11 @@ CelZa:
     carrier: H2_ic
     unit: MWh_LHV
 
-  generator_name: CelZa_gen
-  generator_params:
+  load_name: CelZa_load
+  load_params:
     carrier: H2_ic
     bus: ES H2 CelZa
-    p_nom_extendable: False
-    p_min_pu: 1   ### must-run
-    p_max_pu: 1   ### must-run
-    # p_nom is set in <prepare_sector_network.py> from annual_amount
-    # This is the proper way to impose 'must-run' for n.optimize(), not through p_set. p_set is used in n.pf()
+    # p_set is set in <prepare_sector_network.py> from annual_amount, with negative sign (imports are modelled as a negative demand)
 
   link_name: CelZa link
   link_params:
