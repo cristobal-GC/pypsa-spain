@@ -6413,11 +6413,12 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
         vv['load_params']['bus'] = closest_bus_index
 
 
-        ########## Add H2 load
-        n.add('Load', vv['load_name'], **vv['load_params'])
+        ########## Add H2 load, with constant p_set
+        ### The p_set is static (not in loads_t), since it is the same for all snapshots
         ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
         total_hours = n.snapshot_weightings.generators.sum()
-        n.loads_t['p_set'][vv['load_name']] = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        p_set = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        n.add('Load', vv['load_name'], p_set=p_set, **vv['load_params'])
 #
 #
 ########################################
