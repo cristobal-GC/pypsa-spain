@@ -692,21 +692,7 @@ def patch_electricity_network(n, costs, carriers_to_keep, profiles, landfall_len
         n, costs, landfall_lengths=landfall_lengths, profiles=profiles
     )
     
-    ########## PyPSA-Spain: set carrier="electricity" only to spanish loads, not FR/PT loads
-    ### Original in PyPSA-Eur:
-    # n.loads["carrier"] = "electricity"
-    ### Modified for PyPSA-Spain:
-    es_mask = n.loads.index.str.contains("ES")
-    ic_mask = n.loads.index.str.contains("FR") | n.loads.index.str.contains("PT")
-    n.loads.loc[es_mask, "carrier"] = "electricity"
-    n.loads.loc[ic_mask, "carrier"] = "electricity_ic"
-    ic_loads = n.loads.index[ic_mask].tolist()
-    ### log:
-    if ic_loads:
-        logger.info(
-            f"########## [PyPSA-Spain] Assigned carrier 'electricity_ic' to interconnection loads (FR/PT): {ic_loads}"
-        )
-    #####
+    n.loads["carrier"] = "electricity"
 
     n.buses["location"] = n.buses.index
     n.buses["unit"] = "MWh_el"
@@ -1681,18 +1667,7 @@ def insert_electricity_distribution_grid(
     # this catches regular electricity load and "industry electricity" and
     # "agriculture machinery electric" and "agriculture electricity"
 
-    ########## PyPSA-Spain: exclude 'electricity_ic' (interconnection loads, FR/PT)
-    ### since they are not connected to the Spanish low-voltage distribution grid
-    loads = n.loads.index[
-        n.loads.carrier.str.contains("electric") & (n.loads.carrier != "electricity_ic")
-    ]
-    ### log
-    excluded_ic_loads = n.loads.index[n.loads.carrier == "electricity_ic"].tolist()
-    if excluded_ic_loads:
-        logger.info(
-            f"########## [PyPSA-Spain] Excluded interconnection loads (carrier 'electricity_ic') from low-voltage bus reassignment: {excluded_ic_loads}"
-        )
-    #####
+    loads = n.loads.index[n.loads.carrier.str.contains("electric")]
 
     n.loads.loc[loads, "bus"] += " low voltage"
 

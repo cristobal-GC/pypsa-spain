@@ -1,3 +1,63 @@
+##################################################
+#
+# Electrical interconnections between Spain and its neighbouring countries.
+#
+# Each entry defines one interconnection. In <prepare_network.py>, for each entry:
+#
+#   - A border bus 'bus_name' is added at (x, y), with carrier 'DC_ic' and
+#     country 'ES'.
+#
+#   - Two unidirectional links connect the border bus with the closest AC bus of
+#     the Spanish network: the export one flows ES -> border and the import one
+#     border -> ES, each with the p_nom given below (NTC of that direction).
+#
+#   - Two market generators are attached to the border bus:
+#       import  sign=+1, marginal_cost = +(price(t) + spread/2)
+#       export  sign=-1, marginal_cost = -(price(t) - spread/2)
+#     so that importing costs money and exporting earns money. There is no
+#     neighbouring-country bus and no foreign demand: the objective function only
+#     contains the Spanish system cost plus purchases minus export revenues.
+#
+# Prices and spread per country are defined in <neighbouring_countries.yaml>.
+#
+# Fields per entry:
+#
+#   bus_name    Name of the border bus. Component names are declared explicitly
+#               rather than derived from the entry key, so that they can carry
+#               the name of the real project.
+#   country     Key in <neighbouring_countries.yaml> providing the price series.
+#   x, y        Coordinates of the border bus (lon, lat in degrees).
+#   length      Length of the Spanish side of the link, in km. Taken verbatim
+#               from here, never recomputed from the bus coordinates: the border
+#               bus sits at the physical crossing point while the Spanish bus is
+#               a cluster centroid, so their distance is not the line length.
+#               It drives the HVDC transmission cost, see 'underwater_fraction'.
+#   efficiency  Per-unit efficiency of both links. Computed as
+#                   0.98 * 0.977 ** (length / 1000)
+#               which reproduces the values that PyPSA-Eur's
+#               'sector: transmission_efficiency: DC_ic' used to apply in the
+#               sector stage. Set to 1 to model lossless interconnections.
+#   underwater_fraction
+#               Share of 'length' running under water, from 0 to 1. It splits the
+#               cable cost between the 'HVDC overhead' and 'HVDC submarine' rows
+#               of costs.csv, on top of a fixed 'HVDC inverter pair' cost per MW.
+#               Note that costs.csv also has an 'HVDC underground' row, much more
+#               expensive than overhead, but set_transmission_costs only
+#               interpolates between overhead and submarine, so underground
+#               stretches are inevitably priced as overhead.
+#               The cost is charged on the export link only: both links model the
+#               two directions of the same physical asset, so charging both would
+#               pay twice for the cable and for the converter stations.
+#   export/import:
+#     link_name       Name of the link between the Spanish grid and the border bus.
+#     generator_name  Name of the market generator at the border bus.
+#     p_nom           Net transfer capacity in that direction, in MW.
+#     e_sum_max       Optional cap on the annual energy exchanged in that
+#                     direction, in TWh/year. Leave empty for no limit. Scaled
+#                     internally by the length of the optimization horizon.
+#
+##################################################
+
 
 ################################################## ES - FR ##################################################
 
@@ -15,55 +75,28 @@
 
 ES FR0:
 
-  ##### border bus
   bus_name: ES FR0
-  bus_params:
-    x: 2.877482 
-    y: 42.426598
-    carrier: DC_ic
 
-  ##### link Spanish network - border bus (export)
-  link_export_name: ES FR0 export
-  link_export_params:
-    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    bus1: ES FR0
-    carrier: DC_ic export
-    p_nom: 2800 
-    p_nom_extendable: False
-    length: 34.25 # ES side
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  country: FR
 
-  ##### link Spanish network - border bus (import)
-  link_import_name: ES FR0 import
-  link_import_params:
-    bus0: ES FR0
-    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    carrier: DC_ic import
-    p_nom: 2800 
-    p_nom_extendable: False
-    length: 34.25 # ES side
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  x: 2.877482
+  y: 42.426598
 
-  ##### link border bus . neighbouring country bus
-  link_nc_name: FR0 FR
-  link_nc_params:
-    bus0: ES FR0   ##### Select the border bus
-    bus1: FR    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
-    carrier: DC_ic
-    p_nom_extendable: True
-    efficiency: 1
+  length: 34.25   ### km, ES side
+  efficiency: 0.979219   ### 0.98 * 0.977 ** (34.25 / 1000)
+  underwater_fraction: 0   ### underground trench plus a tunnel, priced as overhead
 
+  export:
+    link_name: ES FR0 export
+    generator_name: ES FR0 market export
+    p_nom: 2800
+    e_sum_max:
 
+  import:
+    link_name: ES FR0 import
+    generator_name: ES FR0 market import
+    p_nom: 2800
+    e_sum_max:
 
 
 ########## Interconnection ES-FR1
@@ -76,62 +109,33 @@ ES FR0:
 # La nueva interconexión entre la subestación de Gatika (cerca de Bilbao) y la subestación de Cubnezais (en la región francesa de Aquitania)
 # Operativa a partir de 2028
 
-
 ES FR1:
 
-  ##### border bus
   bus_name: ES FR1
-  bus_params:
-    x: -2.858534 
-    y: 43.364801
-    carrier: DC_ic
 
-  ##### link Spanish network - border bus (export)
-  link_export_name: ES FR1 export
-  link_export_params:
-    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    bus1: ES FR1
-    carrier: DC_ic export
-    p_nom: 2000 
-    p_nom_extendable: False
-    length: 200 # ES side
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  country: FR
 
-  ##### link Spanish network - border bus (import)
-  link_import_name: ES FR1 import
-  link_import_params:
-    bus0: ES FR1
-    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    carrier: DC_ic import
-    p_nom: 2000 
-    p_nom_extendable: False
-    length: 200 # ES side
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  x: -2.858534
+  y: 43.364801
 
-  ##### link border bus . neighbouring country bus
-  link_nc_name: FR1 FR
-  link_nc_params:
-    bus0: ES FR1   ##### Select the border bus
-    bus1: FR    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
-    carrier: DC_ic
-    p_nom_extendable: True
-    efficiency: 1
+  length: 200   ### km, ES side
+  efficiency: 0.975450   ### 0.98 * 0.977 ** (200 / 1000)
+  underwater_fraction: 1   ### submarine interconnection (Gatika - Cubnezais)
+
+  export:
+    link_name: ES FR1 export
+    generator_name: ES FR1 market export
+    p_nom: 2000
+    e_sum_max:
+
+  import:
+    link_name: ES FR1 import
+    generator_name: ES FR1 market import
+    p_nom: 2000
+    e_sum_max:
 
 
 ########## Además, hay dos proyectos más a través de los Pirineos para 2030, en fase de diseño (por Navarra y Aragón)
-
-
-
 
 
 ################################################## ES - PT ##################################################
@@ -145,110 +149,57 @@ ES FR1:
 # Aquí se simplifica asumiendo lo mismo que el PNIEC (exportación 4200 MW e importación 3500 MW) dividido en dos interconexiones, una al norte y otra al sur. Actualmente se tiene una capacidad de exportación total de 3600 MW, y de importación de 2880 MW.
 
 
-
 ########## Interconnection ES-PT0
-
 
 ES PT0:
 
-  ##### border bus
   bus_name: ES PT0
-  bus_params:
-    x: -6.652149
-    y: 41.223112
-    carrier: DC_ic
 
-  ##### link Spanish network - border bus (export)
-  link_export_name: ES PT0 export
-  link_export_params:
-    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    bus1: ES PT0
-    carrier: DC_ic export
-    p_nom: 2100 
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  country: PT
 
-  ##### link Spanish network - border bus (import)
-  link_import_name: ES PT0 import
-  link_import_params:
-    bus0: ES PT0
-    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    carrier: DC_ic import
-    p_nom: 1750 
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  x: -6.652149
+  y: 41.223112
 
-  ##### link border bus . neighbouring country bus
-  link_nc_name: PT0 PT
-  link_nc_params:
-    bus0: ES PT0   ##### Select the border bus
-    bus1: PT    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
-    carrier: DC_ic
-    p_nom_extendable: True
-    efficiency: 1
+  length: 100   ### km, ES side (random)
+  efficiency: 0.977722   ### 0.98 * 0.977 ** (100 / 1000)
+  underwater_fraction: 0   ### overland crossing
+
+  export:
+    link_name: ES PT0 export
+    generator_name: ES PT0 market export
+    p_nom: 2100
+    e_sum_max:
+
+  import:
+    link_name: ES PT0 import
+    generator_name: ES PT0 market import
+    p_nom: 1750
+    e_sum_max:
 
 
+########## Interconnection ES-PT1
 
 ES PT1:
 
-  ##### border bus
   bus_name: ES PT1
-  bus_params:
-    x: -7.014351
-    y: 38.901836
-    carrier: DC_ic
 
-  ##### link Spanish network - border bus (export)
-  link_export_name: ES PT1 export
-  link_export_params:
-    bus0:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    bus1: ES PT1
-    carrier: DC_ic export
-    p_nom: 2100 
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  country: PT
 
-  ##### link Spanish network - border bus (import)
-  link_import_name: ES PT1 import
-  link_import_params:
-    bus0: ES PT1
-    bus1:        ### to be determined in <prepare_network.py> (the closest one from the network)
-    carrier: DC_ic import
-    p_nom: 1750 
-    p_nom_extendable: False
-    length: 100 # random
-    efficiency: 1  
-    # capital_cost: 50 ### Desaparece durante "prepare_network", es reemplazado por los costes en costes.csv
-    lifetime: 50 ### No afecta a cómo se calculan los costes
-    ### underground: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### underwater_fraction: 0 ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
-    ### under_construction: False ### Estos no se pueden añadir con "n.add" porque no son originales del objeto
+  x: -7.014351
+  y: 38.901836
 
-  ##### link border bus . neighbouring country bus
-  link_nc_name: PT1 PT
-  link_nc_params:
-    bus0: ES PT1   ##### Select the border bus
-    bus1: PT    ##### Select the neighbouring country bus (defined at neighbouring_countries.yaml)
-    carrier: DC_ic
-    p_nom_extendable: True
-    efficiency: 1
+  length: 100   ### km, ES side (random)
+  efficiency: 0.977722   ### 0.98 * 0.977 ** (100 / 1000)
+  underwater_fraction: 0   ### overland crossing
 
+  export:
+    link_name: ES PT1 export
+    generator_name: ES PT1 market export
+    p_nom: 2100
+    e_sum_max:
 
+  import:
+    link_name: ES PT1 import
+    generator_name: ES PT1 market import
+    p_nom: 1750
+    e_sum_max:

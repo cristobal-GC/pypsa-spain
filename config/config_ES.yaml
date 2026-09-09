@@ -535,7 +535,6 @@ pypsa_eur:
   - DC_ic   ##### For Spanish interconnections
   Link:
   - DC
-  - DC_ic   ##### For Spanish interconnections
   - "DC_ic export"   ##### For Spanish interconnections
   - "DC_ic import"   ##### For Spanish interconnections
   Generator:
@@ -548,7 +547,8 @@ pypsa_eur:
   - ror
   - nuclear
   - biomass   #####
-  - DC_ic   ##### For Spanish interconnections
+  - "DC_ic market export"   ##### For Spanish interconnections
+  - "DC_ic market import"   ##### For Spanish interconnections
   StorageUnit:
   - PHS
   - hydro
@@ -946,7 +946,6 @@ sector:
   transmission_efficiency:
     enable:
     - DC
-    - DC_ic   ##### to reverse the link between border node and neighbouring country node
     - H2 pipeline
     - H2 pipeline retrofitted
     - gas pipeline
@@ -954,9 +953,7 @@ sector:
     DC:
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
-    DC_ic:   ##### For Spanish interconnections
-      efficiency_static: 0.98
-      efficiency_per_1000km: 0.977
+    ##### Spanish interconnections set their efficiency in interconnections.yaml
     H2 pipeline:
       efficiency_per_1000km: 1
       compression_per_1000km: 0.018

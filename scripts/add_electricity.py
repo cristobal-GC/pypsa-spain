@@ -446,7 +446,17 @@ def set_transmission_costs(
     if n.links.empty:
         return
 
-    dc_b = n.links.carrier == "DC"
+    ##### PyPSA-Spain: price the Spanish interconnections like regular HVDC links.
+    ### Only the export link of each interconnection is included: the export and
+    ### import links model the two directions of the same physical asset, so
+    ### charging both would pay twice for the cable and the converter stations.
+    ### The export p_nom is the larger of the two in every interconnection defined
+    ### in data_ES/interconnections/interconnections.yaml.
+    ### Original in PyPSA-Eur:
+    # dc_b = n.links.carrier == "DC"
+    ### Modified for PyPSA-Spain:
+    dc_b = n.links.carrier.isin(["DC", "DC_ic export"])
+    #####
 
     # If there are no dc links, then the 'underwater_fraction' column
     # may be missing. Therefore we have to return here.

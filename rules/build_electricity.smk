@@ -3,6 +3,32 @@
 # SPDX-License-Identifier: MIT
 
 
+##### PyPSA-Spain: files feeding the interconnection model, so that editing them
+##### retriggers rule prepare_network. The price CSVs are resolved by reading
+##### neighbouring_countries.yaml while the DAG is built.
+def interconnection_files(w):
+    import yaml
+
+    interconnections = config_provider(
+        "pypsa_spain", "interconnections", default={"enable": False}
+    )(w)
+
+    if not interconnections.get("enable"):
+        return []
+
+    nc_file = interconnections["nc_ES_file"]
+    ic_file = interconnections["ic_ES_file"]
+
+    files = [nc_file, ic_file]
+
+    with open(nc_file) as f:
+        for params in (yaml.safe_load(f) or {}).values():
+            if params.get("prices"):
+                files.append(params["prices"])
+
+    return files
+
+
 rule build_electricity_demand:
     input:
         opsd=rules.retrieve_electricity_demand_opsd.output["csv"],
@@ -924,6 +950,7 @@ rule prepare_network:
             if config_provider("costs", "emission_prices", "dynamic")(w)
             else []
         ),
+        interconnections=lambda w: interconnection_files(w),  #####
     output:
         resources("networks/base_s_{clusters}_elec_{opts}.nc"),
     log:

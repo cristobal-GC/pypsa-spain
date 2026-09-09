@@ -1,60 +1,43 @@
+##################################################
+#
+# Neighbouring countries reachable through the electrical interconnections
+# defined in <interconnections.yaml>.
+#
+# Each country is represented only by its hourly market price. There is no
+# country bus, no country generator and no foreign demand: every interconnection
+# gets its own pair of market generators at the border bus (see
+# <interconnections.yaml> and <prepare_network.py>).
+#
+# Fields per country:
+#
+#   prices   CSV with the hourly market price of the country, in EUR/MWhe.
+#            First column is a datetime index, second column the price. The year
+#            of that index is the year the series corresponds to; it is mapped
+#            onto n.snapshots by (month, day, hour), so if it does not match the
+#            year of the snapshots a warning is logged and the series is used
+#            anyway: keeping both years coherent is the user's responsibility.
+#
+#   spread   Bid-ask spread in EUR/MWh, applied symmetrically:
+#                import marginal cost = +(price(t) + spread / 2)
+#                export marginal cost = -(price(t) - spread / 2)
+#            A round trip therefore costs 'spread' EUR/MWh, which removes the
+#            degenerate optimum of importing and exporting in the same hour and
+#            represents transaction costs. Set to 0 to reproduce the behaviour of
+#            the previous country-bus model. This is the only place where the
+#            spread is defined.
+#
+##################################################
+
 
 ########## France
 
 FR:
-
-  bus_name: FR
-  bus_params:
-    x: 1.58 
-    y: 44.5
-    carrier: DC_ic
-#    v_nom: 10
-
-  generator_name: FR_gen
-  generator_params: 
-    carrier: DC_ic
-    bus: FR
-    efficiency: 1
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
-    p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_FR_2030_cutout2023.csv
-
-  load_name: FR_load
-  load_params:
-    bus: FR
-    # carrier: electricity ##### NO HAY QUE AÑADIR ESTE CARRIER, en add_electricity se comenta para que no se añada
-
-
-
+  prices: data_ES/interconnections/ic_market_prices/mp_FR_2030_cutout2023.csv
+  spread: 0
 
 
 ########## Portugal
 
 PT:
-
-  bus_name: PT
-  bus_params:
-    x: -8.30
-    y: 39.81
-    carrier: DC_ic
-#    v_nom: 10
-
-  generator_name: PT_gen
-  generator_params: 
-    carrier: DC_ic
-    bus: PT
-    efficiency: 1
-    capital_cost: 0
-    p_nom_max: inf
-    p_max_pu: 1
-    p_nom_extendable: True
-  generator_prices: data_ES/interconnections/ic_market_prices/mp_PT_2030_cutout2023.csv
-
-
-  load_name: PT_load
-  load_params:
-    bus: PT
-    # carrier: electricity ##### NO HAY QUE AÑADIR ESTE CARRIER, en add_electricity se comenta para que no se añada
-
+  prices: data_ES/interconnections/ic_market_prices/mp_PT_2030_cutout2023.csv
+  spread: 0

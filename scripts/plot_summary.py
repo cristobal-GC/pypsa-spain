@@ -84,7 +84,18 @@ def plot_costs():
 
     df = df.groupby(df.index.map(rename_techs)).sum()
 
-    to_drop = df.index[df.max(axis=1) < snakemake.params.plotting["costs_threshold"]]
+    ##### PyPSA-Spain: drop by magnitude, not by signed value.
+    ### The interconnection carrier 'DC_ic market export' has a negative cost (the
+    ### revenue earned by exporting), so the original comparison on df.max(axis=1)
+    ### dropped it whatever its size, since a negative value is always below the
+    ### positive threshold. This mirrors what plot_energy() already does.
+    ### Original in PyPSA-Eur:
+    # to_drop = df.index[df.max(axis=1) < snakemake.params.plotting["costs_threshold"]]
+    ### Modified for PyPSA-Spain:
+    to_drop = df.index[
+        df.abs().max(axis=1) < snakemake.params.plotting["costs_threshold"]
+    ]
+    #####
 
     logger.info(
         f"Dropping technology with costs below {snakemake.params['plotting']['costs_threshold']} EUR billion per year"
@@ -117,7 +128,18 @@ def plot_costs():
     handles.reverse()
     labels.reverse()
 
-    ax.set_ylim([0, snakemake.params.plotting["costs_max"]])
+    ##### PyPSA-Spain: let the axis reach below zero when a carrier has negative
+    ### costs (export revenues), otherwise matplotlib stacks those segments under
+    ### zero and the hardcoded lower bound clips them out of view. df.clip(upper=0)
+    ### keeps only the negative part, so the expression is the bottom of the
+    ### stack, and it evaluates to 0 when nothing is negative: plots without
+    ### interconnection revenues are unchanged.
+    ### Original in PyPSA-Eur:
+    # ax.set_ylim([0, snakemake.params.plotting["costs_max"]])
+    ### Modified for PyPSA-Spain:
+    costs_min = min(0.0, df.clip(upper=0).sum().min())
+    ax.set_ylim([costs_min, snakemake.params.plotting["costs_max"]])
+    #####
 
     ax.set_ylabel("System Cost [EUR billion per year]")
 

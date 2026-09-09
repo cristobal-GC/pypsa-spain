@@ -31,6 +31,7 @@ import pandas as pd
 import pypsa
 
 import yaml   ##### Required in PyPSA-Spain
+from pypsa.geo import haversine_pts   ##### Required in PyPSA-Spain
 
 from scripts._helpers import (
     PYPSA_V1,
@@ -320,76 +321,287 @@ def set_line_nom_max(
 #
 # Functions to add interconnections
 #
+# Each interconnection is represented by a border bus (carrier 'DC_ic') linked to
+# the closest AC bus of the Spanish network by two unidirectional links, plus two
+# market generators attached to the border bus:
+#
+#   '<ic> market import'   sign=+1, marginal_cost = +(price(t) + spread/2)
+#   '<ic> market export'   sign=-1, marginal_cost = -(price(t) - spread/2)
+#
+# The export generator has sign=-1, so it withdraws power from the border bus
+# (PyPSA builds the nodal balance as sign * Generator-p), while the objective
+# function uses marginal_cost * p without the sign. A negative marginal cost
+# therefore turns exports into revenue, and the objective contains only the
+# Spanish system cost plus purchases minus export revenues. There is no
+# neighbouring-country bus and no foreign demand to cover.
+#
+
+IC_CARRIER_BUS = 'DC_ic'
+IC_CARRIER_LINK = {'export': 'DC_ic export', 'import': 'DC_ic import'}
+IC_CARRIER_MARKET = {'export': 'DC_ic market export', 'import': 'DC_ic market import'}
+
+### Sign of the market generator dispatch at the border bus, per direction:
+### imports inject into the Spanish side, exports withdraw from it.
+IC_MARKET_SIGN = {'export': -1.0, 'import': 1.0}
 
 
+def _read_ic_price_series(n, country, nc_params):
+    """
+    Read the hourly market price series of a neighbouring country and align it to
+    n.snapshots.
 
-def attach_neighbouring_countries_ES(n, nc_dic):
+    The CSV carries its own datetime index, whose year is the year the series
+    corresponds to. It is mapped onto the snapshots by (month, day, hour), so a
+    price year different from the snapshot year still works: it only triggers a
+    warning, since keeping both coherent is the user's responsibility.
 
-    for kk, vv in nc_dic.items():
+    Values are averaged over the time span each snapshot represents, taken from
+    n.snapshot_weightings.objective. This keeps the series consistent with the
+    temporal averaging or tsam segmentation already applied to the network.
+    """
+    fn = nc_params['prices']
+    prices = pd.read_csv(fn, index_col=0, parse_dates=True).squeeze('columns')
 
-        logger.info(f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding neighbouring country {kk}')
+    if isinstance(prices, pd.DataFrame):
+        raise ValueError(
+            f"[PyPSA-Spain] Price file {fn} for {country} must have a datetime "
+            f"index and a single value column, found columns {list(prices.columns)}."
+        )
+    if not isinstance(prices.index, pd.DatetimeIndex):
+        raise ValueError(
+            f"[PyPSA-Spain] Price file {fn} for {country} has no datetime index. "
+            f"Its first column must hold the timestamp of each hourly price, so "
+            f"that the year of the series is known."
+        )
 
-        ########## Add neighbouring country bus
-        n.add('Bus', vv['bus_name'], **vv['bus_params'])
-        
-        ########## Add neighbouring country generator
-        n.add('Generator', vv['generator_name'], **vv['generator_params'])
+    ##### Warn if the price year and the snapshot years disagree
+    price_years = sorted({ts.year for ts in prices.index})
+    snapshot_years = sorted({ts.year for ts in n.snapshots})
+    if not set(price_years) & set(snapshot_years):
+        logger.warning(
+            f"########## [PyPSA-Spain] <prepare_network.py> WARNING: price series "
+            f"for {country} ({fn}) covers {price_years}, but the snapshots cover "
+            f"{snapshot_years}. The series is mapped by (month, day, hour) anyway; "
+            f"make sure the price file is coherent with the modelled year."
+        )
 
-        ########## Add neighbouring country generator_t: marginal cost
-        df_ic_prices = pd.read_csv(vv['generator_prices'])
-        n.generators_t['marginal_cost'][vv['generator_name']] = df_ic_prices.values
+    ##### Average the hourly prices over the span each snapshot represents.
+    ###
+    ### This is needed for the electricity-only stage: if 'clustering: temporal:
+    ### resolution_elec' is set, average_every_nhours or apply_time_segmentation
+    ### run earlier in this same script, before the interconnections exist, so the
+    ### snapshots reaching this point are already aggregated and sampling them
+    ### would take the price of the first hour of each span as representative.
+    ###
+    ### It is not needed for the sector stage: 'resolution_sector' is applied later,
+    ### in prepare_sector_network, where average_every_nhours resamples the
+    ### marginal_cost of this generator with .mean() like any other time series.
+    ###
+    ### Every hour covered by the snapshots is expanded at once and grouped back,
+    ### so this stays vectorised even for a full hourly year.
+    hourly = pd.Series(
+        prices.to_numpy(),
+        index=pd.MultiIndex.from_arrays(
+            [prices.index.month, prices.index.day, prices.index.hour]
+        ),
+    )
 
-        ########## Add neighbouring country load
-        n.add('Load', vv['load_name'], **vv['load_params'])
+    durations = n.snapshot_weightings.objective.reindex(n.snapshots).fillna(1.0)
+    spans = durations.round().astype(int).clip(lower=1).to_numpy()
+
+    ### One timestamp per hour covered, plus the index of the snapshot it belongs to
+    starts = np.repeat(n.snapshots.to_numpy(), spans)
+    within = np.arange(spans.sum()) - np.repeat(spans.cumsum() - spans, spans)
+    stamps = pd.DatetimeIndex(starts) + pd.to_timedelta(within, unit='h')
+    owner = np.repeat(np.arange(len(n.snapshots)), spans)
+
+    values = hourly.reindex(
+        pd.MultiIndex.from_arrays([stamps.month, stamps.day, stamps.hour])
+    ).to_numpy()
+
+    ### Mean of the hours that do have a price, NaN for snapshots with none
+    found = ~np.isnan(values)
+    totals = np.bincount(
+        owner, weights=np.where(found, values, 0.0), minlength=len(n.snapshots)
+    )
+    counts = np.bincount(owner, weights=found, minlength=len(n.snapshots))
+    aligned = pd.Series(
+        np.where(counts > 0, totals / np.maximum(counts, 1), np.nan),
+        index=n.snapshots,
+    )
+
+    if aligned.isna().all():
+        raise ValueError(
+            f"[PyPSA-Spain] Could not align any price of {fn} ({country}) to the "
+            f"network snapshots."
+        )
+    if aligned.isna().any():
+        missing = aligned.index[aligned.isna()]
+        logger.warning(
+            f"########## [PyPSA-Spain] <prepare_network.py> WARNING: {len(missing)} "
+            f"snapshots have no price in {fn} ({country}), e.g. {missing[0]} "
+            f"(a leap day is the usual reason). They are filled by interpolation."
+        )
+        aligned = aligned.interpolate().ffill().bfill()
+
+    return aligned
 
 
+def _closest_spanish_ac_bus(n, x0, y0, ic_name):
+    """
+    Return the AC bus of the Spanish network closest to (x0, y0).
 
-def attach_interconnections_ES(n, ic_dic):
+    Candidates are selected by attributes (carrier and country), not by matching
+    substrings on bus names, which depend on the clustering mode and silently
+    change the result.
+    """
+    candidates = n.buses.loc[
+        (n.buses['carrier'] == 'AC') & (n.buses['country'] == 'ES'), ['x', 'y']
+    ]
 
-    for kk, vv in ic_dic.items():
+    if candidates.empty:
+        raise ValueError(
+            f"[PyPSA-Spain] No AC bus with country 'ES' found in the network while "
+            f"adding interconnection {ic_name}. Cannot attach it to the Spanish grid."
+        )
 
-        logger.info(f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding interconnection {kk}')
+    distances = pd.Series(
+        haversine_pts(
+            np.array([[x0, y0]]), candidates[['x', 'y']].to_numpy()
+        ),
+        index=candidates.index,
+    )
+    closest = distances.idxmin()
 
+    logger.info(
+        f"########## [PyPSA-Spain] <prepare_network.py> INFO: interconnection "
+        f"{ic_name} attached to bus {closest} ({distances[closest]:.1f} km away)"
+    )
 
-        ########## Identify the closest bus:
-        ### Select candidates: buses in peninsular Spain with carrier AC
-        candidates = n.buses.loc[ (n.buses.index.str.contains('ES0')) & (n.buses['carrier']=='AC'), ['x', 'y']]
-        # If clustering is with 'administrative', buses names are not ES0 for peninsular and ES1 for balearic islands, and 'candidates' is empty. If so, make broad search.
-        # But remove those with 'FR' and 'PT' in the search
-        if candidates.empty:
-            candidates = n.buses.loc[ (n.buses.index.str.contains('ES')) & (~n.buses.index.str.contains('FR')) & (~n.buses.index.str.contains('PT')) & (n.buses['carrier']=='AC'), ['x', 'y']]
-        ### Compute distances
-        x0 = vv['bus_params']['x']
-        y0 = vv['bus_params']['y']
-        distances = np.sqrt((candidates['x'] - x0)**2 + (candidates['y'] - y0)**2)
-
-        ### Find closest bus, and assign it to the correct side of the link
-        closest_bus_index = distances.idxmin()
-        vv['link_export_params']['bus0'] = closest_bus_index
-        vv['link_import_params']['bus1'] = closest_bus_index
-
-
-        ########## Add border bus
-        n.add('Bus', vv['bus_name'], **vv['bus_params'])
-        n.buses.loc[vv['bus_name'], 'country'] = 'ES'  ### Mirar al final si esto da problemas
-
-
-        ########## Add links between Spanish network and border bus (export and import), and set some features
-        n.add('Link', vv['link_export_name'], **vv['link_export_params'])
-        n.links.loc[vv['link_export_name'], 'p_nom_min'] = n.links.loc[vv['link_export_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
-        n.links.loc[vv['link_export_name'], 'underwater_fraction'] = 0.0
-        
-        n.add('Link', vv['link_import_name'], **vv['link_import_params'])
-        n.links.loc[vv['link_import_name'], 'p_nom_min'] = n.links.loc[vv['link_import_name'], 'p_nom']   ### Set p_nom_min as p_nom (otherwise, it seems that prepare_sector_network.py puts p_nom=0)
-        n.links.loc[vv['link_import_name'], 'underwater_fraction'] = 0.0
-
-        # n.links.loc[ic_dic[kk]['link_name'], 'underground'] = False      ### The following line makes an error when saving the network..
-        # n.links.loc[ic_dic[kk]['link_name'], 'under_construction'] = 0
+    return closest
 
 
-        ########## Add link between border bus and neighbouring country, and set some features
-        n.add('Link', vv['link_nc_name'], **vv['link_nc_params'])
-        n.links.loc[vv['link_nc_name'], 'underwater_fraction'] = 0.0
+def attach_interconnections_ES(n, ic_dic, nc_dic):
+    """
+    Add the electrical interconnections with the neighbouring countries.
+
+    Parameters
+    ----------
+    ic_dic : dict
+        Contents of interconnections.yaml, one entry per interconnection.
+    nc_dic : dict
+        Contents of neighbouring_countries.yaml, one entry per country, holding
+        its price series and its bid-ask spread.
+    """
+    ##### Register carriers (idempotent, so re-running on a prepared network is safe)
+    ac_color = n.carriers.at['AC', 'color'] if 'AC' in n.carriers.index else ''
+    for carrier in [IC_CARRIER_BUS, *IC_CARRIER_LINK.values(), *IC_CARRIER_MARKET.values()]:
+        if carrier not in n.carriers.index:
+            n.add('Carrier', name=carrier, color=ac_color, nice_name=carrier)
+
+    ##### Price series per country, aligned to the snapshots (read once per country)
+    prices = {
+        country: _read_ic_price_series(n, country, params)
+        for country, params in nc_dic.items()
+    }
+
+    ##### Length of the optimization horizon, to scale annual energy limits
+    n_years = n.snapshot_weightings.generators.sum() / 8760.0
+
+    for ic_name, ic in ic_dic.items():
+
+        logger.info(
+            f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding '
+            f'interconnection {ic_name}'
+        )
+
+        country = ic['country']
+        if country not in nc_dic:
+            raise ValueError(
+                f"[PyPSA-Spain] Interconnection {ic_name} refers to country "
+                f"'{country}', which is not defined in neighbouring_countries.yaml."
+            )
+
+        ##### Bid-ask spread of the country, in EUR/MWh
+        ic_spread = float(nc_dic[country].get('spread') or 0.0)
+
+        ##### Closest AC bus of the Spanish network, resolved before adding any
+        ##### component of this interconnection
+        closest_bus = _closest_spanish_ac_bus(n, ic['x'], ic['y'], ic_name)
+
+        ##### Border bus
+        bus_name = ic['bus_name']
+        n.add(
+            'Bus',
+            bus_name,
+            x=ic['x'],
+            y=ic['y'],
+            carrier=IC_CARRIER_BUS,
+            country='ES',
+        )
+
+        efficiency = ic.get('efficiency', 1.0)
+        length = ic.get('length', 0.0)
+        ### Share of the length running under water, used by set_transmission_costs
+        ### to split the cable cost between 'HVDC overhead' and 'HVDC submarine'
+        underwater_fraction = float(ic.get('underwater_fraction') or 0.0)
+
+        for direction in ['export', 'import']:
+
+            p_nom = ic[direction]['p_nom']
+
+            ##### Link between the Spanish network and the border bus.
+            ### Exports flow ES -> border, imports flow border -> ES.
+            link_name = ic[direction]['link_name']
+            bus0, bus1 = (
+                (closest_bus, bus_name) if direction == 'export'
+                else (bus_name, closest_bus)
+            )
+            n.add(
+                'Link',
+                link_name,
+                bus0=bus0,
+                bus1=bus1,
+                carrier=IC_CARRIER_LINK[direction],
+                p_nom=p_nom,
+                p_nom_extendable=False,
+                length=length,
+                efficiency=efficiency,
+                lifetime=50,
+            )
+            ### p_nom_min pins the capacity, otherwise prepare_sector_network.py
+            ### ends up setting p_nom=0
+            n.links.loc[link_name, 'p_nom_min'] = p_nom
+            n.links.loc[link_name, 'underwater_fraction'] = underwater_fraction
+
+            ##### Market generator at the border bus
+            generator_name = ic[direction]['generator_name']
+            n.add(
+                'Generator',
+                generator_name,
+                bus=bus_name,
+                carrier=IC_CARRIER_MARKET[direction],
+                sign=IC_MARKET_SIGN[direction],
+                p_nom=p_nom,
+                p_nom_extendable=False,
+                efficiency=1,
+                capital_cost=0,
+            )
+
+            ### Importing pays price + spread/2, exporting earns price - spread/2.
+            ### The export generator has sign=-1 but its dispatch variable p stays
+            ### positive, so the revenue comes from the negative marginal cost.
+            marginal_cost = prices[country] + 0.5 * ic_spread
+            if direction == 'export':
+                marginal_cost = -(prices[country] - 0.5 * ic_spread)
+            n.generators_t['marginal_cost'][generator_name] = marginal_cost
+
+            ##### Optional cap on the annual energy exchanged, given in TWh/year
+            e_sum_max = ic[direction].get('e_sum_max')
+            if e_sum_max is not None:
+                n.generators.loc[generator_name, 'e_sum_max'] = (
+                    float(e_sum_max) * 1e6 * n_years
+                )
 #
 #
 ########################################
@@ -479,40 +691,19 @@ if __name__ == "__main__":
 
     if interconnections['enable']:
 
-        ##### Add DC_ic carrier, to differentiate with AC
-        n.add("Carrier", name='DC_ic', color=n.carriers.at['AC', 'color'], nice_name='DC_ic')
-        n.add("Carrier", name='DC_ic export', color=n.carriers.at['AC', 'color'], nice_name='DC_ic export')
-        n.add("Carrier", name='DC_ic import', color=n.carriers.at['AC', 'color'], nice_name='DC_ic import')
+        with open(interconnections['nc_ES_file'], 'r') as f:
+            nc_dic = yaml.safe_load(f)
 
+        with open(interconnections['ic_ES_file'], 'r') as f:
+            ic_dic = yaml.safe_load(f)
 
-        ##### Attach neighbouring countries
-        ## read nc data
-        file = interconnections['nc_ES_file']
-        with open(file, 'r') as archivo:
-            nc_dic = yaml.safe_load(archivo)
-        ## call function
-        attach_neighbouring_countries_ES(n, nc_dic)
+        attach_interconnections_ES(n, ic_dic, nc_dic)
 
-
-        ##### Attach interconnections
-        ## read ic data
-        file = interconnections['ic_ES_file']
-        with open(file, 'r') as archivo:
-            ic_dic = yaml.safe_load(archivo)
-        ## call function
-        attach_interconnections_ES(n, ic_dic)
-
-
-        ##### Define the load level of the neighbouring countries (as the addition of all the abroad export links capacities
-        # This ensures that, if required, exports can cover all the demand in the neighbouring country
-        ## read ic data
-        file = interconnections['nc_ES_file']
-        with open(file, 'r') as archivo:
-            nc_dic = yaml.safe_load(archivo)
-
-            for kk, vv in nc_dic.items():
-                ########## Add neighbouring country load_t
-                n.loads_t['p_set'][vv['load_name']] = n.links.filter(like=kk, axis=0).filter(like='export', axis=0)['p_nom'].sum()
+        ##### set_transmission_costs already ran inside set_transmission_limit,
+        ### before these links existed, so it is called again to price them. It
+        ### assigns capital_cost rather than accumulating it, so lines and regular
+        ### DC links are left unchanged.
+        set_transmission_costs(n, costs)
     #
     #
     ########################################
