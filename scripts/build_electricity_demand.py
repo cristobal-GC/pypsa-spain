@@ -393,6 +393,26 @@ if __name__ == "__main__":
 
         ##### Sort columns
         load.sort_index(axis=1, inplace=True)
+
+
+        ##### Align with the requested snapshots, as done for the PyPSA-Eur load above
+        missing = snapshots.difference(load.index)
+        if len(missing):
+            raise ValueError(
+                f"The profiles in {electricity_demand['profiles']} do not cover "
+                f"{len(missing)} of the {len(snapshots)} requested snapshots "
+                f"(first missing: {missing[0]}, last: {missing[-1]}). This typically "
+                f"happens when targeting a leap year with `enable: drop_leap_day: false` "
+                f"while the profiles were built for a non-leap year."
+            )
+
+        dropped = load.index.difference(snapshots)
+        if len(dropped):
+            logger.info(
+                f'##### [PyPSA-Spain] <build_electricity_demand>: Restricting demand to the '
+                f'{len(snapshots)} requested snapshots ({len(dropped)} hours of the profiles dropped).'
+            )
+        load = load.reindex(index=snapshots)
 #
 #
 #

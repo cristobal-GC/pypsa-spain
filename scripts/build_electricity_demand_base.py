@@ -258,6 +258,124 @@ def _distribution_factors(
     return factors
 
 
+def _nuts_bus_weights(
+    gdf_regions: gpd.GeoDataFrame,
+    nuts_regions: gpd.GeoDataFrame,
+    raster_fn: str,
+    fallback_factors: pd.Series,
+) -> tuple[pd.DataFrame, dict[str, str]]:
+    """
+    Compute the share of each NUTS region's demand that belongs to each bus region.
+
+    Bus (Voronoi) regions and NUTS regions do not nest: a single Voronoi cell may
+    straddle a NUTS border. Assigning the whole cell to one NUTS region (e.g. by its
+    representative point) charges that region with demand that is physically located
+    in its neighbour. To avoid this, the energy atlas raster is integrated over the
+    *intersection* of each (bus region, NUTS region) pair, so a straddling cell only
+    ever receives the demand of the pixels it actually covers within each region.
+
+    Where the raster carries no information for a NUTS region (it only covers EU27),
+    the baseline distribution factors are used instead, apportioned to each
+    intersection by its share of the bus region's area.
+
+    Parameters
+    ----------
+    gdf_regions : gpd.GeoDataFrame
+        Bus regions indexed and labelled by 'name', in an equal-area CRS.
+    nuts_regions : gpd.GeoDataFrame
+        NUTS regions indexed by 'NUTS_ID', in the same CRS as ``gdf_regions``.
+    raster_fn : str
+        Path to the energy atlas raster (GeoTIFF).
+    fallback_factors : pd.Series
+        Baseline per-bus distribution factors, indexed like ``gdf_regions``.
+
+    Returns
+    -------
+    weights : pd.DataFrame
+        Bus x NUTS matrix whose columns each sum to 1. Only NUTS regions that could
+        be distributed are present as columns.
+    dropped : dict[str, str]
+        NUTS regions that could not be distributed, mapped to the reason why.
+    """
+    valid_regions = gdf_regions[gdf_regions.geometry.notna() & ~gdf_regions.geometry.is_empty]
+
+    # `nuts_regions` may reach here with an unnamed index (e.g. after a `.loc` lookup),
+    # so restore the label the overlay below relies on.
+    nuts_frame = nuts_regions[["geometry"]].rename_axis("NUTS_ID").reset_index()
+
+    # Intersect bus regions with NUTS regions; only overlapping pairs survive.
+    pieces = gpd.overlay(
+        valid_regions[["name", "geometry"]].reset_index(drop=True),
+        nuts_frame,
+        how="intersection",
+        keep_geom_type=True,
+    )
+    pieces = pieces[pieces.geometry.area > 0]
+
+    dropped = {
+        nuts_id: "does not overlap any bus region"
+        for nuts_id in nuts_regions.index.difference(pieces["NUTS_ID"].unique())
+    }
+
+    if pieces.empty:
+        return pd.DataFrame(index=gdf_regions.index), dropped
+
+    # Primary key: energy atlas demand contained in each intersection piece.
+    with rio.open(raster_fn) as raster:
+        band = raster.read(1)
+        stats = zonal_stats(
+            pieces, band, affine=raster.transform, nodata=-1, stats="sum"
+        )
+    pieces["atlas"] = [
+        s["sum"] if s["sum"] is not None else np.nan for s in stats
+    ]
+
+    # Fallback key: baseline bus factor, split across pieces by area share.
+    cell_area = valid_regions.geometry.area
+    pieces["fallback"] = (
+        pieces["name"].map(fallback_factors).to_numpy()
+        * pieces.geometry.area.to_numpy()
+        / pieces["name"].map(cell_area).to_numpy()
+    )
+
+    def _matrix(value: str) -> pd.DataFrame:
+        return (
+            pieces.pivot_table(
+                index="name", columns="NUTS_ID", values=value, aggfunc="sum"
+            )
+            .reindex(index=gdf_regions.index)
+            .reindex(columns=nuts_regions.index)
+        )
+
+    atlas = _matrix("atlas")
+    fallback = _matrix("fallback")
+
+    # Per NUTS region, prefer the raster whenever it carries any demand there.
+    weights = fallback.copy()
+    from_atlas = atlas.sum(min_count=1) > 0
+    weights.loc[:, from_atlas[from_atlas].index] = atlas.loc[:, from_atlas[from_atlas].index]
+
+    column_sums = weights.sum(min_count=1)
+    unusable = column_sums.index[~(column_sums > 0)]
+    dropped.update(
+        {
+            nuts_id: "no positive distribution key on any overlapping bus region"
+            for nuts_id in unusable
+        }
+    )
+
+    weights = weights.drop(columns=unusable)
+    weights = weights.div(weights.sum(), axis=1).fillna(0.0)
+
+    logger.info(
+        f"Distribution keys for {(from_atlas & ~from_atlas.index.isin(unusable)).sum()} "
+        f"NUTS regions taken from the energy atlas raster, "
+        f"{(~from_atlas & ~from_atlas.index.isin(unusable)).sum()} from the fallback keys."
+    )
+
+    return weights, dropped
+
+
 def upsample_load_vPyPSA_Spain(
     n: pypsa.Network,
     regions_fn: str,
@@ -276,11 +394,11 @@ def upsample_load_vPyPSA_Spain(
     1. Load substation-level regions and input demand time series.
     2. Build baseline bus factors (energy atlas / GB / NUTS3 fallback).
     3. Load NUTS geometries indexed by NUTS_ID column.
-    4. Extract NUTS code (AB+1-3 digits) from each load column name.
-    5. Select buses inside that NUTS geometry (fallback: intersecting buses).
-    6. Renormalize factors on selected buses so weights sum to 1.
-    7. Distribute the column time series across selected buses and accumulate.
-    8. Return a time x bus DataArray.
+    4. Extract NUTS code (AB+1-3 digits) from each load column name and aggregate
+       the demand time series per NUTS region.
+    5. Split each NUTS region's demand across the bus regions overlapping it, in
+       proportion to the energy atlas demand contained in each overlap.
+    6. Check that all demand has been placed, then return a time x bus DataArray.
 
     Parameters
     ----------
@@ -307,14 +425,20 @@ def upsample_load_vPyPSA_Spain(
     -------
     xr.DataArray
         Demand time series with dimensions (time, bus).
+
+    Raises
+    ------
+    ValueError
+        If any demand could not be placed on the network, since that would silently
+        lower the national total below the configured ``annual_value``.
     """
     # Step 1: Load bus regions (LV substations only) and regional load time series.
     substation_lv_i = n.buses.index[n.buses["substation_lv"]]
     gdf_regions = gpd.read_file(regions_fn).set_index("name", drop=False).reindex(substation_lv_i)
     gdf_regions = gdf_regions.to_crs(epsg=3035)
     load = pd.read_csv(load_fn, index_col=0, parse_dates=True)
-       
-    # Step 2: Compute baseline spatial factors for all buses.
+
+    # Step 2: Compute baseline spatial factors, used where the raster has no data.
     factors = _distribution_factors(
         gdf_regions,
         raster_fn=raster_fn,
@@ -334,61 +458,79 @@ def upsample_load_vPyPSA_Spain(
     nutsall = nutsall[["NUTS_ID", "geometry"]].copy()
     nutsall["NUTS_ID"] = nutsall["NUTS_ID"].astype(str).str.upper()
     nutsall = nutsall.set_index("NUTS_ID").to_crs(gdf_regions.crs)
+    if nutsall.index.has_duplicates:
+        duplicates = nutsall.index[nutsall.index.duplicated()].unique().tolist()
+        logger.warning(
+            f"Duplicate NUTS_ID entries in {nutsall_fn} ({duplicates[:5]}...); keeping the first of each."
+        )
+        nutsall = nutsall[~nutsall.index.duplicated(keep="first")]
 
-    # Step 4: Prepare bus representative points and output container.
-    bus_points = gdf_regions.geometry.representative_point()
-    load_by_bus = pd.DataFrame(0.0, index=load.index, columns=gdf_regions.index)
-
-    # Step 5: Distribute each NUTS column to buses inside its geometry.
+    # Step 4: Map load columns onto NUTS regions and aggregate per region.
+    column_to_nuts: dict[str, str] = {}
+    skipped: dict[str, str] = {}
     for col in load.columns:
-        # Extract NUTS code (2 letters + 1-3 digits) from column name.
-        col_upper = str(col).upper()
-        match = re.search(r"\b([A-Z]{2}\d{1,3})\b", col_upper)
-        nuts_id = match.group(1) if match else None
-        if nuts_id is None:
-            logger.warning(
-                f"Could not parse NUTS code (pattern: AB + 1-3 digits) from load column '{col}'. Skipping."
-            )
+        match = re.search(r"\b([A-Z]{2}\d{1,3})\b", str(col).upper())
+        if match is None:
+            skipped[col] = "no NUTS code (pattern: AB + 1-3 digits) in the column name"
             continue
-
+        nuts_id = match.group(1)
         if nuts_id not in nutsall.index:
-            logger.warning(
-                f"NUTS code '{nuts_id}' from column '{col}' not found in NUTS geometry file. Skipping."
+            skipped[col] = f"NUTS code '{nuts_id}' is absent from {nutsall_fn}"
+            continue
+        column_to_nuts[col] = nuts_id
+
+    load_nuts = load[list(column_to_nuts)].rename(columns=column_to_nuts)
+    load_nuts = load_nuts.T.groupby(level=0).sum().T
+
+    # Step 5: Distribute each NUTS region's demand across the bus regions it overlaps.
+    weights, dropped = _nuts_bus_weights(
+        gdf_regions,
+        nutsall.loc[load_nuts.columns],
+        raster_fn=raster_fn,
+        fallback_factors=factors,
+    )
+    for col, nuts_id in column_to_nuts.items():
+        if nuts_id in dropped:
+            skipped[col] = f"NUTS region '{nuts_id}' {dropped[nuts_id]}"
+
+    load_nuts = load_nuts[weights.columns]
+    load_by_bus = pd.DataFrame(
+        load_nuts.to_numpy() @ weights.to_numpy().T,
+        index=load_nuts.index,
+        columns=weights.index,
+    )
+
+    # Step 6: Verify that no demand was lost on the way, then assemble the output.
+    expected = load.to_numpy().sum()
+    delivered = load_by_bus.to_numpy().sum()
+
+    if skipped:
+        lost = sum(load[col].sum() for col in skipped)
+        detail = "\n".join(
+            f"  - '{col}' ({load[col].sum() / 1e6:.3f} TWh): {reason}"
+            for col, reason in sorted(skipped.items())
+        )
+        if lost > 1e-6 * expected:
+            raise ValueError(
+                f"Could not place {lost / 1e6:.3f} TWh of "
+                f"{expected / 1e6:.3f} TWh ({lost / expected:.2%}) of electricity demand "
+                f"on the network. The national total would silently fall below the "
+                f"configured `annual_value`. Offending load columns:\n{detail}"
             )
-            continue
+        logger.warning(f"Ignoring load columns carrying no demand:\n{detail}")
 
-        # Select buses inside the NUTS region (fallback to intersects).
-        region_geom = nutsall.at[nuts_id, "geometry"]
-        bus_mask = bus_points.within(region_geom)
+    if not np.isclose(delivered, expected, rtol=1e-6):
+        raise ValueError(
+            f"Demand upsampling is not energy-conserving: {delivered / 1e6:.3f} TWh "
+            f"distributed over the buses against {expected / 1e6:.3f} TWh in {load_fn}."
+        )
 
-        if not bus_mask.any():
-            bus_mask = gdf_regions.geometry.intersects(region_geom)
+    logger.info(
+        f"Distributed {delivered / 1e6:.3f} TWh of electricity demand from "
+        f"{len(weights.columns)} NUTS regions over {(load_by_bus.sum() > 0).sum()} "
+        f"of {len(gdf_regions)} bus regions."
+    )
 
-        selected_buses = gdf_regions.index[bus_mask]
-        if len(selected_buses) == 0:
-            logger.warning(f"No buses found inside NUTS region '{nuts_id}'. Skipping.")
-            continue
-
-        selected_factors = factors.loc[selected_buses].dropna()
-        selected_buses = selected_factors.index
-        if len(selected_buses) == 0:
-            logger.warning(
-                f"No valid factors found for buses in NUTS region '{nuts_id}'. Skipping."
-            )
-            continue
-
-        factor_sum = selected_factors.sum()
-        if factor_sum <= 0:
-            logger.warning(
-                f"Non-positive factor sum for NUTS region '{nuts_id}'. Skipping."
-            )
-            continue
-
-        # Renormalize selected factors and accumulate the time series.
-        weights = selected_factors / factor_sum
-        load_by_bus.loc[:, selected_buses] += np.outer(load[col].values, weights.values)
-
-    # Step 6: Return final time x bus demand array.
     return xr.DataArray(
         load_by_bus.values,
         dims=["time", "bus"],
