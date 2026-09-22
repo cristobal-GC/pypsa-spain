@@ -22,9 +22,7 @@
 #                export marginal cost = -(price(t) - spread / 2)
 #            A round trip therefore costs 'spread' EUR/MWh, which removes the
 #            degenerate optimum of importing and exporting in the same hour and
-#            represents transaction costs. Set to 0 to reproduce the behaviour of
-#            the previous country-bus model. This is the only place where the
-#            spread is defined.
+#            represents transaction costs.
 #
 ##################################################
 
@@ -33,11 +31,11 @@
 
 FR:
   prices: data_ES/interconnections/ic_market_prices/mp_FR_2030_cutout2023.csv
-  spread: 0
+  spread: 5
 
 
 ########## Portugal
 
 PT:
   prices: data_ES/interconnections/ic_market_prices/mp_PT_2030_cutout2023.csv
-  spread: 0
+  spread: 5
