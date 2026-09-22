@@ -18,7 +18,7 @@ Upcoming Release
 PyPSA-Spain v2026.09.0 (22th Sep 2026)
 ===========================================
 
-* This is a safety release ahead of adapting PyPSA-Spain to the significant changes introduced in PyPSA-Eur (`#1838 <https://github.com/PyPSA/pypsa-eur/pull/1838>__).
+* This is a safety release ahead of adapting PyPSA-Spain to the significant changes introduced in PyPSA-Eur (`#1838 <https://github.com/PyPSA/pypsa-eur/pull/1838>`__).
 
 * The electricity interconnection model has been updated. The previous model represented each neighbouring country with a bus carrying a large load, and supplying that foreign demand artificially increased the total system cost. Each border now carries a pair of market generators instead, one importing at the country price and one exporting at minus that price, so that imports increase the total cost and exports reduce it, and the objective function refers to the Spanish system alone. See details `here <https://pypsa-spain.readthedocs.io/en/latest/interconnections.html>`__).(`PR #22 <https://github.com/cristobal-GC/pypsa-spain/pull/22>`__)
 
