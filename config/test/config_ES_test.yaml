@@ -1487,17 +1487,3 @@ overpass_api:
     project_name: "PyPSA-Eur"
     email: "contact@pypsa.org"
     website: "https://github.com/PyPSA/pypsa-eur"
-
-#################### PyPSA-Spain
-#
-# Con clustering.temporal.averaging: 720h el ano queda en 13 snapshots y algunos meses se
-# quedan sin ninguno (febrero, en 2023). Las graficas mensuales del balance no solo carecen
-# de sentido a esa resolucion, sino que hacen fallar a plot_balance_timeseries, que asume
-# un dataframe no vacio (plt.xlim((df.index[0], ...))). La configuracion de produccion usa
-# 168h, con un minimo de 4 snapshots por mes, y no se ve afectada.
-#
-plotting:
-  balance_timeseries:
-    monthly: false
-#
-####################
