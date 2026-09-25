@@ -30,22 +30,28 @@ from scripts.lib.validation.config import (
 configfile: "config/config.default.yaml"
 configfile: "config/plotting.default.yaml"
 
-
-if Path("config/config.yaml").exists():
-
-    configfile: "config/config.yaml"
-
-
 #################### PyPSA-Spain
 #
-# Load config_ES.yaml as the default config. Placed last so it takes precedence over a
-# local config/config.yaml, and loaded as a directive (not via --configfile) so it is
-# available when rules are parsed (e.g. the module-level dataset_version() calls in
-# rules/retrieve.smk). Override on the CLI with --configfile to adjust specific fields.
+# config_ES.yaml is the default configuration of PyPSA-Spain, so it is loaded here,
+# right after the upstream defaults and BEFORE the optional local config/config.yaml.
+# This keeps upstream's layering intact: defaults first, user overrides last.
+#
+# It is loaded as a directive rather than through --configfile so that it is available
+# while the rules are parsed, which the module-level dataset_version() calls in
+# rules/retrieve.smk require.
+#
+# Precedence, lowest to highest:
+#   config.default.yaml -> plotting.default.yaml -> config_ES.yaml
+#     -> config/config.yaml (if present) -> --configfile on the command line
 #
 configfile: "config/config_ES.yaml"
 #
 ####################
+
+
+if Path("config/config.yaml").exists():
+
+    configfile: "config/config.yaml"
 
 
 validated = validate_config(config)
