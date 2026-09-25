@@ -376,11 +376,22 @@ rule determine_availability_matrix:
         cutout=lambda w: input_cutout(
             w, config_provider("renewable", w.technology, "cutout")(w)
         ),
-        ISA=lambda w: ancient(                      ##### Spanish "Indice de Sensibilidad Ambiental"
-            "data_ES/ISA/Clas_ISA_eol_pb.tiff"
-            if w.technology == "onwind"
-            else "data_ES/ISA/Clas_ISA_ftv_pb.tiff"
-            if w.technology in ("solar", "solar-hsat")
+        ##### PyPSA-Spain: Spanish "Indice de Sensibilidad Ambiental" (MITECO).
+        ### Gated on ISA_class.enable, like the fork's other optional inputs, so the MITECO
+        ### rasters are not retrieved when the feature is off.
+        ### NOT wrapped in ancient(): this file is produced by rule retrieve_isa_*, and
+        ### marking a rule-generated file as ancient makes Snakemake schedule only that
+        ### retrieval, prune everything downstream and exit 0 without building the
+        ### requested target, so the workflow needs a second pass from a clean checkout.
+        ISA=lambda w: (
+            (
+                "data_ES/ISA/Clas_ISA_eol_pb.tiff"
+                if w.technology == "onwind"
+                else "data_ES/ISA/Clas_ISA_ftv_pb.tiff"
+                if w.technology in ("solar", "solar-hsat")
+                else []
+            )
+            if config_provider("pypsa_spain", "ISA_class", "enable", default=False)(w)
             else []
         ),
     output:
