@@ -12,6 +12,46 @@ All configuration is now driven by config sections rather than wildcards.
 """
 
 
+#################### PyPSA-Spain
+#
+# Input helpers for the fork's own data files. They are declared as inputs of
+# compose_network so that editing them retriggers the rule; the scripts themselves
+# read the paths from the config, not from these entries.
+#
+def interconnection_files(w):
+    """Files feeding the interconnection model (moved here from build_electricity.smk
+    when #1838 folded rule prepare_network into compose_network). The price CSVs are
+    resolved by reading neighbouring_countries.yaml while the DAG is built."""
+    import yaml
+
+    interconnections = config_provider(
+        "pypsa_spain", "interconnections", default={"enable": False}
+    )(w)
+
+    if not interconnections.get("enable"):
+        return []
+
+    nc_file = interconnections["nc_ES_file"]
+    ic_file = interconnections["ic_ES_file"]
+
+    files = [nc_file, ic_file]
+
+    with open(nc_file) as f:
+        for params in (yaml.safe_load(f) or {}).values():
+            if params.get("prices"):
+                files.append(params["prices"])
+
+    return files
+
+
+def pypsa_spain_file(w, *keys):
+    """Return the file of a pypsa_spain feature when it is enabled, else []."""
+    cfg = config_provider("pypsa_spain", *keys, default={"enable": False})(w)
+    return cfg["file"] if cfg.get("enable") else []
+#
+####################
+
+
 def get_compose_inputs(w):
     """Determine inputs for compose rule based on foresight and horizon."""
     cfg = get_config(w)
@@ -53,6 +93,15 @@ def get_compose_inputs(w):
             if "solar" in cfg["electricity"]["renewable_carriers"]
             else []
         ),
+        #################### PyPSA-Spain
+        #
+        onshore_regions=resources("onshore_regions.geojson"),   ##### update_elec_capacities
+        nuts2_ES="data_ES/nuts/NUTS2_ES.geojson",               ##### update_elec_capacities
+        interconnections=interconnection_files(w),              ##### interconnections
+        h2_valley_file=pypsa_spain_file(w, "H2_valley_demands"),    ##### H2_valley_demands
+        h2_ic_file=pypsa_spain_file(w, "H2_imports_exports"),       ##### H2_imports_exports
+        #
+        ####################
     )
 
     # Sector-specific inputs (only when sector coupling is enabled)
@@ -242,6 +291,22 @@ rule compose_network:
         ),
         co2_budget=config_provider("co2_budget"),
         adjustments=config_provider("adjustments"),
+        #################### PyPSA-Spain
+        #
+        update_elec_capacities=config_provider(
+            "pypsa_spain", "update_elec_capacities", default={"enable": False}
+        ),  ##### add_electricity.main()
+        interconnections=config_provider(
+            "pypsa_spain", "interconnections", default={"enable": False}
+        ),  ##### prepare_network.main()
+        H2_valley_demands=config_provider(
+            "pypsa_spain", "H2_valley_demands", default={"enable": False}
+        ),  ##### prepare_sector_network.main()
+        H2_imports_exports=config_provider(
+            "pypsa_spain", "H2_imports_exports", default={"enable": False}
+        ),  ##### prepare_sector_network.main()
+        #
+        ####################
     message:
         "Composing network for horizon {wildcards.horizon}"
     script:
