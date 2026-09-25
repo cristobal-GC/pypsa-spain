@@ -10,8 +10,7 @@ Description
 -----------
 
 The rule [add_electricity][] ties all the different data inputs from the
-preceding rules together into a detailed PyPSA network that is stored in
-`networks/base_s_{clusters}_elec.nc`. It includes:
+preceding rules together into a detailed PyPSA network. It includes:
 
 - today's transmission topology and transfer capacities (optionally including
   lines which are under construction according to the config settings ``lines:
@@ -65,11 +64,7 @@ import geopandas as gpd   ##### Required in PyPSA-Spain
 
 from scripts._helpers import (
     PYPSA_V1,
-    configure_logging,
-    get_snapshots,
-    load_costs,
     rename_techs,
-    set_scenario_config,
     update_p_nom_max,
 )
 
@@ -384,37 +379,32 @@ def load_and_aggregate_powerplants(
 def attach_load(
     n: pypsa.Network,
     load_fn: str,
-    busmap_fn: str,
     scaling: float = 1.0,
 ) -> None:
     """
-    Attach load data to the network.
+    Attach clustered load data to the network.
 
     Parameters
     ----------
     n : pypsa.Network
         The PyPSA network to attach the load data to.
     load_fn : str
-        Path to the load data file.
-    busmap_fn : str
-        Path to the busmap file.
+        Path to the clustered load data file.
     scaling : float, optional
         Scaling factor for the load data, by default 1.0.
     """
     load = (
-        xr.open_dataarray(load_fn).to_dataframe().squeeze(axis=1).unstack(level="time")
+        xr.open_dataarray(load_fn)
+        .to_dataframe()
+        .squeeze(axis=1)
+        .unstack(level="time")
+        .T
     )
-
-    # apply clustering busmap
-    busmap = pd.read_csv(busmap_fn, dtype=str)
-    index_col = "name" if PYPSA_V1 else "Bus"
-    busmap = busmap.set_index(index_col).squeeze()
-    load = load.groupby(busmap).sum().T
 
     logger.info(f"Load data scaled by factor {scaling}.")
     load *= scaling
 
-    n.add("Load", load.columns, bus=load.columns, p_set=load)  # carrier="electricity"
+    n.add("Load", load.columns, bus=load.columns, p_set=load, carrier="electricity")
 
 
 def set_transmission_costs(
@@ -446,17 +436,13 @@ def set_transmission_costs(
     if n.links.empty:
         return
 
-    ##### PyPSA-Spain: price the Spanish interconnections like regular HVDC links.
-    ### Only the export link of each interconnection is included: the export and
-    ### import links model the two directions of the same physical asset, so
-    ### charging both would pay twice for the cable and the converter stations.
-    ### The export p_nom is the larger of the two in every interconnection defined
-    ### in data_ES/interconnections/interconnections.yaml.
-    ### Original in PyPSA-Eur:
-    # dc_b = n.links.carrier == "DC"
-    ### Modified for PyPSA-Spain:
-    dc_b = n.links.carrier.isin(["DC", "DC_ic export"])
-    #####
+    ##### PyPSA-Spain: the "DC_ic export" carrier used to be added to this mask so that
+    ### a second, global set_transmission_costs() call from prepare_network would price
+    ### the interconnections. Since #1838 prepare_network.main() runs AFTER the sector
+    ### layer, so that global call was replaced by prepare_network._price_interconnection_links(),
+    ### and this mask is back to upstream's. The interconnections do not exist yet at this
+    ### point anyway, so widening it here would have no effect.
+    dc_b = n.links.carrier == "DC"
 
     # If there are no dc links, then the 'underwater_fraction' column
     # may be missing. Therefore we have to return here.
@@ -1270,244 +1256,64 @@ def fun_update_elec_capacities(n, carriers_to_update, nuts2_ES, regions):
 
   
 
-##### This is a previous version of the function employed to updated capacities. 
-# The approach consisted in gathering all the buses within a NUTS2 region, an to re-scale them to fit real data for NUTS2 capacity.
-# The problem with this approach is that, for small number of clusters, a big one may include a whole NUTS2 region. In that case, the
-# related power of that NUTS2 region is missed, and the total capacity infra-assessed.
-#
-# This function has been replaced by a new fun_update_elec_capacities (see above)
-#
-# def fun_update_elec_capacities_DEPRECATED(n, carriers_to_update, method_increase, nuts2_ES_file, dic_nuts_file):
-#
-#     def _update_in_network(df, required_capacity, method_increase, cc, rr_name):   ##### cc, rr_name is for the message
-#         '''
-#         This function operates on a df = n.generators. It modifies 'p_nom' to match a target installed capacity
-#         '''
-#
-#         ### Compute initial capacity
-#         initial_capacity = df['p_nom'].sum()
-#
-#         df_updated = df.copy()
-#
-#         ### Increase capacity according to defined method
-#         if int(required_capacity) > int(initial_capacity):
-#
-#             if method_increase == 'additional':
-#                 capacity_added_at_each_bus = (required_capacity-initial_capacity)/df.shape[0]
-#                 df_updated.loc[:, 'p_nom'] += capacity_added_at_each_bus
-#
-#               
-#             if (method_increase == 'proportional') and (initial_capacity>0):
-#                 factor = required_capacity / initial_capacity
-#                 df_updated.loc[:, 'p_nom'] *= factor
-#
-#
-#             if (method_increase == 'proportional') and (initial_capacity==0):
-#                 logger.info(f'########## [PyPSA-Spain] <add_electricity.py> WARNING: no initial capacity for carrier {cc} in {rr_name}. Using "additional" method')
-#                 capacity_added_at_each_bus = (required_capacity-initial_capacity)/df.shape[0]
-#                 df_updated.loc[:, 'p_nom'] += capacity_added_at_each_bus
-#
-#
-#         ### Reduce capacity proportionally at each bus
-#         if int(required_capacity) < int(initial_capacity):
-#             factor = required_capacity / initial_capacity
-#             df_updated.loc[:, 'p_nom'] *= factor
-#
-#         return df_updated
-#
-#
-#
-#     ##### Define relevant variables:
-#     df_buses = n.buses
-#     df_generators = n.generators
-#
-#     nuts2_ES = gpd.read_file(nuts2_ES_file)
-#
-#     with open(dic_nuts_file, "r") as archivo:
-#         dic_nuts = yaml.safe_load(archivo)
-#     dic_nuts2 = dic_nuts['dic_NUTS2']
-#
-#
-#     # gdf_buses
-#     geometry_buses = gpd.points_from_xy(df_buses["x"], df_buses["y"])
-#     gdf_buses = gpd.GeoDataFrame(df_buses,geometry=geometry_buses, crs=4326)
-#
-#
-#      
-#     #################### Loop over carriers to update
-#     for cc, ff in carriers_to_update.items():
-#
-#
-#         ##### Load esios file
-#         df_installed_capacity = pd.read_csv(ff, index_col='datetime')
-#
-#
-#
-#         #################### Loop over NUTS2 regions included in df_installed_capacity columns
-#         for rr in df_installed_capacity.columns:
-#
-#
-#             ##### Enter only if rr is in dic_NUTS2 (which contains regions only included in PyPSA-Spain)
-#             # This is to avoid columns such as 'total', 'Melilla', 'Canarias'... that are in rr
-#             if rr in dic_nuts2.values():
-#
-#
-#                 # This is just for using the name in the log
-#                 rr_name = nuts2_ES.loc[ nuts2_ES["NUTS_ID"]==rr , "NUTS_NAME"].values[0]
-#
-#                   
-#                 ########## get a list with local buses located in region rr
-#                 gdf_region = nuts2_ES[nuts2_ES['NUTS_ID']==rr]
-#
-#                 gdf_buses_local = gpd.sjoin(gdf_buses, gdf_region, how="inner", predicate="within")
-#
-#                 list_buses_local = gdf_buses_local.index.to_list()
-#
-#
-#                 ########## Get the generators in local buses and carrier cc, with capacity>0.01 (to avoid everywhere generators). 
-#                 df_generators_local_cc = df_generators.loc[ (df_generators['bus'].isin(list_buses_local)) & (df_generators['carrier']==cc) & (df_generators['p_nom']>0.01)]
-#                 # but if none, then include everywhere generators
-#                 if len(df_generators_local_cc)==0:
-#                     df_generators_local_cc = df_generators.loc[ (df_generators['bus'].isin(list_buses_local)) & (df_generators['carrier']==cc)]
-#                 # if still none, there is no bus with this carrier
-#                 if len(df_generators_local_cc)==0:
-#                     logger.info(f'########## [PyPSA-Spain] <add_electricity.py> WARNING: No bus with generator {cc} in {rr_name}. Updating capacity was not possible.')
-#
-#                 else:
-#                     ########## Get the real capacity reported by ESIOS in that region and carrier for the desired year        
-#                     required_capacity = df_installed_capacity[rr].mean()
-#
-#   
-#                     ############### Update capacities
-#                     df_updated = _update_in_network(df_generators_local_cc, required_capacity, method_increase, cc, rr_name)   ##### cc, rr_name is for the message
-#
-#
-#
-#
-#                     ############### Some buses may have surpassed p_nom_max. Share extra capacity across the other buses
-#
-#                     # Check first that there is space for all the capacity
-#                     if df_updated['p_nom'].sum() > df_updated['p_nom_max'].sum():
-#                         sys.exit(f'Not enough space to allocate required capacity of carrier {cc} in region {rr_name}')
-#
-#
-#                     df_to_sanitise = df_updated.copy()
-#
-#
-#                     while (df_updated['p_nom'] > df_updated['p_nom_max']).any():
-#
-#                         # Take the first one
-#                         index_conflictive = df_updated[df_generators_local_cc['p_nom']>df_updated['p_nom_max']].index[0]
-#
-#                         # Identify overcapacity
-#                         overcapacity = df_updated.at[index_conflictive,'p_nom'] - df_updated.at[index_conflictive,'p_nom_max']
-#
-#                         # Remove capacity in conflictive bus at df_updated, so that it is not conflictive anymore
-#                         df_updated.at[index_conflictive,'p_nom'] -= overcapacity
-#
-#                         # Remove conflictive bus at df_to_sanitise
-#                         df_to_sanitise.drop(index_conflictive, inplace=True)
-#
-#                         # Share the overcapacity across the other buses
-#                         required_capacity = df_to_sanitise['p_nom'].sum() + overcapacity
-#                         df_to_sanitise = _update_in_network(df_to_sanitise, required_capacity, method_increase, cc, rr_name)   ##### cc, rr_name is for the message
-#
-#
-#                         ############### Update df_generators_local_cc with df_to_sanitise
-#                         df_updated.update(df_to_sanitise)                   
-#                   
-#
-#
-#                     ##### Messages  
-#
-#                     initial_capacity = int(df_generators_local_cc['p_nom'].sum())       
-#                     final_capacity = int(df_updated['p_nom'].sum())
-#  
-#                     if final_capacity == initial_capacity:
-#                         logger.info(f'########## [PyPSA-Spain] <add_electricity.py> INFO: {cc} capacity matches in {rr_name}.')
-#
-#                     else:
-#                         logger.info(f'########## [PyPSA-Spain] <add_electricity.py> INFO: {cc} capacity in {rr_name} was updated from {initial_capacity} to {final_capacity}.')
-#
-#
-#                     saturated_nodes = (df_updated['p_nom']==df_updated['p_nom_max']).sum()
-#                
-#                     if saturated_nodes > 0:
-#                         logger.info(f'########## [PyPSA-Spain] <add_electricity.py> WARNING: Maximum capacity was reached in {saturated_nodes}!!')
-#
-#
-#
-#                     ############### Update n.generators with df_updated
-#                     n.generators.update(df_updated)
-#
+##### The previous version of this function (fun_update_elec_capacities_DEPRECATED,
+##### ~170 commented-out lines) was removed during the #1838 migration.
 #
 #
 ########################################
 
 
+def main(
+    n: pypsa.Network,
+    inputs,
+    params,
+    costs: pd.DataFrame,
+) -> None:
+    logger.info("Adding electricity components")
+    foresight = params.foresight
 
-
-
-if __name__ == "__main__":
-    if "snakemake" not in globals():
-        from scripts._helpers import mock_snakemake
-
-        snakemake = mock_snakemake("add_electricity", clusters=60)
-    configure_logging(snakemake)  # pylint: disable=E0606
-    set_scenario_config(snakemake)
-
-    params = snakemake.params
-    max_hours = params.electricity["max_hours"]
     landfall_lengths = {
         tech: settings["landfall_length"]
         for tech, settings in params.renewable.items()
         if "landfall_length" in settings.keys()
     }
 
-    n = pypsa.Network(snakemake.input.base_network)
-
-    time = get_snapshots(snakemake.params.snapshots, snakemake.params.drop_leap_day)
-    n.set_snapshots(time)
-
-    costs = load_costs(snakemake.input.costs)
-
     ppl = load_and_aggregate_powerplants(
-        snakemake.input.powerplants,
+        inputs["powerplants"],
         costs,
-        params.consider_efficiency_classes,
-        params.aggregation_strategies,
-        params.exclude_carriers,
+        consider_efficiency_classes=params.clustering["consider_efficiency_classes"],
+        aggregation_strategies=params.clustering["aggregation_strategies"],
+        exclude_carriers=params.clustering["exclude_carriers"],
     )
 
     attach_load(
         n,
-        snakemake.input.load,
-        snakemake.input.busmap,
-        params.scaling_factor,
+        inputs["load"],
+        params.load["scaling_factor"],
     )
 
     set_transmission_costs(
         n,
         costs,
-        params.line_length_factor,
-        params.link_length_factor,
+        params.lines["length_factor"],
+        params.links["length_factor"],
     )
 
     renewable_carriers = set(params.electricity["renewable_carriers"])
     extendable_carriers = params.electricity["extendable_carriers"]
     conventional_carriers = params.electricity["conventional_carriers"]
     conventional_inputs = {
-        k: v for k, v in snakemake.input.items() if k.startswith("conventional_")
+        k: v for k, v in inputs.items() if k.startswith("conventional_")
     }
 
     if params.conventional["unit_commitment"]:
-        unit_commitment = pd.read_csv(snakemake.input.unit_commitment, index_col=0)
+        unit_commitment = pd.read_csv(inputs.unit_commitment, index_col=0)
     else:
         unit_commitment = None
 
     if params.conventional["dynamic_fuel_price"]:
         fuel_price = pd.read_csv(
-            snakemake.input.fuel_price, index_col=0, parse_dates=True
+            inputs.fuel_price, index_col=0, header=0, parse_dates=True
         )
         fuel_price = fuel_price.reindex(n.snapshots).ffill()
     else:
@@ -1529,32 +1335,32 @@ if __name__ == "__main__":
     attach_wind_and_solar(
         n,
         costs,
-        snakemake.input,
+        inputs,
         renewable_carriers,
         extendable_carriers,
-        params.line_length_factor,
+        params.lines["length_factor"],
         landfall_lengths,
     )
 
     if "hydro" in renewable_carriers:
-        p = params.renewable["hydro"]
+        p = params.renewable["hydro"].copy()
         carriers = p.pop("carriers", [])
         attach_hydro(
             n,
             costs,
             ppl,
-            snakemake.input.profile_hydro,
-            snakemake.input.hydro_capacities,
+            inputs.profile_hydro,
+            inputs.hydro_capacities,
             carriers,
             **p,
         )
 
     estimate_renewable_caps = params.electricity["estimate_renewable_capacities"]
     if estimate_renewable_caps["enable"]:
-        if params.foresight != "overnight":
+        if foresight != "overnight":
             logger.info(
                 "Skipping renewable capacity estimation because they are added later "
-                "in rule `add_existing_baseyear` with foresight mode 'myopic'."
+                "in add_existing_baseyear with foresight mode 'myopic'."
             )
         else:
             tech_map = estimate_renewable_caps["technology_mapping"]
@@ -1562,7 +1368,7 @@ if __name__ == "__main__":
             year = estimate_renewable_caps["year"]
 
             if estimate_renewable_caps["from_powerplantmatching"]:
-                attach_renewable_powerplants(n, tech_map, snakemake.input)
+                attach_renewable_powerplants(n, tech_map, inputs)
 
             if estimate_renewable_caps["from_irenastat"]:
                 estimate_renewable_capacities(
@@ -1576,14 +1382,14 @@ if __name__ == "__main__":
     # Update elec capacities 
     #
     ##### parameters
-    update_elec_capacities = snakemake.params.update_elec_capacities
+    update_elec_capacities = params.update_elec_capacities   ##### PyPSA-Spain: via compose_network params
 
     if update_elec_capacities['enable']:
     
         carriers_to_update = update_elec_capacities['carriers_to_update']
 
         ###### Prepare input: regions
-        regions_file = snakemake.input.regions # Contains the geometries of the clustered network regions
+        regions_file = inputs.onshore_regions   ##### PyPSA-Spain: clustered network regions (renamed by #1838)
         regions = gpd.read_file(regions_file)
         # Convert to crs 3035 for area computation
         regions = regions.to_crs(3035)
@@ -1593,7 +1399,7 @@ if __name__ == "__main__":
         regions = regions[['name', 'area_regions', 'geometry']]
         
         ###### Prepare input: nuts2_ES_file
-        nuts2_ES_file = snakemake.input.nuts2_ES
+        nuts2_ES_file = inputs.nuts2_ES   ##### PyPSA-Spain
         nuts2_ES = gpd.read_file(nuts2_ES_file)
         nuts2_ES.set_index('id', inplace=True)
         # Convert to crs 3035 for area computation
@@ -1614,17 +1420,13 @@ if __name__ == "__main__":
 
     update_p_nom_max(n)
 
+    max_hours = params.electricity["max_hours"]
     attach_storageunits(
         n, costs, n.buses.index, extendable_carriers["StorageUnit"], max_hours
     )
     attach_stores(n, costs, n.buses.index, extendable_carriers["Store"])
 
-    if params.electricity.get("estimate_battery_capacities", False):
+    if params.electricity["estimate_battery_capacities"]:
         attach_existing_batteries(n, costs, ppl)
 
-    sanitize_carriers(n, snakemake.config)
-    if "location" in n.buses:
-        sanitize_locations(n)
-
-    n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
-    n.export_to_netcdf(snakemake.output[0])
+    logger.info("Completed electricity components")
