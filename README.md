@@ -45,8 +45,18 @@ A description of the new functionalities implemented in PyPSA-Spain is now avail
 ## Basic commands for running PyPSA-Spain
 
 As a fork of PyPSA-Eur, PyPSA-Spain uses the same command structure.  
-Note that PyPSA-Spain employs the **sector network** approach
+Note that PyPSA-Spain employs the **sector network** approach (`sector.enabled: true`).
 
+Since the streamlined workflow ([PyPSA-Eur #1838](https://github.com/PyPSA/pypsa-eur/pull/1838)),
+scenario information lives in the configuration file instead of in file names, and the
+workflow runs through five stages:
+
+```
+base -> simplified -> clustered -> composed_{horizon} -> solved_{horizon}
+```
+
+Only two wildcards remain: `{horizon}`, the planning year, and `{run}`, which appears when
+`run.scenarios.enable` is true.
 
 
 - **Full workflow run**:
@@ -64,13 +74,13 @@ $ snakemake cluster_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 ```bash
-##### Prepare the network
-$ snakemake prepare_sector_networks --configfile config/config_ES.yaml --cores 4
+##### Compose the network (replaces the former prepare_elec/prepare_sector_networks)
+$ snakemake compose_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 ```bash
-##### Solve the network
-$ snakemake solve_sector_networks --configfile config/config_ES.yaml --cores 4
+##### Solve the network (replaces the former solve_elec/solve_sector_networks)
+$ snakemake solve_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 - **Run to get a specific output**, for example, `base.nc` network:
@@ -84,7 +94,10 @@ $ snakemake resources/networks/base.nc --configfile config/config_ES.yaml --core
 
 **Comments:**
 1. Adjust the number of `--cores` according to your system.
-2. Add the `-n` flag (dry-run) to check the workflow before execution 
+2. Add the `-n` flag (dry-run) to check the workflow before execution.
+3. `config/config_ES.yaml` is loaded by the `Snakefile` as the default configuration, so
+   passing it with `--configfile` is optional; it is shown here for clarity. A local
+   `config/config.yaml`, if present, overrides it.
 
 
 
@@ -94,5 +107,5 @@ $ snakemake resources/networks/base.nc --configfile config/config_ES.yaml --core
 ## Licence
 
 PyPSA-Spain is a fork of [PyPSA-Eur](https://github.com/PyPSA/pypsa-eur), which is released as free software under the
-[MIT License](https://opensource.org/licenses/MIT), see [`doc/licenses.rst`](doc/licenses.rst).
+[MIT License](https://opensource.org/licenses/MIT), see [`doc/licenses.md`](doc/licenses.md).
 However, different licenses and terms of use may apply to the various input data.
