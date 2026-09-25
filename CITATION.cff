@@ -1,12 +1,15 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Spain <https://github.com/cristobal-GC/pypsa-spain>
 # SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
 #
 # SPDX-License-Identifier: CC0-1.0
 
-cff-version: 0.0.0
-message: "If you use this PyPSA-Eur fork, please cite it in the following way."
+cff-version: 1.2.0
+message: "If you use PyPSA-Spain, please cite the article under preferred-citation."
 title: "PyPSA-Spain: An extension of PyPSA-Eur to model the Spanish Energy System"
-repository: https://github.com/cristobal-GC/pypsa-spain
+repository-code: https://github.com/cristobal-GC/pypsa-spain
+url: https://pypsa-spain.readthedocs.io
 license: MIT
+type: software
 authors:
   - family-names: Gallego-Castillo
     given-names: Cristobal
@@ -14,3 +17,20 @@ authors:
   - family-names: Victoria
     given-names: Marta
     orcid: https://orcid.org/0000-0003-1665-1281
+
+preferred-citation:
+  type: article
+  title: "PyPSA-Spain: An extension of PyPSA-Eur to model the Spanish energy system"
+  journal: "Energy Strategy Reviews"
+  volume: 60
+  start: 101764
+  year: 2025
+  issn: "2211-467X"
+  doi: 10.1016/j.esr.2025.101764
+  authors:
+    - family-names: Gallego-Castillo
+      given-names: Cristobal
+      orcid: https://orcid.org/0000-0002-8249-5179
+    - family-names: Victoria
+      given-names: Marta
+      orcid: https://orcid.org/0000-0003-1665-1281

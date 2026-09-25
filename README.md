@@ -1,17 +1,15 @@
 <!--
 SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
+SPDX-FileCopyrightText: Contributors to PyPSA-Spain <https://github.com/cristobal-GC/pypsa-spain>
 SPDX-License-Identifier: CC-BY-4.0
 -->
 
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/pypsa/pypsa-eur?include_prereleases)](https://github.com/PyPSA/pypsa-eur/releases)
-[![Documentation](https://readthedocs.org/projects/pypsa-eur/badge/?version=latest)](https://pypsa-eur.readthedocs.io/en/latest/?badge=latest)
-[![Test workflows](https://github.com/pypsa/pypsa-eur/actions/workflows/test.yaml/badge.svg)](https://github.com/pypsa/pypsa-eur/actions/workflows/test.yaml)
-![Size](https://img.shields.io/github/repo-size/pypsa/pypsa-eur)
-[![Zenodo PyPSA-Eur](https://zenodo.org/badge/DOI/10.5281/zenodo.3520874.svg)](https://doi.org/10.5281/zenodo.3520874)
-[![Zenodo PyPSA-Eur-Sec](https://zenodo.org/badge/DOI/10.5281/zenodo.3938042.svg)](https://doi.org/10.5281/zenodo.3938042)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/cristobal-GC/pypsa-spain?include_prereleases)](https://github.com/cristobal-GC/pypsa-spain/releases)
+[![Documentation](https://readthedocs.org/projects/pypsa-spain/badge/?version=latest)](https://pypsa-spain.readthedocs.io/en/latest/?badge=latest)
+![Size](https://img.shields.io/github/repo-size/cristobal-GC/pypsa-spain)
+[![Paper](https://img.shields.io/badge/DOI-10.1016%2Fj.esr.2025.101764-blue)](https://doi.org/10.1016/j.esr.2025.101764)
 [![Snakemake](https://img.shields.io/badge/snakemake-≥9-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
 [![Discord](https://img.shields.io/discord/911692131440148490?logo=discord)](https://discord.gg/AnuJBk23FU)
-[![REUSE status](https://api.reuse.software/badge/github.com/pypsa/pypsa-eur)](https://api.reuse.software/info/github.com/pypsa/pypsa-eur)
 
 
 
@@ -102,6 +100,25 @@ $ snakemake resources/networks/base.nc --configfile config/config_ES.yaml --core
 
 
 
+
+
+## Credits
+
+PyPSA-Spain is a fork of [PyPSA-Eur](https://github.com/PyPSA/pypsa-eur), the open
+optimisation model of the European energy system, and tracks it closely so that upstream
+advances and bug fixes are incorporated. The upstream model and its sector-coupled
+extension are archived at:
+
+[![Zenodo PyPSA-Eur](https://zenodo.org/badge/DOI/10.5281/zenodo.3520874.svg)](https://doi.org/10.5281/zenodo.3520874)
+[![Zenodo PyPSA-Eur-Sec](https://zenodo.org/badge/DOI/10.5281/zenodo.3938042.svg)](https://doi.org/10.5281/zenodo.3938042)
+
+If you use PyPSA-Spain in your research, please cite:
+
+> Gallego-Castillo, C. and Victoria, M. (2025). *PyPSA-Spain: An extension of PyPSA-Eur to
+> model the Spanish energy system.* Energy Strategy Reviews 60, 101764.
+> [10.1016/j.esr.2025.101764](https://doi.org/10.1016/j.esr.2025.101764)
+
+See [`CITATION.cff`](CITATION.cff) for the machine-readable version.
 
 
 ## Licence
