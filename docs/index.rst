@@ -12,7 +12,7 @@ The primary motivation behind the development of PyPSA-Spain was to leverage the
 
 PyPSA-Spain is an up-to-date fork of PyPSA-Eur, ensuring that advancements and bug fixes made to PyPSA-Eur are integrated. In addition, PyPSA-Spain includes a number of novel functionalities that enhance the representation of the Spanish energy system, as compared with PyPSA-Eur. 
 
-Find the details of PyPSA-Spain v.0.0.0 in the `seminal paper <https://doi.org/10.1016/j.esr.2025.101764>`__. For updates, see the `Release Notes <https://pypsa-spain.readthedocs.io/en/latest/release_notes.html>`__.
+Find the details of PyPSA-Spain in the `seminal paper <https://doi.org/10.1016/j.esr.2025.101764>`__. For updates, see the `Release Notes <https://pypsa-spain.readthedocs.io/en/latest/release_notes.html>`__.
 
 
 
@@ -34,12 +34,16 @@ Find the details of PyPSA-Spain v.0.0.0 in the `seminal paper <https://doi.org/1
    :maxdepth: 1
    :caption: Features
 
+   electricity_demand
+   q2q_transform
    ISA_index
    interconnections
    regional_network_focus
+   update_elec_capacities
    H2_valley_demands
    H2_imports_exports
    pop_layouts
+   industry_scenario
 
 .. toctree::
    :hidden:

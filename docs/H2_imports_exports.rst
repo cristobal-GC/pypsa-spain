@@ -11,7 +11,7 @@ The model for H2 imports and exports
 
 PyPSA-Spain includes a functionality to model hydrogen imports and exports through cross-border points. Each import/export point represents a fixed annual amount of hydrogen flowing in or out of the Spanish system at a given geographical location, typically associated with a planned or existing transboundary H2 infrastructure (e.g. a pipeline corridor).
 
-The required elements are added during the rule `prepare_sector_network`, after the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the cross-border points, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
+The required elements are added once the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the cross-border points, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
 
 
 Model components

@@ -72,7 +72,7 @@ When ``pop_layouts_HR.enable`` is active, PyPSA-Spain bypasses the cell intermed
 
    M[r, m] = \frac{A(r \cap m)}{A(m)}, \qquad p^{\text{region}}_r = \sum_m M[r, m] \cdot p^{\text{muni}}_m
 
-Each municipality's population is split across the regions that intersect it in proportion to area overlap, so total population is preserved exactly for fully-covered municipalities (i.e. all peninsular and Balearic municipalities once Canarias, Ceuta and Melilla are excluded). The fraction of municipal area falling outside ``regions_onshore`` and the corresponding lost population are reported in the log as a diagnostic.
+Each municipality's population is split across the regions that intersect it in proportion to area overlap, so total population is preserved exactly for fully-covered municipalities (i.e. all peninsular and Balearic municipalities once Canarias, Ceuta and Melilla are excluded). The fraction of municipal area falling outside ``onshore_regions`` and the corresponding lost population are reported in the log as a diagnostic.
 
 
 Configuration

@@ -11,7 +11,7 @@ The model for H2 valley demands
 
 PyPSA-Spain includes a functionality to model geolocalised annual hydrogen demands associated with so-called H2 valleys (clusters of industrial, mobility or sectoral H2 consumers planned at a given location). Each H2 valley represents a fixed annual amount of hydrogen consumed inside the Spanish system at a given geographical location, which the model then distributes as a constant load over the whole year.
 
-The required elements are added during the rule ``prepare_sector_network``, after the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the H2 valleys, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
+The required elements are added once the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the H2 valleys, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
 
 
 The repository ships with several template YAML files that can be used out of the box or as a starting point for custom scenarios:

@@ -13,7 +13,7 @@ PyPSA-Spain includes a functionality to model power interconnections with neighb
 
 The model described here supersedes the one presented in the seminal paper :cite:`Gallego-Castillo2025`. In that earlier version, each neighbouring country was represented by a *country bus* carrying a generator priced at the country market price and a large constant load, sized so that exports could always be absorbed. That formulation gave the right marginal incentives, but the cost of covering the foreign demand entered the objective function and was therefore mixed with the cost of covering the Spanish demand (see :ref:`equivalence` below). The current model removes the country bus altogether and prices the exchange directly at each border.
 
-All the required elements are added during the rule `prepare_network`, after ``set_transmission_limit`` and ``set_line_nom_max`` so that the interconnections are not affected by the global transmission limits, and before ``enforce_autarky``.
+The interconnections are added once the clustered network is complete and the global transmission limits have already been applied, so that they are not themselves constrained by them.
 
 
 Model components
@@ -113,7 +113,7 @@ Component names are declared explicitly rather than derived from the entry key, 
 
 ``length`` is the length of the Spanish side of the link, in km. It is taken verbatim from this file and is never recomputed from the coordinates of the buses. This is deliberate: the border bus sits at the physical crossing point, whereas the Spanish bus is the centroid of a clustered region, so the distance between the two is not the length of the real line.
 
-The links are priced as HVDC transmission. ``set_transmission_costs`` has been extended to cover the carrier ``DC_ic export``, and it is called a second time in `prepare_network` after the interconnections have been added, because the first call happens inside ``set_transmission_limit``, before they exist. The capital cost per MW is
+The links are priced as HVDC transmission. Only the export link of each interconnection is charged: the export and import links represent the two directions of the same physical asset, so charging both would pay twice for the cable and for the converter stations. The capital cost per MW is
 
 .. math::
 

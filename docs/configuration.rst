@@ -24,8 +24,6 @@ Features included in PyPSA-Spain are configured in a new module within the ``con
    :start-at: pypsa_spain:
    :end-before: # docs in https:
 
-.. csv-table::
-   :header-rows: 1
-   :widths: 22,7,22,33
-   :file: configtables/pypsa-spain.csv
+Each option is described in the page of the corresponding feature, listed under
+**Features** in the sidebar.
 

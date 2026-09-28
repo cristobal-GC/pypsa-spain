@@ -1,0 +1,13 @@
+/* SPDX-FileCopyrightText: Contributors to PyPSA-Spain
+   SPDX-License-Identifier: CC-BY-4.0 */
+
+/* Keep the logo discreet next to the project title in the sidebar brand area.
+   The source image is nearly square (1250x1122), so without a cap it would take
+   the full sidebar width. `.logo__image` is the class used by sphinx-book-theme;
+   `.sidebar-logo` is kept as a fallback for other theme versions. */
+.logo__image,
+.sidebar-logo {
+  max-height: 70px;
+  width: auto;
+  margin-bottom: 0.4rem;
+}

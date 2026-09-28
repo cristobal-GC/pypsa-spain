@@ -106,3 +106,7 @@ doc/img/intro-workflow.svg
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+##### PyPSA-Spain: Sphinx build output. Read the Docs builds from source
+##### (see .readthedocs.yaml -> docs/conf.py), so it must not be versioned.
+docs/_build/
