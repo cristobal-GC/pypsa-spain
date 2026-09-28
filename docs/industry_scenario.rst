@@ -12,7 +12,7 @@ The future industrial production that drives the industrial energy demand of the
 sector-coupled model is derived by PyPSA-Eur from historical production and a set of
 built-in assumptions.
 
-PyPSA-Spain allows **replacing that projection with a user-provided one**, so that
+PyPSA-Spain allows replacing that projection with a user-provided one, so that
 alternative industrial scenarios for Spain can be explored without modifying the workflow.
 When the functionality is enabled, the supplied CSV is used instead of the default
 projection of future industrial production per country; when it is disabled, the PyPSA-Eur

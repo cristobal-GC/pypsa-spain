@@ -12,8 +12,8 @@ The initial installed capacities that PyPSA-Eur assigns to each model region com
 ``powerplantmatching``, which for distributed technologies such as wind and solar does not
 always reproduce the regional totals reported by the Spanish system operator.
 
-PyPSA-Spain can correct this by **rescaling the installed capacity of selected carriers so
-that it matches the values reported by ESIOS per NUTS-2 region**. The reported regional
+PyPSA-Spain can correct this by rescaling the installed capacity of selected carriers so
+that it matches the values reported by ESIOS per NUTS-2 region. The reported regional
 capacity is apportioned among the model regions in proportion to the area each of them
 shares with the NUTS-2 region, and the existing distribution between buses within a region
 is preserved. Where a region has no initial capacity for that carrier, the capacity is added

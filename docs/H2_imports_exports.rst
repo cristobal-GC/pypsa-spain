@@ -11,7 +11,7 @@ The model for H2 imports and exports
 
 PyPSA-Spain includes a functionality to model hydrogen imports and exports through cross-border points. Each import/export point represents a fixed annual amount of hydrogen flowing in or out of the Spanish system at a given geographical location, typically associated with a planned or existing transboundary H2 infrastructure (e.g. a pipeline corridor).
 
-The required elements are added once the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the cross-border points, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
+The configuration relies on two groups of elements: a YAML file describing the cross-border points, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
 
 
 Model components
@@ -20,20 +20,9 @@ Model components
 For each cross-border point, the following elements are added to the network:
 
 - a **border H2 bus** with carrier ``H2_ic`` and unit ``MWh_LHV``, located at the user-specified coordinates.
-- a fixed **load** at the border bus, with a constant power such that the total annual energy equals the configured amount of hydrogen. Exports are modelled as a positive demand, and imports as a **negative demand**, so that demand statistics directly report the net balance between imports and exports.
+- a fixed **load** at the border bus, with a constant power such that the total annual energy equals the configured amount of hydrogen. Exports are modelled as a positive demand, and imports as a negative demand, so that demand statistics directly report the net balance between imports and exports.
 - a **link** between the border bus and the closest H2 bus of the Spanish network. The direction of the link reflects the flow direction (border → network for imports, network → border for exports). The link uses carrier ``H2_ic import`` or ``H2_ic export`` accordingly.
 
-The closest H2 bus is identified at runtime based on Euclidean distance between the border coordinates and the buses in peninsular Spain.
-
-The annual hydrogen amount is converted to a constant power setpoint using:
-
-.. math::
-
-   p = \frac{\text{annual\_amount} \cdot 33.33 \times 10^6}{\sum_t w_t} \quad [\text{MW}]
-
-where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution).
-
-Since the value is the same for all snapshots, it is imposed through the static attribute ``loads.p_set`` (i.e. :math:`+p` for exports and :math:`-p` for imports), rather than through the time-dependent ``loads_t.p_set``.
 
 
 Configuration

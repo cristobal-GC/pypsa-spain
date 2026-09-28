@@ -11,7 +11,7 @@ The model for H2 valley demands
 
 PyPSA-Spain includes a functionality to model geolocalised annual hydrogen demands associated with so-called H2 valleys (clusters of industrial, mobility or sectoral H2 consumers planned at a given location). Each H2 valley represents a fixed annual amount of hydrogen consumed inside the Spanish system at a given geographical location, which the model then distributes as a constant load over the whole year.
 
-The required elements are added once the regular sector-coupled network has been built. The configuration relies on two groups of elements: a YAML file describing the H2 valleys, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
+The configuration relies on two groups of elements: a YAML file describing the H2 valleys, and a corresponding entry in the ``pypsa_spain`` module of the configuration file.
 
 
 The repository ships with several template YAML files that can be used out of the box or as a starting point for custom scenarios:
@@ -31,14 +31,8 @@ The figures below show the H2 valleys defined in the IDAE template (left) and in
 Model components
 ========================
 
-For each H2 valley, a **fixed H2 load** is attached to the closest H2 bus of the Spanish network. The closest H2 bus is identified at runtime based on Euclidean distance between the H2 valley coordinates and the H2 buses in peninsular Spain.
-The annual hydrogen mass is converted to a constant H2 power setpoint via a pure unit change (mass → energy through the H2 lower heating value):
+For each H2 valley, a **fixed H2 load** is attached to the closest H2 bus of the Spanish network.
 
-.. math::
-
-   p_{\text{H2}} = \frac{\text{annual\_amount} \cdot 33.33 \times 10^6}{\sum_t w_t} \quad [\text{MW}_{\text{H2}}]
-
-where :math:`33.33 \times 10^6` MWh is the lower heating value of one million tonnes of H2, and :math:`\sum_t w_t` is the total weight of the snapshots (equal to 8760 hours for full-year runs at any temporal resolution). Since the value is the same for all snapshots, it is imposed through the static attribute ``loads.p_set``, rather than through the time-dependent ``loads_t.p_set``.
 
 
 Configuration
