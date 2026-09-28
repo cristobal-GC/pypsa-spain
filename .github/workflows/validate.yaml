@@ -1,6 +1,9 @@
 name: Validator Bot
 
 on:
+  push:
+    branches:
+    - master
   pull_request:
     branches:
     - master
