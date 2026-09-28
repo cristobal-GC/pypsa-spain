@@ -154,5 +154,3 @@ Modelling assumptions and limitations
 - **Nodal summaries.** Border buses receive a ``location`` equal to their own name in the sector-coupled stage, so nodal summaries emit rows for them with no associated geometry. This is harmless in the CSV outputs, but a map that joins by location will simply drop them.
 
 
-.. bibliography::
-  :filter: docname in docnames

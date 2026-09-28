@@ -72,5 +72,3 @@ PyPSA-Spain v0.0.0 (12th December 2024)
 This is the first release of PyPSA-Spain. The details are described in the seminal paper :cite:`Gallego-Castillo2025`.
 
 
-.. bibliography::
-  :filter: docname in docnames

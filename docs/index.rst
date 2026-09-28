@@ -34,14 +34,14 @@ Find the details of PyPSA-Spain in the `seminal paper <https://doi.org/10.1016/j
    :maxdepth: 1
    :caption: Features
 
-   electricity_demand
    q2q_transform
-   ISA_index
+   electricity_demand
    interconnections
-   regional_network_focus
    update_elec_capacities
+   ISA_index
    H2_valley_demands
    H2_imports_exports
+   regional_network_focus
    pop_layouts
    industry_scenario
 

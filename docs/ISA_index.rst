@@ -69,7 +69,5 @@ The following figures show the potential capacity computed with PyPSA-Spain acco
 For a deeper analysis on the wind powe potential in Spain restricted to low sensitivity areas, see :cite:`GallegoCastillo2026a`.
 
 
-.. bibliography::
-  :filter: docname in docnames
 
 
