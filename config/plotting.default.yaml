@@ -46,7 +46,7 @@ plotting:
     carrier_groups:
       electricity:
       - AC
-      ##### - low voltage
+      - low voltage
     #####   heat:
     #####   - urban central heat
     #####   - urban decentral heat

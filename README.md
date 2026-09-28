@@ -21,7 +21,7 @@ datasets from national organisations. Additionally, a single-country model enabl
 spatial and temporal resolution with the same computational resources due to the smaller
 geographical domain. Finally, it does not require assumptions about coordinated action
 between countries, making it a more suitable tool for analysing national energy policies.
-To accommodate cross-border interactions, a nested model approach with PyPSA-Eur was
+To accommodate cross-border interactions, a nested model approach with PyPSA-Eur can be
 used, wherein electricity prices from neighbouring countries are precomputed through the
 optimisation of the European energy system.
 
@@ -31,7 +31,7 @@ of the Spanish energy system, as compared with PyPSA-Eur.
 
 Find more details in [https://pypsa-spain.readthedocs.io/en/latest/](https://pypsa-spain.readthedocs.io/en/latest/)
 
-A description of the new functionalities implemented in PyPSA-Spain is now available in this article: [https://doi.org/10.1016/j.esr.2025.101764](https://doi.org/10.1016/j.esr.2025.101764).
+A description of the new functionalities implemented in PyPSA-Spain is available in: [https://doi.org/10.1016/j.esr.2025.101764](https://doi.org/10.1016/j.esr.2025.101764).
 
 
 
@@ -42,18 +42,14 @@ A description of the new functionalities implemented in PyPSA-Spain is now avail
 
 ## Basic commands for running PyPSA-Spain
 
-As a fork of PyPSA-Eur, PyPSA-Spain uses the same command structure.  
-Note that PyPSA-Spain employs the **sector network** approach (`sector.enabled: true`).
-
-Since the streamlined workflow ([PyPSA-Eur #1838](https://github.com/PyPSA/pypsa-eur/pull/1838)),
-scenario information lives in the configuration file instead of in file names, and the
+As a fork of PyPSA-Eur, PyPSA-Spain uses the same command structure. The
 workflow runs through five stages:
 
 ```
 base -> simplified -> clustered -> composed_{horizon} -> solved_{horizon}
 ```
 
-Only two wildcards remain: `{horizon}`, the planning year, and `{run}`, which appears when
+Only two wildcards are utilized: `{horizon}`, the planning year, and `{run}`, which appears when
 `run.scenarios.enable` is true.
 
 
@@ -72,12 +68,12 @@ $ snakemake cluster_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 ```bash
-##### Compose the network (replaces the former prepare_elec/prepare_sector_networks)
+##### Compose the network
 $ snakemake compose_networks --configfile config/config_ES.yaml --cores 4
 ```
 
 ```bash
-##### Solve the network (replaces the former solve_elec/solve_sector_networks)
+##### Solve the network
 $ snakemake solve_networks --configfile config/config_ES.yaml --cores 4
 ```
 
@@ -91,7 +87,7 @@ $ snakemake resources/networks/base.nc --configfile config/config_ES.yaml --core
 
 
 **Comments:**
-1. Adjust the number of `--cores` according to your system.
+1. Adjust the number of `--cores` according to your computer system.
 2. Add the `-n` flag (dry-run) to check the workflow before execution.
 3. `config/config_ES.yaml` is loaded by the `Snakefile` as the default configuration, so
    passing it with `--configfile` is optional; it is shown here for clarity. A local
