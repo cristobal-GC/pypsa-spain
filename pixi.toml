@@ -162,7 +162,7 @@ tsam = ">=2.3.1"
 
 [feature.test.tasks]
 
-##### Comment integration-tests from pypsa-eur   ##### (actualizado a upstream #1838)
+##### Comment integration-tests from pypsa-eur   #####
 #integration-tests = """
 #    snakemake -call --configfile config/test/config.electricity.yaml &&
 #    snakemake -call --configfile config/test/config.overnight.yaml &&
@@ -179,16 +179,14 @@ integration-tests = """
     snakemake -call all --configfile config/test/config_ES_test.yaml &&
     echo "All tests for PyPSA-Spain completed successfully."
 """
+##### Comment integration-tests-streamlined from pypsa-eur   #####
+#integration-tests-streamlined = """
+#    snakemake -call --configfile config/test/config.electricity-perfect.yaml &&
+#    snakemake -call --configfile config/test/config.electricity-myopic.yaml &&
+#    echo "All tests completed successfully."
+#"""
 
-##### PyPSA-Spain: tarea de upstream conservada sin cambios. Sirve de control de que las
-##### reinyecciones del fork son inertes cuando pypsa_spain.*.enable esta desactivado.
-integration-tests-streamlined = """
-    snakemake -call --configfile config/test/config.electricity-perfect.yaml &&
-    snakemake -call --configfile config/test/config.electricity-myopic.yaml &&
-    echo "All tests completed successfully."
-"""
-
-##### Comment clean-tests from pypsa-eur   ##### (actualizado a upstream #1838)
+##### Comment clean-tests from pypsa-eur   #####
 #clean-tests = """
 #    snakemake -call --configfile config/test/config.electricity.yaml --delete-all-output ;
 #    snakemake -call --configfile config/test/config.overnight.yaml --delete-all-output ;
@@ -207,7 +205,6 @@ clean-tests = """
     snakemake -call all --configfile config/test/config_ES_test.yaml --delete-all-output ;
 	echo "All test outputs for PyPSA-Spain have been cleaned up."
 """
-
 unit-tests = "pytest test"
 
 all-tests = {depends-on = ["integration-tests", "clean-tests", "unit-tests"]}
