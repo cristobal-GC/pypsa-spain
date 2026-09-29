@@ -58,6 +58,10 @@ pypsa_spain:
   industry_scenario:
     enable: false
     industry_scenario_file: data_ES/industry/industrial_production_per_country_alternative.csv
+  solar_rooftop:
+    enable: true
+    scenario: roof_fraction   ##### without_surplus_remuneration / with_surplus_remuneration / roof_fraction
+    roof_fraction: 0.25   ##### Only for scenario roof_fraction: fraction of the roof covered by PV, in (0, 1]
 
 
 

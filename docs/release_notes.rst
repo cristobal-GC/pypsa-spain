@@ -12,6 +12,8 @@ Release Notes
 Upcoming Release
 ================
 
+* New functionality ``solar_rooftop``: Regional values of the rooftop PV capacity per person (kW/person), obtained for each NUTS2 region from Gallego-Castillo et al. (2021), replace the homogeneous 2 kW/person of PyPSA-Eur in the solar rooftop potentials. Each clustered region takes the area-weighted average of the NUTS2 regions it overlaps. See details `here <https://pypsa-spain.readthedocs.io/en/latest/solar_rooftop.html>`__.
+
 
 
 

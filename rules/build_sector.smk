@@ -81,14 +81,30 @@ rule build_solar_rooftop_potentials:
         pop_layout=resources("pop_layout_total.nc"),
         class_regions=resources("regions_by_class_solar.geojson"),
         cutout=lambda w: input_cutout(w),
+        onshore_regions=resources("onshore_regions.geojson"),  ##### PyPSA-Spain: solar_rooftop
+        nuts2_ES=lambda w: (  ##### PyPSA-Spain: solar_rooftop
+            "data_ES/nuts/NUTS2_ES.geojson"
+            if config_provider("pypsa_spain", "solar_rooftop", "enable", default=False)(w)
+            else []
+        ),
+        kw_per_person=lambda w: (  ##### PyPSA-Spain: solar_rooftop
+            "data_ES/solar_rooftop/rooftop_pv_kw_per_person_nuts2.csv"
+            if config_provider("pypsa_spain", "solar_rooftop", "enable", default=False)(w)
+            else []
+        ),
     output:
         potentials=resources("solar_rooftop_potentials.csv"),
+        map_kw_per_person=resources("solar_rooftop/map_kw_per_person.png"),  ##### PyPSA-Spain: solar_rooftop
     log:
         logs("build_solar_rooftop_potentials.log"),
     benchmark:
         benchmarks("build_solar_rooftop_potentials")
     resources:
         mem_mb=10000,
+    params:
+        solar_rooftop=config_provider(  ##### PyPSA-Spain: solar_rooftop
+            "pypsa_spain", "solar_rooftop", default={"enable": False}
+        ),
     message:
         "Building solar rooftop potentials"
     script:
