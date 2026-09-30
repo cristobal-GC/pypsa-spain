@@ -44,6 +44,7 @@ Find the details of PyPSA-Spain in the `seminal paper <https://doi.org/10.1016/j
    regional_network_focus
    pop_layouts
    industry_scenario
+   solar_rooftop
 
 .. toctree::
    :hidden:
