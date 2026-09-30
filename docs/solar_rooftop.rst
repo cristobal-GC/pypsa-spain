@@ -43,14 +43,6 @@ Three scenarios are provided:
      - Optimal installation when surplus energy is remunerated under the Spanish simplified compensation scheme (RD 244/2019).
 
 
-The figure below shows the kW/person value of each clustered region for ``scenario: roof_fraction`` with ``roof_fraction: 0.25``.
-
-.. figure:: img/solar_rooftop_roof_fraction.png
-  :width: 85%
-  :align: center
-  :alt: Rooftop PV capacity per person by region for the roof_fraction scenario
-
-
 
 
 Configuration
@@ -76,6 +68,13 @@ Diagnostic plots
 ========================
 
 The rule also produces a control map, ``map_kw_per_person.png``, under ``resources/{PREFIX}/{NAME}/solar_rooftop/``. It shows the clustered regions of the Iberian Peninsula and the Balearic Islands coloured by their kW/person value, with the NUTS2 boundaries overlaid. The title reports the scenario, the range of kW/person values and the total potential.
+
+The figure below shows the control map for ``scenario: roof_fraction`` with ``roof_fraction: 0.25``.
+
+.. figure:: img/solar_rooftop_roof_fraction.png
+  :width: 85%
+  :align: center
+  :alt: Rooftop PV capacity per person by region for the roof_fraction scenario
 
 
 Modelling assumptions and limitations
