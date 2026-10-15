@@ -61,12 +61,13 @@ class _DistrictHeatingConfig(ConfigModel):
     )
     ptes: dict[str, Any] = Field(
         default_factory=lambda: {
+            "enable": True,
             "dynamic_capacity": False,
             "supplemental_heating": {"enable": False, "booster_heat_pump": False},
             "max_top_temperature": 90,
             "min_bottom_temperature": 35,
         },
-        description="Pit thermal energy storage settings.",
+        description="Pit thermal energy storage settings. `enable` adds pit thermal energy storage (water pits) to urban central heating, independently of `sector: ttes`. If disabled, all other `ptes` options are ignored.",
     )
     ates: dict[str, Any] = Field(
         default_factory=lambda: {
@@ -189,7 +190,11 @@ class _CHPConfig(BaseModel):
     )
     fuel: list[str] = Field(
         default_factory=lambda: ["solid biomass", "gas"],
-        description='Possible options are all fuels which have an existing bus and their CO2 intensity is given in the technology data. Currently possible are "gas", "oil", "methanol", "lignite", "coal" as well as "solid biomass". For all fuels except solid biomass, the techno-economic data from gas CHP is used. For the special case of solid biomass fuel, both CHP plants with and without carbon capture are added.',
+        description='Possible options are all fuels which have an existing bus and their CO2 intensity is given in the technology data. Currently possible are "gas", "oil", "methanol", "lignite", "coal" as well as "solid biomass". For all fuels except solid biomass, the techno-economic data from gas CHP is used.',
+    )
+    fuel_cc: list[str] = Field(
+        default_factory=lambda: ["solid biomass", "gas"],
+        description="Fuels for which CHP plants with carbon capture (CC) are added in addition to the CHP plants without carbon capture. Only fuels that are also listed in `fuel` are considered. Set to an empty list to disable CHP with carbon capture.",
     )
     micro_chp: bool = Field(
         False,
@@ -233,7 +238,9 @@ class _TransmissionEfficiencyConfig(BaseModel):
             "H2 pipeline",
             "H2 pipeline retrofitted",
             "gas pipeline",
+            "gas pipeline new",
             "electricity distribution grid",
+            "CO2 pipeline",
         ],
         description="Switch to select the carriers for which transmission efficiency is to be added. Carriers not listed assume lossless transmission.",
     )
@@ -268,10 +275,23 @@ class _TransmissionEfficiencyConfig(BaseModel):
         alias="gas pipeline",
         description="Gas pipeline transmission efficiency.",
     )
+    gas_pipeline_new: dict[str, float] = Field(
+        default_factory=lambda: {
+            "efficiency_per_1000km": 1,
+            "compression_per_1000km": 0.01,
+        },
+        alias="gas pipeline new",
+        description="Gas pipeline new transmission efficiency.",
+    )
     electricity_distribution_grid: dict[str, float] = Field(
         default_factory=lambda: {"efficiency_static": 0.97},
         alias="electricity distribution grid",
         description="Electricity distribution grid efficiency.",
+    )
+    CO2_pipeline: dict[str, float] = Field(
+        default_factory=lambda: {"efficiency_per_1000km": 1},
+        alias="CO2 pipeline",
+        description="CO2 pipeline transmission efficiency.",
     )
 
     model_config = ConfigDict(populate_by_name=True)
@@ -627,9 +647,15 @@ class SectorConfig(BaseModel):
         default_factory=_RetrofittingConfig, description="Retrofitting configuration."
     )
 
-    tes: bool = Field(
+    ttes: bool = Field(
         True,
-        description="Add option for storing thermal energy in large water pits associated with district heating systems and individual thermal energy storage (TES).",
+        description="Add tank thermal energy storage (water tanks) in all heat systems. Pit and aquifer thermal energy storage are controlled separately by `district_heating: ptes: enable` and `district_heating: ates: enable`.",
+    )
+    tes: bool | None = Field(
+        None,
+        deprecated=True,
+        exclude=True,
+        description="Deprecated, use `ttes` and `district_heating: ptes: enable`.",
     )
     boilers: bool = Field(
         True, description="Add option for transforming gas into heat using gas boilers."
@@ -695,6 +721,10 @@ class SectorConfig(BaseModel):
     hydrogen_turbine: bool = Field(
         True,
         description="Add option to include hydrogen turbine for re-electrification. Assuming OCGT technology costs.",
+    )
+    electrolysis: bool = Field(
+        True,
+        description="Add option to include hydrogen electrolysis for power-to-gas conversion.",
     )
     SMR: bool = Field(
         True,
