@@ -6,28 +6,36 @@
 
 #################### PyPSA-Spain
 #
-# Desviaciones de PyPSA-Spain sobre config/plotting.default.yaml.
+# PyPSA-Spain deviations from config/plotting.default.yaml.
 #
-# Ese fichero se mantiene IDENTICO a upstream a proposito: es un default suyo, lo
-# reescribe en cada ciclo (en v2026.09 fueron +410/-433 lineas) y upstream valida que
-# coincida con su esquema pydantic (test_plotting_default_yaml_in_sync). Manteniendo
-# aqui las desviaciones, ese fichero deja de ser fuente de conflictos en cada
-# actualizacion y el test pasa sin excluir nada.
+# That file is kept IDENTICAL to upstream on purpose. It is an upstream default: upstream
+# rewrites it on every release cycle (+410/-433 lines in v2026.09) and now validates that
+# it matches its own pydantic schema (test_plotting_default_yaml_in_sync). Keeping the
+# deviations here means that file never conflicts on an update, and the test passes
+# without excluding anything.
 #
-# Contenido:
-#   - limites del mapa, recortados a la peninsula iberica
-#   - listas de carriers reducidas a los que usa el caso espanol
-#   - nice_names y tech_colors de los carriers propios: DC_ic* y H2_ic*
+# Loaded by the Snakefile right after config_ES.yaml, so it overrides the upstream
+# plotting defaults while a local config/config.yaml and --configfile still win over it.
+#
+# Contents:
+#   - map boundaries, cropped to the Iberian peninsula
+#   - carrier lists reduced to the ones used by the Spanish case
+#   - nice_names and tech_colors for the fork's own carriers: DC_ic* and H2_ic*
 #
 ####################
 
 plotting:
+
+  # Map extent cropped to the Iberian peninsula (upstream: [-11, 30, 34, 71]).
   map:
     boundaries:
     - -14
     - 6.35
     - 35
     - 46.3
+
+  # Carrier lists below are reduced to the ones the Spanish case actually uses, so the
+  # plots do not fill up with empty panels. Upstream keeps the full lists.
   balance_timeseries:
     carriers:
     - H2
@@ -66,6 +74,9 @@ plotting:
     bus_carriers:
     - AC
     - H2
+
+  # Labels and colours for the fork's own carriers: the Spanish electrical
+  # interconnections (DC_ic*) and the cross-border hydrogen points (H2_ic*).
   nice_names:
     DC_ic: Interconnections
     DC_ic export: Interconnections
