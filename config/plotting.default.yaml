@@ -9,12 +9,11 @@ plotting:
     temperature_cmap: Reds
     energy_cmap: Oranges
   map:
-    ##### PyPSA-Spain: peninsula iberica (upstream: [-11, 30, 34, 71])
     boundaries:
-    - -14
-    - 6.35
-    - 35
-    - 46.3
+    - -11
+    - 30
+    - 34
+    - 71
     geomap_colors:
       ocean: white
       land: white
@@ -37,46 +36,45 @@ plotting:
     annual_resolution: D
     carriers:
     - H2
-    ##### - NH3
-    ##### - gas
-    ##### - methanol
-    ##### - oil
-    ##### - solid biomass
-    ##### - biogas
-    ##### - co2 stored
-    ##### - co2
+    - NH3
+    - gas
+    - methanol
+    - oil
+    - solid biomass
+    - biogas
+    - co2 stored
+    - co2
     carrier_groups:
       electricity:
       - AC
       - low voltage
-    #####   heat:
-    #####   - urban central heat
-    #####   - urban decentral heat
-    #####   - rural heat
-    #####   - residential urban decentral heat
-    #####   - residential rural heat
-    #####   - services urban decentral heat
-    #####   - services rural heat
+      heat:
+      - urban central heat
+      - urban decentral heat
+      - rural heat
+      - residential urban decentral heat
+      - residential rural heat
+      - services urban decentral heat
+      - services rural heat
   interactive_bus_balance:
     bus_name_pattern: None
   heatmap_timeseries:
     marginal_price:
     - AC
     - H2
-    ##### - NH3
-    ##### - gas
-    ##### - methanol
-    ##### - oil
-    ##### - co2 stored
-    ##### - urban central heat
+    - NH3
+    - gas
+    - methanol
+    - oil
+    - co2 stored
+    - urban central heat
     utilisation_rate:
     - solar
     - solar rooftop
     - "solar-hsat"
     - onwind
-    ##### PyPSA-Spain: solo offwind-float
-    ##### - "offwind-dc"
-    ##### - "offwind-ac"
+    - "offwind-dc"
+    - "offwind-ac"
     - "offwind-float"
     - ror
     - hydro
@@ -84,36 +82,35 @@ plotting:
     - battery charger
     - battery discharger
     - H2 Electrolysis
-    ##### PyPSA-Spain: no usados en el caso espanol
-    ##### - "Fischer-Tropsch"
-    ##### - methanolisation
-    ##### - Sabatier
+    - "Fischer-Tropsch"
+    - methanolisation
+    - Sabatier
     - OCGT
     - H2 Fuel Cell
-    ##### - urban central CHP
-    ##### - urban central CHP CC
-    ##### - urban central solid biomass CHP
-    ##### - urban central solid biomass CHP CC
-    ##### - rural gas boiler
-    ##### - urban central air heat pump
+    - urban central CHP
+    - urban central CHP CC
+    - urban central solid biomass CHP
+    - urban central solid biomass CHP CC
+    - rural gas boiler
+    - urban central air heat pump
     - DAC
     soc:
     - battery
     - H2 Store
-    ##### - co2 stored
+    - co2 stored
     - gas
-    ##### - methanol
-    ##### - oil
-    ##### - urban central water tanks
+    - methanol
+    - oil
+    - urban central water tanks
   balance_map:
     bus_carriers:
     - AC
-    ##### - co2_stored
-    ##### - gas
+    - co2_stored
+    - gas
     - H2
-    ##### - methanol
-    ##### - oil 
-    ##### - urban central heat
+    - methanol
+    - oil
+    - urban_central_heat
     AC:
       cmap: Greens
       vmin:
@@ -260,12 +257,12 @@ plotting:
   balance_map_interactive:
     bus_carriers:
     - AC
-    ##### - co2_stored
-    ##### - gas
+    - co2_stored
+    - gas
     - H2
-    ##### - methanol
-    ##### - oil
-    ##### - urban_central_heat
+    - methanol
+    - oil
+    - urban_central_heat
     AC:
       cmap: Greens
       region_unit: €/MWh
@@ -393,12 +390,6 @@ plotting:
     load: Load Shedding
     ac: AC
     dc: DC
-    ##### PyPSA-Spain: interconexiones espanolas
-    DC_ic: Interconnections
-    DC_ic export: Interconnections
-    DC_ic import: Interconnections
-    DC_ic market export: Electricity exports
-    DC_ic market import: Electricity imports
   tech_colors:
     onwind: "#235ebc"
     onshore wind: "#235ebc"
@@ -717,14 +708,6 @@ plotting:
     DC: "#8a1caf"
     "DC-DC": "#8a1caf"
     DC link: "#8a1caf"
-    DC_ic: "#8a1caf"   ##### For Spanish ics
-    DC_ic export:  "#9B30FF"   ##### For Spanish ics
-    DC_ic import:  "#A020F0"   ##### For Spanish ics
-    DC_ic market export:  "#6a67a3"   ##### For Spanish ics
-    DC_ic market import:  "#b5a8d5"   ##### For Spanish ics
-    H2_ic: "#bf13a0"   ##### For Spanish H2 ics
-    H2_ic export: "#9b1f86"   ##### For Spanish H2 ics
-    H2_ic import: "#db8ccd"   ##### For Spanish H2 ics
     load: "#dd2e23"
     waste CHP: "#e3d37d"
     waste CHP CC: "#e3d3ff"

@@ -108,30 +108,6 @@ rule build_solar_rooftop_potentials:
         scripts("build_solar_rooftop_potentials.py")
 
 
-rule build_simplified_population_layouts:
-    input:
-        pop_layout_total=resources("pop_layout_total.nc"),
-        pop_layout_urban=resources("pop_layout_urban.nc"),
-        pop_layout_rural=resources("pop_layout_rural.nc"),
-        onshore_regions=resources("onshore_regions_simplified.geojson"),
-        cutout=lambda w: input_cutout(w),
-    ##### PyPSA-Spain: the pop_layouts_HR patch was deliberately NOT ported to this rule.
-    ##### Upstream's version runs build_population_layouts.py, which writes through
-    ##### snakemake.output["pop_layout_<key>"] - keys this rule does not declare - and its
-    ##### output pop_layout_simplified.csv is consumed nowhere in rules/ or scripts/.
-    ##### See "Anomalias detectadas / B-1" in the migration plan. Reinstate the patch only
-    ##### once upstream fixes the rule.
-    output:
-        clustered_pop_layout=resources("pop_layout_simplified.csv"),
-    log:
-        logs("build_simplified_population_layouts.log"),
-    benchmark:
-        benchmarks("build_simplified_population_layouts")
-    resources:
-        mem_mb=10000,
-    script:
-        scripts("build_population_layouts.py")
-
 rule build_gas_network:
     """Preprocesses the SciGRID_gas transmission network into cleaned pipeline segments."""
     input:

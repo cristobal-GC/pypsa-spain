@@ -33,19 +33,25 @@ configfile: "config/plotting.default.yaml"
 
 #################### PyPSA-Spain
 #
-# config_ES.yaml is the default configuration of PyPSA-Spain, so it is loaded here,
-# right after the upstream defaults and BEFORE the optional local config/config.yaml.
-# This keeps upstream's layering intact: defaults first, user overrides last.
+# config_ES.yaml and plotting_ES.yaml hold the defaults of PyPSA-Spain. They are loaded
+# here, right after the upstream defaults and BEFORE the optional local
+# config/config.yaml, keeping upstream's layering intact: defaults first, user overrides
+# last.
 #
-# It is loaded as a directive rather than through --configfile so that it is available
-# while the rules are parsed, which the module-level dataset_version() calls in
+# They are loaded as directives rather than through --configfile so that they are
+# available while the rules are parsed, which the module-level dataset_version() calls in
 # rules/retrieve.smk require.
 #
+# plotting_ES.yaml exists so that config/plotting.default.yaml can stay identical to
+# upstream: upstream rewrites that file on every cycle and validates that it matches its
+# own pydantic schema (test_plotting_default_yaml_in_sync).
+#
 # Precedence, lowest to highest:
-#   config.default.yaml -> plotting.default.yaml -> config_ES.yaml
+#   config.default.yaml -> plotting.default.yaml -> config_ES.yaml -> plotting_ES.yaml
 #     -> config/config.yaml (if present) -> --configfile on the command line
 #
 configfile: "config/config_ES.yaml"
+configfile: "config/plotting_ES.yaml"
 #
 ####################
 
