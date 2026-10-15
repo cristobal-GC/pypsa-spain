@@ -3,8 +3,7 @@
 # yaml-language-server: $schema=./schema.default.json
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#version_cf
-version: v2026.08.0
-
+version: v2026.09.0
 
 
 # docs in https://pypsa-spain.readthedocs.io/
@@ -66,11 +65,16 @@ pypsa_spain:
 
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#tutorial_cf
+
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#tutorial_cf
 tutorial: false
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#logging_cf
 logging:
   level: INFO
+  console_level: WARNING
+  file_level:
   format: "%(levelname)s:%(name)s:%(message)s"
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#remote_cf
@@ -81,7 +85,7 @@ remote:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#run_cf
 run:
   prefix: ""
-  name: ""   #####
+  name: ""
   scenarios:
     enable: false
     file: config/scenarios.yaml
@@ -96,14 +100,10 @@ run:
 foresight: overnight
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#planning_horizons_cf
-planning_horizons: #####
+planning_horizons: ##### PyPSA-Spain
 - 2030
-
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#countries_cf
-countries:
+countries:  ##### PyPSA-Spain
 - ES
-
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#snapshots_cf
 snapshots:
   start: "2013-01-01"
   end: "2014-01-01"
@@ -120,7 +120,7 @@ co2_budget:
   upper:
     2020: 0.72
     2025: 0.648
-    2030: 0.183  ##### PyPSA-Spain elec-only # 0.45
+    2030: 0.183  ##### PyPSA-Spain
     2035: 0.25
     2040: 0.1
     2045: 0.05
@@ -155,13 +155,10 @@ electricity:
     "iron-air": 100
     H2: 168
   extendable_carriers:
-    Generator:  #####
+    Generator:  ##### PyPSA-Spain
     - solar
-    #- "solar-hsat"
     - onwind
-    #- "offwind-ac"
-    #- "offwind-dc"
-    - "offwind-float"
+    - offwind-float
     - OCGT
     - CCGT
     StorageUnit: []
@@ -182,34 +179,32 @@ electricity:
   - geothermal
   - waste
   - biomass
-  renewable_carriers: #####
+  renewable_carriers:  ##### PyPSA-Spain
   - solar
-  - "solar-hsat"
+  - solar-hsat
   - onwind
-  #- "offwind-ac"
-  #- "offwind-dc"
-  - "offwind-float"
+  - offwind-float
   - hydro
   estimate_renewable_capacities:
-    enable: false   ##### true
+    enable: false  ##### PyPSA-Spain
     from_powerplantmatching: true
     from_irenastat: false
     year: 2024
     expansion_limit: false
     technology_mapping:
-      Offshore: "offwind-float"  #####
+      Offshore: "offwind-float"  ##### PyPSA-Spain
       Onshore: onwind
       PV: solar
   estimate_battery_capacities: false
   autarky:
     enable: false
     by_country: false
-  transmission_limit: vopt   #####
+  transmission_limit: vopt
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#atlite_cf
 atlite:
   default_cutout: "europe-2013-sarah3-era5"
-  nprocesses: 8  #####
+  nprocesses: 8  ##### PyPSA-Spain
   show_progress: false
   plot_availability_matrix: false
   cutouts:
@@ -249,9 +244,9 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 3
     correction_factor: 1.0
-    corine: false  #####
+    corine: false  ##### PyPSA-Spain
     luisa: false
-    natura: false  #####
+    natura: false  ##### PyPSA-Spain
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   "offwind-ac":
@@ -300,18 +295,18 @@ renewable:
     cutout: default
     resource:
       method: wind
-      turbine: NREL_ReferenceTurbine_2020ATB_12MW_offshore  #####
+      turbine: NREL_ReferenceTurbine_2020ATB_12MW_offshore  ##### PyPSA-Spain
       smooth: false
       add_cutout_windspeed: true
     resource_classes: 1
-    capacity_per_sqkm: 10  ##### 2
-    correction_factor: 1 ##### 0.8855
+    capacity_per_sqkm: 10  ##### PyPSA-Spain
+    correction_factor: 1 ##### PyPSA-Spain
     corine: false
     luisa: false
     natura: true
     ship_threshold: 400
     max_depth: 1000.0
-    min_depth: 50.0  #####
+    min_depth: 50.0  ##### PyPSA-Spain
     max_shore_distance:
     min_shore_distance:
     excluder_resolution: 200
@@ -329,9 +324,9 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 5.1
     correction_factor: 1.0
-    corine: false  #####
+    corine: false  ##### PyPSA-Spain
     luisa: false
-    natura: false  #####
+    natura: false  ##### PyPSA-Spain
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   "solar-hsat":
@@ -346,9 +341,9 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 4.43
     correction_factor: 1.0
-    corine: false  #####
+    corine: false  ##### PyPSA-Spain
     luisa: false
-    natura: false  #####
+    natura: false  ##### PyPSA-Spain
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   hydro:
@@ -368,6 +363,42 @@ renewable:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#conventional_cf
 conventional:
+  estimate_efficiencies:
+    enable: false
+    reference_year: 2025
+    degradation_start: 10
+    degradation_rate: 0.001
+    parameters:
+      lignite:
+        efficiency: 0.25
+        slope: 0.003
+        year: 1960
+        max: 0.42
+      coal:
+        efficiency: 0.28
+        slope: 0.003
+        year: 1960
+        max: 0.44
+      CCGT:
+        efficiency: 0.4
+        slope: 0.004
+        year: 1980
+        max: 0.6
+      OCGT:
+        efficiency: 0.28
+        slope: 0.003
+        year: 1970
+        max: 0.41
+      oil:
+        efficiency: 0.28
+        slope: 0.002
+        year: 1960
+        max: 0.38
+      nuclear:
+        efficiency: 0.33
+        slope: 0.0
+        year: 1960
+        max: 0.33
   unit_commitment: false
   dynamic_fuel_price: false
   fuel_price_rolling_window: 6
@@ -446,30 +477,28 @@ load:
   supplement_synthetic: true
   substation_only: true
   distribution_key:
-    gdp: 0.18  #####
-    population: 0.82 #####
-
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#pypsa_eur_cf
+    gdp: 0.18  ##### PyPSA-Spain
+    population: 0.82 ##### PyPSA-Spain
 pypsa_eur:
-  Bus:
+  Bus:  ##### PyPSA-Spain
   - AC
-  - DC_ic   #####
-  Link:
+  - DC_ic
+  Link: ##### PyPSA-Spain
   - DC
-  - DC_ic export   #####
-  - DC_ic import   #####
-  Generator:
+  - DC_ic export
+  - DC_ic import
+  Generator: ##### PyPSA-Spain
   - onwind
-  - "offwind-ac"
-  - "offwind-dc"
-  - "offwind-float"
-  - "solar-hsat"
+  - offwind-ac
+  - offwind-dc
+  - offwind-float
+  - solar-hsat
   - solar
   - ror
   - nuclear
-  - biomass   #####
-  - DC_ic market export   #####
-  - DC_ic market import   #####
+  - biomass
+  - DC_ic market export
+  - DC_ic market import
   StorageUnit:
   - PHS
   - hydro
@@ -628,13 +657,13 @@ existing_capacities:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#sector_cf
 sector:
   enabled: true
-  transport: false #####
-  heating: false #####
-  biomass: false  #####
-  industry: false #####
-  shipping: false #####
-  aviation: false #####
-  agriculture: false  #####
+  transport: false ##### PyPSA-Spain
+  heating: false ##### PyPSA-Spain
+  biomass: false  ##### PyPSA-Spain
+  industry: false ##### PyPSA-Spain
+  shipping: false ##### PyPSA-Spain
+  aviation: false ##### PyPSA-Spain
+  agriculture: false  ##### PyPSA-Spain
   fossil_fuels: true
   district_heating:
     potential: 0.6
@@ -666,6 +695,7 @@ sector:
       rolling_window_ambient_temperature: 72
       relative_annual_temperature_reduction: 0.01
     ptes:
+      enable: true
       dynamic_capacity: false
       supplemental_heating:
         enable: false
@@ -824,7 +854,7 @@ sector:
     annualise_cost: true
     tax_weighting: false
     construction_index: true
-  tes: true
+  ttes: true
   boilers: true
   resistive_heaters: true
   oil_boilers: false
@@ -837,12 +867,15 @@ sector:
     fuel:
     - solid biomass
     - gas
+    fuel_cc:
+    - solid biomass
+    - gas
     micro_chp: false
   solar_thermal: true
   solar_cf_correction: 0.788457
-  methanation: false  #####
+  methanation: false  ##### PyPSA-Spain
   coal_cc: false
-  dac: false  #####
+  dac: false  ##### PyPSA-Spain
   co2_vent: false
   heat_vent:
     urban central: true
@@ -852,12 +885,13 @@ sector:
   allam_cycle_gas: false
   hydrogen_fuel_cell: true
   hydrogen_turbine: true
-  SMR: false  #####
-  SMR_cc: false #####
-  regional_oil_demand: false #####
+  electrolysis: true
+  SMR: false  ##### PyPSA-Spain
+  SMR_cc: false ##### PyPSA-Spain
+  regional_oil_demand: false ##### PyPSA-Spain
   regional_coal_demand: false
   regional_co2_sequestration_potential:
-    enable: false  #####
+    enable: false  ##### PyPSA-Spain
     attribute:
     - conservative estimate GAS Mt
     - conservative estimate OIL Mt
@@ -876,8 +910,8 @@ sector:
     2050: 250
   co2_sequestration_cost: 30
   co2_sequestration_lifetime: 50
-  co2_spatial: false #####
-  co2_network: false  #####
+  co2_spatial: false ##### PyPSA-Spain
+  co2_network: false  ##### PyPSA-Spain
   co2_network_cost_factor: 1
   co2_network_liquefaction: false
   cc_fraction: 0.9
@@ -901,9 +935,9 @@ sector:
       ccgt_cc: false
       ocgt: true
       allam: false
-    biomass_to_methanol: false  #####
+    biomass_to_methanol: false  ##### PyPSA-Spain
     biomass_to_methanol_cc: false
-  ammonia: false  #####
+  ammonia: false  ##### PyPSA-Spain
   min_part_load_electrolysis: 0
   min_part_load_fischer_tropsch: 0.5
   min_part_load_methanolisation: 0.3
@@ -923,7 +957,9 @@ sector:
     - H2 pipeline
     - H2 pipeline retrofitted
     - gas pipeline
+    - gas pipeline new
     - electricity distribution grid
+    - CO2 pipeline
     DC:
       efficiency_static: 0.98
       efficiency_per_1000km: 0.977
@@ -936,8 +972,13 @@ sector:
     gas pipeline:
       efficiency_per_1000km: 1
       compression_per_1000km: 0.01
+    gas pipeline new:
+      efficiency_per_1000km: 1
+      compression_per_1000km: 0.01
     electricity distribution grid:
       efficiency_static: 0.97
+    CO2 pipeline:
+      efficiency_per_1000km: 1
   H2_network: true
   gas_network: true
   H2_retrofit: false
@@ -952,9 +993,9 @@ sector:
   conventional_generation:
     OCGT: gas
     CCGT: gas
-  biomass_to_liquid: false  #####
+  biomass_to_liquid: false  ##### PyPSA-Spain
   biomass_to_liquid_cc: false
-  electrobiofuels: false  #####
+  electrobiofuels: false  ##### PyPSA-Spain
   biosng: false
   biosng_cc: false
   bioH2: false
@@ -1058,6 +1099,9 @@ industry:
   HVC_environment_sequestration_fraction: 0.0
   waste_to_energy: false
   waste_to_energy_cc: false
+  solid_biomass_for_industry_cc: true
+  gas_for_industry_cc: true
+  process_emissions_cc: true
   sector_ratios_fraction_future:
     2020: 0.0
     2025: 0.05
@@ -1109,7 +1153,7 @@ costs:
 clustering:
   mode: busmap
   administrative:
-    level: 2  #####
+    level: 2  ##### PyPSA-Spain
     countries: {}
   focus_weights: false
   copperplate_regions: []
@@ -1117,11 +1161,12 @@ clustering:
     remove_islands: false
     aggregate_to_tyndp: false
   simplify_network:
+    to_380: true
     to_substations: false
     remove_stubs: true
     remove_stubs_across_borders: false
   cluster_network:
-    n_clusters: 5  ##### PyPSA-Spain:recommended 35-50
+    n_clusters: 5  ##### PyPSA-Spain
     algorithm: kmeans
     allow_ac_dc_mixing_in_bus_clusters: false
     hac_features:
@@ -1136,7 +1181,7 @@ clustering:
       ramp_limit_down: max
     buses: {}
   temporal:
-    averaging: 168h   #####
+    averaging: 168h  ##### PyPSA-Spain
     segmentation: false
     representative: false
 
@@ -1174,7 +1219,10 @@ solving:
     track_iterations: false
     min_iterations: 2
     max_iterations: 3
-    transmission_losses: 2
+    transmission_losses:
+      mode: secants
+      atol: 15
+      rtol: 0.5
     linearized_unit_commitment: true
     horizon: 365
     overlap: 0
@@ -1312,15 +1360,6 @@ solving:
 data:
   version_files:
   - data/versions.csv
-  isa_onwind:
-    source: primary
-    version: latest
-  isa_solar:
-    source: primary
-    version: latest
-  pop_ES_municipalities:
-    source: primary
-    version: latest
   hotmaps_industrial_sites:
     source: archive
     version: latest
@@ -1503,6 +1542,15 @@ data:
     version: latest
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#overpass_api_cf
+  isa_onwind:
+    source: primary
+    version: latest
+  isa_solar:
+    source: primary
+    version: latest
+  pop_ES_municipalities:
+    source: primary
+    version: latest
 overpass_api:
   url: "https://overpass-api.de/api/interpreter"
   max_tries: 5
