@@ -1,10 +1,12 @@
 name: Validator Bot
 
 on:
-  ##### PyPSA-Spain: pull_request trigger disabled, the validator needs a self-hosted runner
-  # pull_request:
-  #   branches:
-  #   - master
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
   workflow_dispatch:
 
 concurrency:
@@ -12,9 +14,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ##### PyPSA-Spain: lightweight check that the workflow graph still builds. The unit
+  ##### tests do not touch Snakemake, so without this nothing would catch a broken rule
+  ##### until someone runs the workflow by hand. Runs on push and on pull requests; it
+  ##### needs no self-hosted runner and takes a couple of minutes.
+  dag-validation:
+    name: DAG dry-run
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Setup Pixi
+      uses: prefix-dev/setup-pixi@v0.11.0
+      with:
+        cache: true
+        cache-write: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+
+    - name: Dry-run DAG validation
+      run: |
+        pixi run snakemake -n all --configfile config/test/config.validator.yaml
+
+  ##### PyPSA-Spain: the two jobs below are upstream's full validator. They need a
+  ##### self-hosted runner, which this fork does not have, so they are restricted to
+  ##### workflow_dispatch instead of running on every pull request.
+  ##### Their original condition tested github.event.pull_request, which is empty on a
+  ##### manual run, so they could never start; the condition is now on the event itself.
   run-validation:
     name: Run validation
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch'
     runs-on: self-hosted
     outputs:
       validation_failed: ${{ steps.check_validation.outputs.failed }}
@@ -41,7 +71,7 @@ jobs:
     name: Create report
     needs: run-validation
     if: |
-      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event_name == 'workflow_dispatch' &&
       needs.run-validation.outputs.validation_failed != 'true'
     runs-on: ubuntu-latest
     steps:
