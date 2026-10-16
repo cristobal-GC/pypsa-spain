@@ -6145,7 +6145,7 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
 
     for kk, vv in H2_valley_demands_dic.items():
 
-        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 demand for {kk}')
+        logger.info(f'##### [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 demand for {kk}')
 
 
         ########## Identify the closest bus:
@@ -6194,7 +6194,7 @@ def attach_H2_imports_exports(n, H2_imports_exports_dic):
 
     for kk, vv in H2_imports_exports_dic.items():
 
-        logger.info(f'########## [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 import/export {vv["type"]} for {kk}')
+        logger.info(f'##### [PyPSA-Spain] <prepare_sector_network.py> INFO: Adding H2 import/export {vv["type"]} for {kk}')
 
         if vv['type'] not in ['import', 'export']:
             raise ValueError(f"Unknown H2 imports/exports type '{vv['type']}' for {kk}. Expected 'import' or 'export'.")

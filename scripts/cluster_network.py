@@ -681,7 +681,7 @@ if __name__ == "__main__":
 
     if regional_network_focus['enable']:
 
-        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Clustering network with focus on: {regional_network_focus['region_NUTS']}")
+        logger.info(f"##### [PyPSA-Spain] <cluster_network.py>: Clustering network with focus on: {regional_network_focus['region_NUTS']}")
 
         k_focus = regional_network_focus['k_focus']
         region_NUTS = regional_network_focus['region_NUTS'] 
@@ -705,7 +705,7 @@ if __name__ == "__main__":
         ### Buses in region
         buses_region = buses_gdf.index[buses_gdf.within(region.union_all())]   # union_all: more robust if multi-polygon
 
-        logger.info(f"##### [PyPSA-Spain] <cluster_network>: Selected buses in {regional_network_focus['region_NUTS']}: {len(buses_region)}")
+        logger.info(f"##### [PyPSA-Spain] <cluster_network.py>: Selected buses in {regional_network_focus['region_NUTS']}: {len(buses_region)}")
 
         ### Modify load, clip a minimum value
         #load[buses_region] = load[buses_region].clip(lower=5000*load.max())

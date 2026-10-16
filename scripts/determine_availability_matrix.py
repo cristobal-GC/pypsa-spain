@@ -64,7 +64,7 @@ if __name__ == "__main__":
         params[f'ISA'] = params_ISA_class[f'ISA_{technology.replace('-', '_')}']
 
         if params['ISA']:
-            logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix> for {technology}: Using the Spanish "Indice de Sensibilidad Ambiental"..')
+            logger.info(f'##### [PyPSA-Spain] <determine_availability_matrix.py> for {technology}: Using the Spanish "Indice de Sensibilidad Ambiental"..')
 
     else:
         params['ISA'] = {'ISA': False} 

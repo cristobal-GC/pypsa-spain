@@ -81,7 +81,7 @@ if __name__ == "__main__":
     pop_layouts_HR = snakemake.params.pop_layouts_HR
     if pop_layouts_HR.get("enable", False):
         logger.info(
-            "########## PyPSA-Spain [build_clustered_population_layouts]: "
+            "##### [PyPSA-Spain] <build_clustered_population_layouts.py>: "
             "Recomputing clustered population from municipality-level data"
         )
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
             lost_kinhab = float(((1.0 - coverage) * pop_kinhab).sum())
             if lost_kinhab > 1e-3:
                 logger.warning(
-                    "########## PyPSA-Spain [build_clustered_population_layouts]: "
+                    "##### [PyPSA-Spain] <build_clustered_population_layouts.py>: "
                     f"{label}: {lost_kinhab * 1e3:.0f} inhabitants outside "
                     f"regions_onshore (mean muni coverage = {coverage.mean() * 100:.2f}%)"
                 )
@@ -138,7 +138,7 @@ if __name__ == "__main__":
         pop.to_csv(snakemake.output.clustered_pop_layout)
 
         logger.info(
-            "########## PyPSA-Spain [build_clustered_population_layouts]: "
+            "##### [PyPSA-Spain] <build_clustered_population_layouts.py>: "
             f"total={pop.total.sum():.1f} kinhab, "
             f"urban={pop.urban.sum():.1f} ({100 * pop.urban.sum() / pop.total.sum():.1f}%), "
             f"rural={pop.rural.sum():.1f} ({100 * pop.rural.sum() / pop.total.sum():.1f}%)"

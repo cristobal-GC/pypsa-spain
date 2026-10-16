@@ -362,7 +362,7 @@ if __name__ == "__main__":
         del load
         
 
-        logger.info(f'##### [PyPSA-Spain] <build_electricity_demand>: Creating customised electricity demand for Spain..')
+        logger.info(f'##### [PyPSA-Spain] <build_electricity_demand.py>: Creating customised electricity demand for Spain..')
 
 
         ##### Fix the year in df_profiles
@@ -413,7 +413,7 @@ if __name__ == "__main__":
         dropped = load.index.difference(snapshots)
         if len(dropped):
             logger.info(
-                f'##### [PyPSA-Spain] <build_electricity_demand>: Restricting demand to the '
+                f'##### [PyPSA-Spain] <build_electricity_demand.py>: Restricting demand to the '
                 f'{len(snapshots)} requested snapshots ({len(dropped)} hours of the profiles dropped).'
             )
         load = load.reindex(index=snapshots)

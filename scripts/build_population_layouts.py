@@ -135,7 +135,7 @@ if __name__ == "__main__":
     pop_layouts_HR = snakemake.params.pop_layouts_HR
     if pop_layouts_HR.get("enable", False):
         logger.info(
-            "########## PyPSA-Spain [build_population_layouts]: Recomputing population layouts from municipality-level data "
+            "##### [PyPSA-Spain] <build_population_layouts.py>: Recomputing population layouts from municipality-level data "
             f"({snakemake.input.pop_municipalities})"
         )
 
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         n_excluded = n_before - len(municipalities)
         pop_excluded = pop_before - municipalities["pob_23"].sum()
         logger.info(
-            "########## PyPSA-Spain [build_population_layouts]: "
+            "##### [PyPSA-Spain] <build_population_layouts.py>: "
             f"excluded {n_excluded} municipalities in "
             f"{excluded_ccaa} ({len(municipalities)} remaining); "
             f"excluded population: {pop_excluded:,.0f} hab "
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         muni_density = municipalities["pob_23"] / muni_area_km2
 
         logger.info(
-            "########## PyPSA-Spain [build_population_layouts]:\n"
+            "##### [PyPSA-Spain] <build_population_layouts.py>:\n"
             "Municipality density (hab/km^2): "
             f"min={muni_density.min():.2f}, "
             f"p25={muni_density.quantile(0.25):.2f}, "
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         worldbank_urban_fraction = float(urban_fraction.get("ES", float("nan")))
 
         logger.info(
-            "########## PyPSA-Spain [build_population_layouts]: "
+            "##### [PyPSA-Spain] <build_population_layouts.py>: "
             f"urban fraction — World Bank (Spain): {worldbank_urban_fraction:.3f}, "
             f"config (used): {target_urban_fraction:.3f}"
         )

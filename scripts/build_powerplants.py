@@ -208,7 +208,7 @@ if __name__ == "__main__":
     #################### PyPSA-Spain: add nuclear phase-out calendar in Spain
     #
     #
-    logger.warning(f"########## PyPSA-Spain [build_powerplants]: adding nuclear phase-out calendar in Spain.")
+    logger.warning(f"##### [PyPSA-Spain] <build_powerplants.py>: adding nuclear phase-out calendar in Spain.")
 
     ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Almaraz 1"), "DateOut"] = 2027
     ppl.loc[(ppl.Country == "ES") & (ppl.Fueltype == "Nuclear") & (ppl.Name == "Almaraz 2"), "DateOut"] = 2028

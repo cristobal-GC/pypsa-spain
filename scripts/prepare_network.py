@@ -496,7 +496,7 @@ def _read_ic_price_series(n, country, nc_params):
     snapshot_years = sorted({ts.year for ts in n.snapshots})
     if not set(price_years) & set(snapshot_years):
         logger.warning(
-            f"########## [PyPSA-Spain] <prepare_network.py> WARNING: price series "
+            f"##### [PyPSA-Spain] <prepare_network.py> WARNING: price series "
             f"for {country} ({fn}) covers {price_years}, but the snapshots cover "
             f"{snapshot_years}. The series is mapped by (month, day, hour) anyway; "
             f"make sure the price file is coherent with the modelled year."
@@ -555,7 +555,7 @@ def _read_ic_price_series(n, country, nc_params):
     if aligned.isna().any():
         missing = aligned.index[aligned.isna()]
         logger.warning(
-            f"########## [PyPSA-Spain] <prepare_network.py> WARNING: {len(missing)} "
+            f"##### [PyPSA-Spain] <prepare_network.py> WARNING: {len(missing)} "
             f"snapshots have no price in {fn} ({country}), e.g. {missing[0]} "
             f"(a leap day is the usual reason). They are filled by interpolation."
         )
@@ -591,7 +591,7 @@ def _closest_spanish_ac_bus(n, x0, y0, ic_name):
     closest = distances.idxmin()
 
     logger.info(
-        f"########## [PyPSA-Spain] <prepare_network.py> INFO: interconnection "
+        f"##### [PyPSA-Spain] <prepare_network.py> INFO: interconnection "
         f"{ic_name} attached to bus {closest} ({distances[closest]:.1f} km away)"
     )
 
@@ -628,7 +628,7 @@ def attach_interconnections_ES(n, ic_dic, nc_dic):
     for ic_name, ic in ic_dic.items():
 
         logger.info(
-            f'########## [PyPSA-Spain] <prepare_network.py> INFO: Adding '
+            f'##### [PyPSA-Spain] <prepare_network.py> INFO: Adding '
             f'interconnection {ic_name}'
         )
 

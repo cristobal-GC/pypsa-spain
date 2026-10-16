@@ -177,11 +177,11 @@ if __name__ == "__main__":
 
         for bb, vv in kw_per_person.items():
             logger.info(
-                f"########## [PyPSA-Spain] <build_solar_rooftop_potentials.py> Region {bb}: {vv:.2f} kW/person"
+                f"##### [PyPSA-Spain] <build_solar_rooftop_potentials.py> Region {bb}: {vv:.2f} kW/person"
             )
 
     logger.info(
-        f"########## [PyPSA-Spain] <build_solar_rooftop_potentials.py> Solar rooftop potential ({scenario}): {potentials.sum() / 1e3:.1f} GW"
+        f"##### [PyPSA-Spain] <build_solar_rooftop_potentials.py> Solar rooftop potential ({scenario}): {potentials.sum() / 1e3:.1f} GW"
     )
 
     title = (

@@ -574,7 +574,7 @@ if __name__ == "__main__":
 
     if electricity_demand['enable']:
 
-        logger.info(f'########## [PyPSA-Spain] <build_electricity_demand_base> INFO: Using upsample_load_vPyPSA_Spain to add electricity demand in ES.')
+        logger.info(f'##### [PyPSA-Spain] <build_electricity_demand_base.py> INFO: Using upsample_load_vPyPSA_Spain to add electricity demand in ES.')
 
         load = upsample_load_vPyPSA_Spain(
             n,

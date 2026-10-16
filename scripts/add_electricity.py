@@ -1272,14 +1272,14 @@ def fun_update_elec_capacities(n, carriers_to_update, nuts2_ES, regions):
                 # Apply scaling factor
                 n.generators.loc[(n.generators['carrier']==cc) & (n.generators['bus']==bb), 'p_nom'] *= scale_factor
                 n.generators.loc[(n.generators['carrier']==cc) & (n.generators['bus']==bb), 'p_nom_min'] *= scale_factor                                
-                logger.info(f'########## [PyPSA-Spain] <add_electricity.py> For carrier {cc} and bus {bb}, p_nom and p_nom_min were SCALED from {actual_capacity:.2f} MW to {(actual_capacity*scale_factor):.2f}')
+                logger.info(f'##### [PyPSA-Spain] <add_electricity.py> For carrier {cc} and bus {bb}, p_nom and p_nom_min were SCALED from {actual_capacity:.2f} MW to {(actual_capacity*scale_factor):.2f}')
             # If actual_capacity is smaller than 1 MW, just add it
             else:
                 additive_factor = df_target[bb]
                 # Apply additive factor
                 n.generators.loc[(n.generators['carrier']==cc) & (n.generators['bus']==bb), 'p_nom'] += additive_factor
                 n.generators.loc[(n.generators['carrier']==cc) & (n.generators['bus']==bb), 'p_nom_min'] += additive_factor
-                logger.info(f'########## [PyPSA-Spain] <add_electricity.py> For carrier {cc} and bus {bb}, p_nom and p_nom_min were ADDED from {actual_capacity:.2f} MW to {(actual_capacity+additive_factor):.2f}')
+                logger.info(f'##### [PyPSA-Spain] <add_electricity.py> For carrier {cc} and bus {bb}, p_nom and p_nom_min were ADDED from {actual_capacity:.2f} MW to {(actual_capacity+additive_factor):.2f}')
 
 
         del df_target

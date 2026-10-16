@@ -296,12 +296,12 @@ if __name__ == "__main__":
 
         ##### If name_of_function is empty, do nothing
         if not q2q_filename:            
-            logger.info(f'########## [PyPSA-Spain] <build_renewable_profiles.py> WARNING: No q2q transform available for {technology}..')
+            logger.info(f'##### [PyPSA-Spain] <build_renewable_profiles.py> WARNING: No q2q transform available for {technology}..')
 
 
         ##### Aply q2q transform
         else:
-            logger.info(f'########## [PyPSA-Spain] <build_renewable_profiles.py> INFO: Applying q2q transform "{q2q_filename}" to {technology}..')
+            logger.info(f'##### [PyPSA-Spain] <build_renewable_profiles.py> INFO: Applying q2q transform "{q2q_filename}" to {technology}..')
 
             with open(q2q_filename, 'rb') as f:
                 interp_func = pickle.load(f)
@@ -319,7 +319,7 @@ if __name__ == "__main__":
                 ds['profile'][:, :, :] = interp_func(ds.variables['profile'])
 
     else:
-        print(f'########## [PyPSA-Spain] <build_renewable_profiles.py> INFO: Ommitting q2q transform for {technology}..')
+        print(f'##### [PyPSA-Spain] <build_renewable_profiles.py> INFO: Ommitting q2q transform for {technology}..')
 
     ########################################
 
