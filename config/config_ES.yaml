@@ -101,9 +101,13 @@ foresight: overnight
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#planning_horizons_cf
 planning_horizons: #####
-- 2030
+- 2040
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#countries_cf
 countries:  #####
 - ES
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#snapshots_cf
 snapshots:
   start: "2013-01-01"
   end: "2014-01-01"
@@ -120,7 +124,7 @@ co2_budget:
   upper:
     2020: 0.72
     2025: 0.648
-    2030: 0.183  ##### elec-only # 0.45
+    2030: 0.45  ##### for elec-only use: 0.183
     2035: 0.25
     2040: 0.1
     2045: 0.05
@@ -157,10 +161,14 @@ electricity:
   extendable_carriers:
     Generator:  #####
     - solar
+    - "solar-hsat"
     - onwind
-    - offwind-float
+    #- "offwind-ac"
+    #- "offwind-dc"
+    - "offwind-float"
     - OCGT
     - CCGT
+    #- biomass   ##### add for elec only
     StorageUnit: []
     Store:
     - battery
@@ -181,18 +189,20 @@ electricity:
   - biomass
   renewable_carriers:  #####
   - solar
-  - solar-hsat
+  - "solar-hsat"
   - onwind
-  - offwind-float
+  #- "offwind-ac"
+  #- "offwind-dc"
+  - "offwind-float"
   - hydro
   estimate_renewable_capacities:
-    enable: false  ##### true
+    enable: false # true   #####
     from_powerplantmatching: true
     from_irenastat: false
     year: 2024
     expansion_limit: false
     technology_mapping:
-      Offshore: "offwind-float"  #####
+      Offshore: "offwind-float"  ##### "offwind-ac"
       Onshore: onwind
       PV: solar
   estimate_battery_capacities: false
@@ -204,7 +214,7 @@ electricity:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#atlite_cf
 atlite:
   default_cutout: "europe-2013-sarah3-era5"
-  nprocesses: 8  #####
+  nprocesses: 8 # 1   #####
   show_progress: false
   plot_availability_matrix: false
   cutouts:
@@ -244,9 +254,9 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 3
     correction_factor: 1.0
-    corine: false  #####
+    corine: false   #####
     luisa: false
-    natura: false  #####
+    natura: false # true   #####
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   "offwind-ac":
@@ -295,18 +305,18 @@ renewable:
     cutout: default
     resource:
       method: wind
-      turbine: NREL_ReferenceTurbine_2020ATB_12MW_offshore  #####
+      turbine: NREL_ReferenceTurbine_2020ATB_12MW_offshore # NREL_ReferenceTurbine_5MW_offshore   #####
       smooth: false
       add_cutout_windspeed: true
     resource_classes: 1
-    capacity_per_sqkm: 10  ##### 2
-    correction_factor: 1 ##### 0.8855
+    capacity_per_sqkm: 10 # 2   ##### 
+    correction_factor: 1 # 0.8855   #####
     corine: false
     luisa: false
     natura: true
     ship_threshold: 400
     max_depth: 1000.0
-    min_depth: 50.0  #####
+    min_depth: 50.0 # 60.0   #####
     max_shore_distance:
     min_shore_distance:
     excluder_resolution: 200
@@ -324,9 +334,9 @@ renewable:
     resource_classes: 1
     capacity_per_sqkm: 5.1
     correction_factor: 1.0
-    corine: false  #####
+    corine: false   #####
     luisa: false
-    natura: false  #####
+    natura: false # true   #####
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   "solar-hsat":
@@ -343,7 +353,7 @@ renewable:
     correction_factor: 1.0
     corine: false  #####
     luisa: false
-    natura: false  #####
+    natura: false # true   #####
     excluder_resolution: 100
     clip_p_max_pu: 0.01
   hydro:
@@ -477,30 +487,30 @@ load:
   supplement_synthetic: true
   substation_only: true
   distribution_key:
-    gdp: 0.18  #####
-    population: 0.82 #####
+    gdp: 0.18 # 0.6   #####
+    population: 0.82 # 0.4   #####
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#pypsa_eur_cf
 pypsa_eur:
-  Bus:  #####
+  Bus:
   - AC
-  - DC_ic
-  Link: #####
+  - DC_ic   #####
+  Link:
   - DC
-  - DC_ic export
-  - DC_ic import
-  Generator: #####
+  - DC_ic export   #####
+  - DC_ic import   #####
+  Generator:
   - onwind
-  - offwind-ac
-  - offwind-dc
-  - offwind-float
-  - solar-hsat
+  #- "offwind-ac"
+  #- "offwind-dc"
+  - "offwind-float"
+  - "solar-hsat"
   - solar
   - ror
   - nuclear
-  - biomass
-  - DC_ic market export
-  - DC_ic market import
+  - DC_ic market export   #####
+  - DC_ic market import   #####
+  # - biomass   ##### Add for elec only
   StorageUnit:
   - PHS
   - hydro
@@ -658,14 +668,14 @@ existing_capacities:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#sector_cf
 sector:
-  enabled: true
-  transport: false #####
-  heating: false #####
-  biomass: false  #####
-  industry: false #####
-  shipping: false #####
-  aviation: false #####
-  agriculture: false  #####
+  enabled: true   ##### false for elec only
+  transport: true
+  heating: true
+  biomass: true
+  industry: true
+  shipping: true
+  aviation: true
+  agriculture: true
   fossil_fuels: true
   district_heating:
     potential: 0.6
@@ -875,9 +885,9 @@ sector:
     micro_chp: false
   solar_thermal: true
   solar_cf_correction: 0.788457
-  methanation: false  #####
+  methanation: true   ##### false for elec only
   coal_cc: false
-  dac: false  #####
+  dac: true   ##### false for elec only
   co2_vent: false
   heat_vent:
     urban central: true
@@ -888,12 +898,12 @@ sector:
   hydrogen_fuel_cell: true
   hydrogen_turbine: true
   electrolysis: true
-  SMR: false  #####
-  SMR_cc: false #####
-  regional_oil_demand: false #####
+  SMR: true   ##### false for elec only
+  SMR_cc: true   ##### false for elec only
+  regional_oil_demand: true   ##### false for elec only
   regional_coal_demand: false
   regional_co2_sequestration_potential:
-    enable: false  #####
+    enable: true   ##### false for elec only
     attribute:
     - conservative estimate GAS Mt
     - conservative estimate OIL Mt
@@ -912,8 +922,8 @@ sector:
     2050: 250
   co2_sequestration_cost: 30
   co2_sequestration_lifetime: 50
-  co2_spatial: false #####
-  co2_network: false  #####
+  co2_spatial: true   ##### false for elec only
+  co2_network: true   ##### false for elec only
   co2_network_cost_factor: 1
   co2_network_liquefaction: false
   cc_fraction: 0.9
@@ -937,9 +947,9 @@ sector:
       ccgt_cc: false
       ocgt: true
       allam: false
-    biomass_to_methanol: false  #####
+    biomass_to_methanol: true   ##### false for elec only
     biomass_to_methanol_cc: false
-  ammonia: false  #####
+  ammonia: true   ##### false for elec only
   min_part_load_electrolysis: 0
   min_part_load_fischer_tropsch: 0.5
   min_part_load_methanolisation: 0.3
@@ -995,9 +1005,9 @@ sector:
   conventional_generation:
     OCGT: gas
     CCGT: gas
-  biomass_to_liquid: false  #####
+  biomass_to_liquid: true   ##### false for elec only
   biomass_to_liquid_cc: false
-  electrobiofuels: false  #####
+  electrobiofuels: true   ##### false for elec only
   biosng: false
   biosng_cc: false
   bioH2: false
@@ -1153,9 +1163,9 @@ costs:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#clustering_cf
 clustering:
-  mode: busmap
+  mode: busmap   #####
   administrative:
-    level: 2  #####
+    level: 1
     countries: {}
   focus_weights: false
   copperplate_regions: []
@@ -1168,7 +1178,7 @@ clustering:
     remove_stubs: true
     remove_stubs_across_borders: false
   cluster_network:
-    n_clusters: 5  ##### recommended 35-50
+    n_clusters: 5   ##### for PyPSA-Spain, 35-50 recommended
     algorithm: kmeans
     allow_ac_dc_mixing_in_bus_clusters: false
     hac_features:
@@ -1183,7 +1193,7 @@ clustering:
       ramp_limit_down: max
     buses: {}
   temporal:
-    averaging: 168h  #####
+    averaging: 168h   #####
     segmentation: false
     representative: false
 
