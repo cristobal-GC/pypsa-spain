@@ -524,7 +524,10 @@ def upsample_load_vPyPSA_Spain(
                 f"on the network. The national total would silently fall below the "
                 f"configured `annual_value`. Offending load columns:\n{detail}"
             )
-        logger.warning(f"Ignoring load columns carrying no demand:\n{detail}")
+        logger.warning(
+            f"##### [PyPSA-Spain] <build_electricity_demand_base.py> WARNING: "
+            f"ignoring load columns carrying no demand:\n{detail}"
+        )
 
     if not np.isclose(delivered, expected, rtol=1e-6):
         raise ValueError(
