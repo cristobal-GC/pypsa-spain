@@ -63,10 +63,6 @@ pypsa_spain:
     roof_fraction: 0.25   ##### Only for scenario roof_fraction: fraction of the roof covered by PV, in (0, 1]
 
 
-
-# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#tutorial_cf
-
-
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#tutorial_cf
 tutorial: false
 
@@ -1193,7 +1189,7 @@ clustering:
       ramp_limit_down: max
     buses: {}
   temporal:
-    averaging: 168h   #####
+    averaging: 168h # false   #####
     segmentation: false
     representative: false
 
@@ -1372,6 +1368,15 @@ solving:
 data:
   version_files:
   - data/versions.csv
+  isa_onwind:   #####
+    source: primary
+    version: latest
+  isa_solar:   #####
+    source: primary
+    version: latest
+  pop_ES_municipalities:   #####
+    source: primary
+    version: latest
   hotmaps_industrial_sites:
     source: archive
     version: latest
@@ -1554,15 +1559,6 @@ data:
     version: latest
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#overpass_api_cf
-  isa_onwind:
-    source: primary
-    version: latest
-  isa_solar:
-    source: primary
-    version: latest
-  pop_ES_municipalities:
-    source: primary
-    version: latest
 overpass_api:
   url: "https://overpass-api.de/api/interpreter"
   max_tries: 5
