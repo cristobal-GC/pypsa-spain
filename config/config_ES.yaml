@@ -209,7 +209,15 @@ electricity:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#atlite_cf
 atlite:
-  default_cutout: "europe-2013-sarah3-era5"
+  #####
+  # Besides the upstream cutouts (e.g. europe-2013-sarah3-era5), PyPSA-Spain can use these
+  # cutouts, retrieved from Zenodo by name (see rules/retrieve_ES.smk):
+  #   - iberia-<year>-era5-sarah3, year in 1990-2020 (0.3 deg, all variables)
+  #     https://zenodo.org/records/22745628
+  #   - iberia-<year>-cerra, year in 2019, 2020, 2023 (0.05 deg, wind only: use it only in
+  #     renewable:onwind/offwind-*:cutout, keeping an era5 cutout as default_cutout)
+  #     https://zenodo.org/records/20625166
+  default_cutout: "iberia-2013-era5-sarah3"  # "europe-2013-sarah3-era5"   #####
   nprocesses: 8 # 1   #####
   show_progress: false
   plot_availability_matrix: false
@@ -1368,6 +1376,7 @@ solving:
 data:
   version_files:
   - data/versions.csv
+  - data_ES/versions_ES.csv   #####
   isa_onwind:   #####
     source: primary
     version: latest
@@ -1532,6 +1541,12 @@ data:
     version: latest
   cutout:
     source: archive
+    version: latest
+  cutout_iberia_era5_sarah3:   #####
+    source: primary
+    version: latest
+  cutout_iberia_cerra:   #####
+    source: primary
     version: latest
   dh_areas:
     source: archive

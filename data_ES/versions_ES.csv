@@ -1,0 +1,8 @@
+# PyPSA-Spain: datasets added on top of data/versions.csv (loaded via data:version_files in config_ES.yaml).
+# Same format and validation rules as data/versions.csv (rows sorted by dataset, one 'latest' per dataset/source).
+dataset,version,source,tags,added,note,url
+cutout_iberia_cerra,zenodo-20625166,primary,latest supported,2026-10-23,CERRA wind-only cutouts at 0.05 deg for onwind/offwind (doi 10.5281/zenodo.20625166),https://zenodo.org/records/20625166/files
+cutout_iberia_era5_sarah3,zenodo-22745628,primary,latest supported,2026-10-23,ERA5-SARAH3 cutouts at 0.3 deg for 1990-2020 (doi 10.5281/zenodo.22745628),https://zenodo.org/records/22745628/files
+isa_onwind,latest,primary,latest supported,2026-01-22,,https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_EOL_clasificada_2024.zip
+isa_solar,latest,primary,latest supported,2026-01-22,,https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/temas/evaluacion-ambiental-de-planes-programas-y-proyectos/Zonificacion_FTV_clasificada_2024.zip
+pop_ES_municipalities,2023,primary,latest supported,2026-05-28,Spanish municipality boundaries with INE 2023 population (LR low-resolution geometry EPSG:4258),https://zenodo.org/records/20431328/files/pop_ES_2023_LR.geojson?download=1

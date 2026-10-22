@@ -237,6 +237,27 @@ def input_cutout(wildcards, cutout_names="default"):
         cutout_names = config_provider("atlite", "default_cutout")(wildcards)
 
     if isinstance(cutout_names, list):
-        return [f"{cutouts_path}/{cn}.nc" for cn in cutout_names]
+        return [f"{cutout_folder_ES(cn, cutouts_path)}/{cn}.nc" for cn in cutout_names]   #####
     else:
-        return f"{cutouts_path}/{cutout_names}.nc"
+        return f"{cutout_folder_ES(cutout_names, cutouts_path)}/{cutout_names}.nc"   #####
+
+
+#################### PyPSA-Spain
+# Cutouts published on Zenodo by PyPSA-Spain (retrieved in rules/retrieve_ES.smk) are
+# routed by name to their own dataset folder; other names keep the upstream folder.
+CUTOUT_DATASETS_ES = {
+    "cutout_iberia_era5_sarah3": r"iberia-\d{4}-era5-sarah3",
+    "cutout_iberia_cerra": r"iberia-\d{4}-cerra",
+}
+
+
+def cutout_folder_ES(cutout_name, default_folder):
+    import re
+
+    for dataset, pattern in CUTOUT_DATASETS_ES.items():
+        if re.fullmatch(pattern, cutout_name):
+            return dataset_version(dataset)["folder"]
+    return default_folder
+
+
+####################
