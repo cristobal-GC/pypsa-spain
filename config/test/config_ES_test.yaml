@@ -1358,6 +1358,7 @@ solving:
 data:
   version_files:
   - data/versions.csv
+  - data_ES/versions_ES.csv
   hotmaps_industrial_sites:
     source: archive
     version: latest

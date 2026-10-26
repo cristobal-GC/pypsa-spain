@@ -45,6 +45,7 @@ Find the details of PyPSA-Spain in the `seminal paper <https://doi.org/10.1016/j
    pop_layouts
    industry_scenario
    solar_rooftop
+   cutouts
 
 .. toctree::
    :hidden:

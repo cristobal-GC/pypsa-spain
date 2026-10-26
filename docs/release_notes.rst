@@ -14,6 +14,8 @@ Upcoming Release
 
 * New functionality ``solar_rooftop``: Regional values of the rooftop PV capacity per person (kW/person), obtained for each NUTS2 region from Gallego-Castillo et al. (2021) (`doi:10.1016/j.enpol.2021.112144 <https://doi.org/10.1016/j.enpol.2021.112144>`__), replace the homogeneous 2 kW/person of PyPSA-Eur in the solar rooftop potentials. Each clustered region takes the area-weighted average of the NUTS2 regions it overlaps. See details `here <https://pypsa-spain.readthedocs.io/en/latest/solar_rooftop.html>`__.
 
+* New weather cutouts for the Iberian Peninsula, retrieved from Zenodo when their names are set in the configuration file: ERA5-SARAH3 cutouts for 1990-2020 (``iberia-<year>-era5-sarah3``), now used by default, and high-resolution CERRA cutouts for wind power (``iberia-<year>-cerra``). See details `here <https://pypsa-spain.readthedocs.io/en/latest/cutouts.html>`__.
+
 
 
 
