@@ -63,6 +63,21 @@ Set the cutout names in the ``atlite`` and ``renewable`` sections of the configu
         cutout: iberia-2019-cerra
 
 
+Using cutouts already downloaded
+================================
+
+Cutouts kept in a local folder (for instance, shared by several clones of the repository) can be used instead of retrieving them again. Enable ``local_cutouts`` and set the folder that holds the ``<cutout_name>.nc`` files. Since the folder depends on the machine, set it in ``config/config.yaml``, which is not versioned and is loaded automatically when present:
+
+.. code:: yaml
+
+    pypsa_spain:
+      local_cutouts:
+        enable: true
+        folder: /path/to/cutouts
+
+Each cutout found in that folder is symlinked into the folder where the workflow expects it (e.g. ``data/cutout_iberia_cerra/primary/zenodo-20625166/``). Cutouts not found there are retrieved (or built) as usual. This applies to the upstream cutouts as well as to the Iberian ones.
+
+
 
 
 

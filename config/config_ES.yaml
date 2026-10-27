@@ -61,6 +61,9 @@ pypsa_spain:
     enable: true
     scenario: roof_fraction   ##### roof_fraction / without_surplus_remuneration / with_surplus_remuneration
     roof_fraction: 0.25   ##### Only for scenario roof_fraction: fraction of the roof covered by PV, in (0, 1]
+  local_cutouts:
+    enable: false   ##### If enabled, cutouts found in folder are symlinked instead of retrieved or built. Machine-specific: set it in config/config.yaml (not versioned)
+    folder: ''   ##### Folder with <cutout_name>.nc files
 
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#tutorial_cf

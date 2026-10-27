@@ -8,6 +8,8 @@
 # reused here.
 #
 
+import os
+import re
 from pathlib import Path
 from shutil import copy2
 from zipfile import ZipFile
@@ -156,6 +158,57 @@ rule retrieve_cutout_iberia_cerra:
         mem_mb=5000,
     run:
         copy2(input[0], output[0])
+
+#
+#
+#
+####################
+
+
+
+#################### Link weather cutouts from a local folder
+#
+# With pypsa_spain:local_cutouts enabled, a cutout found in its folder is symlinked into the
+# dataset folder where the workflow expects it, instead of being retrieved or built. A cutout
+# missing from that folder leaves link_local_cutout without input, so Snakemake falls back
+# to the retrieve (or build) rule of its dataset.
+#
+# Snakemake rejects a ruleorder that names an undefined rule, hence the switch between
+# retrieve_cutout and build_cutout, only one of which exists depending on data:cutout:source.
+#
+
+if (LOCAL_CUTOUTS := config["pypsa_spain"]["local_cutouts"])["enable"]:
+
+    rule link_local_cutout:
+        """Links a cutout from a local folder instead of retrieving or building it."""
+        input:
+            LOCAL_CUTOUTS["folder"] + "/{cutout}.nc",
+        output:
+            "{cutout_folder}/{cutout}.nc",
+        wildcard_constraints:
+            cutout_folder="|".join(
+                re.escape(dataset["folder"])
+                for dataset in [
+                    CUTOUT_DATASET,
+                    CUTOUT_IBERIA_ERA5_SARAH3_DATASET,
+                    CUTOUT_IBERIA_CERRA_DATASET,
+                ]
+            ),
+            cutout=r"[^/]+",
+        localrule: True
+        run:
+            os.symlink(Path(input[0]).resolve(), output[0])
+
+    ruleorder: link_local_cutout > retrieve_cutout_iberia_era5_sarah3
+    ruleorder: link_local_cutout > retrieve_cutout_iberia_cerra
+
+    if CUTOUT_DATASET["source"] == "build":
+
+        ruleorder: link_local_cutout > build_cutout
+
+    else:
+
+        ruleorder: link_local_cutout > retrieve_cutout
 
 #
 #

@@ -16,6 +16,8 @@ Upcoming Release
 
 * New weather cutouts for the Iberian Peninsula, retrieved from Zenodo when their names are set in the configuration file: ERA5-SARAH3 cutouts for 1990-2020 (``iberia-<year>-era5-sarah3``), now used by default, and high-resolution CERRA cutouts for wind power (``iberia-<year>-cerra``). See details `here <https://pypsa-spain.readthedocs.io/en/latest/cutouts.html>`__.
 
+* New option ``local_cutouts``: cutouts found in a local folder are symlinked instead of being retrieved or built. See details `here <https://pypsa-spain.readthedocs.io/en/latest/cutouts.html>`__.
+
 
 
 
