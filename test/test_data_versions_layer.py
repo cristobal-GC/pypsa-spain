@@ -15,9 +15,17 @@ from scripts.lib.validation.config import (
 )
 from scripts.lib.validation.config.data import VersionsSchema, sort_versions
 
+##### PyPSA-Spain: take the version files from config_ES.yaml, which adds
+##### data_ES/versions_ES.csv to the upstream default (data/versions.csv)
+with open(Path(__file__).parent.parent / "config/config_ES.yaml") as f:
+    VERSION_FILES_ES = yaml.safe_load(f)["data"]["version_files"]
+
 VERSIONS_PATHS = [
     Path(__file__).parent.parent / file if not Path(file).is_absolute() else Path(file)
-    for file in validate_config({}).data.version_files
+    # for file in validate_config({}).data.version_files   #####
+    for file in validate_config(
+        {"data": {"version_files": VERSION_FILES_ES}}  #####
+    ).data.version_files
 ]
 
 
@@ -46,7 +54,15 @@ def test_versions_csv(pytestconfig, file):
 
 def test_data_inventory_matches_versions():
     """Every dataset in the versions registry has a row in the docs inventory."""
-    inventory = pd.read_csv(Path("doc/data_inventory.csv"))
+    # inventory = pd.read_csv(Path("doc/data_inventory.csv"))   #####
+    ##### PyPSA-Spain: the datasets of data_ES/versions_ES.csv are listed in
+    ##### data_ES/data_inventory_ES.csv, apart from the upstream inventory
+    inventory = pd.concat(
+        [
+            pd.read_csv(Path("doc/data_inventory.csv")),
+            pd.read_csv(Path("data_ES/data_inventory_ES.csv"), comment="#"),
+        ]
+    )
     versions = load_data_versions(*VERSIONS_PATHS)
     assert set(inventory["Short name"]) == set(versions["dataset"])
 
