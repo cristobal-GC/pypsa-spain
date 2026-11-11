@@ -167,7 +167,6 @@ electricity:
     - "offwind-float"
     - OCGT
     - CCGT
-    #- biomass   ##### add for elec only
     StorageUnit: []
     Store:
     - battery
@@ -175,6 +174,7 @@ electricity:
     Link: []
   powerplants_filter: "(DateOut > 2025 or DateOut != DateOut) and (DateIn < 2026 or DateIn != DateIn) and not (Country == 'ES' and Fueltype == 'Nuclear' and DateOut < 2031)"  #####
   custom_powerplants: false
+  custom_powerplants_fn: data/custom_powerplants.csv
   everywhere_powerplants: []
   conventional_carriers:
   - nuclear
@@ -517,7 +517,6 @@ pypsa_eur:
   - nuclear
   - DC_ic market export   #####
   - DC_ic market import   #####
-  # - biomass   ##### Add for elec only
   StorageUnit:
   - PHS
   - hydro
@@ -675,7 +674,7 @@ existing_capacities:
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#sector_cf
 sector:
-  enabled: true   ##### false for elec only
+  enabled: true
   transport: true
   heating: true
   biomass: true
@@ -892,9 +891,9 @@ sector:
     micro_chp: false
   solar_thermal: true
   solar_cf_correction: 0.788457
-  methanation: true   ##### false for elec only
+  methanation: true
   coal_cc: false
-  dac: true   ##### false for elec only
+  dac: true
   co2_vent: false
   heat_vent:
     urban central: true
@@ -905,12 +904,12 @@ sector:
   hydrogen_fuel_cell: true
   hydrogen_turbine: true
   electrolysis: true
-  SMR: true   ##### false for elec only
-  SMR_cc: true   ##### false for elec only
-  regional_oil_demand: true   ##### false for elec only
+  SMR: true
+  SMR_cc: true
+  regional_oil_demand: true
   regional_coal_demand: false
   regional_co2_sequestration_potential:
-    enable: true   ##### false for elec only
+    enable: true
     attribute:
     - conservative estimate GAS Mt
     - conservative estimate OIL Mt
@@ -929,8 +928,8 @@ sector:
     2050: 250
   co2_sequestration_cost: 30
   co2_sequestration_lifetime: 50
-  co2_spatial: true   ##### false for elec only
-  co2_network: true   ##### false for elec only
+  co2_spatial: true
+  co2_network: true
   co2_network_cost_factor: 1
   co2_network_liquefaction: false
   cc_fraction: 0.9
@@ -954,9 +953,9 @@ sector:
       ccgt_cc: false
       ocgt: true
       allam: false
-    biomass_to_methanol: true   ##### false for elec only
+    biomass_to_methanol: true
     biomass_to_methanol_cc: false
-  ammonia: true   ##### false for elec only
+  ammonia: true
   min_part_load_electrolysis: 0
   min_part_load_fischer_tropsch: 0.5
   min_part_load_methanolisation: 0.3
@@ -1012,9 +1011,9 @@ sector:
   conventional_generation:
     OCGT: gas
     CCGT: gas
-  biomass_to_liquid: true   ##### false for elec only
+  biomass_to_liquid: true
   biomass_to_liquid_cc: false
-  electrobiofuels: true   ##### false for elec only
+  electrobiofuels: true
   biosng: false
   biosng_cc: false
   bioH2: false
@@ -1363,6 +1362,13 @@ solving:
       baralg: 4
       barhggpu: 1
       barhgreltol: 1.0e-05
+    "mosek-default":
+      MSK_IPAR_NUM_THREADS: 8
+      MSK_IPAR_OPTIMIZER: MSK_OPTIMIZER_INTPNT
+      MSK_IPAR_INTPNT_BASIS: MSK_BI_NEVER
+      MSK_DPAR_INTPNT_TOL_REL_GAP: 1.0e-05
+      MSK_DPAR_INTPNT_TOL_PFEAS: 1.0e-06
+      MSK_DPAR_INTPNT_TOL_DFEAS: 1.0e-06
     "cbc-default": {}
     "glpk-default": {}
   check_objective:
@@ -1370,7 +1376,6 @@ solving:
     expected_value:
     atol: 10000
     rtol: 0.001
-  oetc:
   mem_mb: 128000
   memory_logging_frequency: 5
   runtime: 48h
