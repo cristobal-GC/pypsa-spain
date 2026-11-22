@@ -18,6 +18,14 @@ management](../design/carbon-management.md) in the design section.
 
 {{ rules("build_gas_network", "build_gas_input_locations", "cluster_gas_network", "build_salt_cavern_potentials") }}
 
+## Transport corridors
+
+{{ rules("build_transmission_topology") }}
+
 ## Carbon sequestration
 
 {{ rules("build_co2_sequestration_potentials", "build_clustered_co2_sequestration_potentials") }}
+
+## Carbon dioxide removal
+
+{{ rules("determine_carbon_dioxide_removal_availability_matrix", "build_carbon_dioxide_removal_land", "build_afforestation_potentials") }}

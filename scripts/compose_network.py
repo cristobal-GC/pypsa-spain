@@ -52,7 +52,7 @@ from scripts.prepare_sector_network import (
 
 logger = logging.getLogger(__name__)
 
-SECTOR_RENEWABLE_CARRIERS = {"solar rooftop"}
+SECTOR_RENEWABLE_CARRIERS = {"solar rooftop", "afforestation", "biochar", "perennials"}
 
 
 if __name__ == "__main__":
@@ -68,7 +68,6 @@ if __name__ == "__main__":
     set_scenario_config(snakemake)
 
     # Extract configuration and parameters
-    config = snakemake.config
     params = snakemake.params
     inputs = snakemake.input
 
@@ -101,7 +100,10 @@ if __name__ == "__main__":
 
     renewable_carriers = sorted(
         set(params.renewable_carriers)
-        | (SECTOR_RENEWABLE_CARRIERS & set(n.generators.carrier))
+        | (
+            SECTOR_RENEWABLE_CARRIERS
+            & (set(n.generators.carrier) | set(n.links.carrier))
+        )
     )
 
     if foresight != "overnight" and is_first_horizon:
@@ -131,9 +133,11 @@ if __name__ == "__main__":
     maybe_adjust_costs_and_potentials(n, adjustments["sector"], current_horizon)
 
     sanitize_custom_columns(n)
-    sanitize_carriers(n, config)
+    sanitize_carriers(n, params.nice_names, params.tech_colors)
     sanitize_locations(n)
-    n.meta = dict(config, **dict(wildcards=dict(snakemake.wildcards)))
+    n.meta["snakemake_config"] = dict(
+        snakemake.config, wildcards=dict(snakemake.wildcards)
+    )
     if n.investment_periods.empty:
         n.consistency_check()
     else:

@@ -62,7 +62,9 @@ overlap.
 Solid biomass can be burned in combined heat and power plants with or without
 carbon capture, converted to liquid fuels, to methanol, to hydrogen or to
 synthetic natural gas, and combined with hydrogen in electrobiofuels.
-Unsustainable bioliquids feed the oil supply directly. Biogas is upgraded to
+Unsustainable bioliquids feed the oil supply directly. Optionally, the
+emissions of growing their feedstock are added to their use, in CO~2~
+equivalents. Biogas is upgraded to
 methane before it enters the gas system. Which conversion routes are built is
 a result of the optimisation; the carbon captured from biogenic sources
 counts as negative emissions when it is sequestered, see
@@ -73,6 +75,8 @@ counts as negative emissions when it is sequestered, see
 Solid biomass can be one European pool or regionally resolved. When resolved,
 transport between regions can be free or priced per distance with
 country-specific costs, which reflects road transport of bulky feedstocks.
+Priced transport follows the same candidate corridors as new
+[hydrogen pipelines](hydrogen.md#transport).
 Biogas follows the gas network if that is resolved.
 
 ## Further reading

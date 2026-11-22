@@ -8,7 +8,7 @@ The script works at two resolutions: the cutout grid cells of the weather data
 and the coarser network regions. For each grid cell it computes the average
 capacity factor with [atlite](https://atlite.readthedocs.io/en/latest/) and
 takes the eligible land share from [determine_availability_matrix][]. Within
-each region the cells are split into a configurable number of resource classes
+each region the eligible cells are split into a configurable number of resource classes
 by capacity factor, and the capacity layout is assumed proportional to eligible
 area and capacity factor, since more capacity is expected where the resource is
 better. This layout weights the hourly cell time series into one profile per
@@ -48,7 +48,6 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
-from atlite.gis import ExclusionContainer
 
 from scripts._helpers import (
     _simplify_polys,
@@ -71,10 +70,10 @@ if __name__ == "__main__":
     set_scenario_config(snakemake)
 
     nprocesses = int(snakemake.threads)
-    noprogress = snakemake.config["run"].get("disable_progressbar", True)
-    noprogress = noprogress or not snakemake.config["atlite"]["show_progress"]
+    noprogress = snakemake.params.disable_progressbar
+    noprogress = noprogress or not snakemake.params.show_progress
     technology = snakemake.wildcards.technology
-    params = snakemake.params.renewable[technology]
+    params = snakemake.params.technology
     resource = params["resource"]  # pv panel params / wind turbine params
     resource["show_progress"] = not noprogress
 
@@ -103,7 +102,18 @@ if __name__ == "__main__":
     regions = regions.set_index("name").rename_axis("bus")
     if snakemake.wildcards.technology.startswith("offwind"):
         # for offshore regions, the shortest distance to the shoreline is used
-        offshore_regions = availability.coords["bus"].values
+        offshore_regions = availability.coords["bus"].to_index()
+        missing = offshore_regions.difference(regions.index)
+        if not missing.empty:
+            logger.info(
+                f"Using nearest onshore regions as shoreline for {len(missing)} buses without onshore region."
+            )
+            offshore = gpd.read_file(snakemake.input.resource_regions).set_index("name")
+            i, j = regions.to_crs(3035).sindex.nearest(
+                offshore.loc[missing].to_crs(3035).geometry
+            )
+            shore = regions.iloc[j][["geometry"]].set_axis(missing[i])
+            regions = pd.concat([regions, shore.dissolve(level=0)])
         regions = regions.loc[offshore_regions]
         regions = regions.map(lambda g: _simplify_polys(g, minarea=1)).set_crs(
             regions.crs
@@ -146,11 +156,7 @@ if __name__ == "__main__":
     fn = snakemake.input.resource_regions
     resource_regions = gpd.read_file(fn).set_index("name").rename_axis("bus").geometry
 
-    # indicator matrix for which cells touch which regions
-    kwargs = dict(nprocesses=nprocesses, disable_progressbar=noprogress)
-    I = cutout.availabilitymatrix(resource_regions, ExclusionContainer(), **kwargs)
-    I = np.ceil(I)
-    cf_by_bus = capacity_factor * I.where(I > 0)
+    cf_by_bus = capacity_factor.where(availability > 0)
 
     epsilon = 1e-3
     cf_min, cf_max = (

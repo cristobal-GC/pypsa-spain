@@ -86,17 +86,47 @@ years. Storage sites can be resolved regionally from a geological database
 of potentials, with a choice between offshore formations only, which are
 larger and far from settlements, and onshore formations as well.
 
+Regional geological potentials are divided by `years_of_storage` to obtain
+an annual potential. Each planning horizon gets a fresh sequestration store
+per region bounded by this annual potential, so potentials do not accumulate
+across horizons.
+
 !!! warning "The sequestration limit shapes the result"
     The limit is a deliberate choice: it keeps sequestration for
     hard-to-abate emissions and prevents it from becoming a backstop that
     offsets fossil fuel use which could be avoided. Results depend strongly
     on it.
 
+## Land-based removal
+
+Four optional technologies remove CO~2~ from the atmosphere permanently
+without geological storage [@fernandesExploringCarbon2026], so they do not
+count towards the sequestration limit. Their potential per region follows
+from the land that is eligible, and they remove CO~2~ at a constant rate while
+they operate.
+
+- **Enhanced rock weathering** [@streflerPotentialCosts2018] spreads ground
+  basalt on a share of the cropland in regions that are warm enough. It
+  consumes electricity for grinding.
+- **Biochar** from the pyrolysis of solid biomass is applied to a share of the
+  cropland. Only the carbon that stays in the biochar counts as removal. The
+  process consumes electricity and can feed heat into district heating.
+- **Afforestation** of transitional woodland and shrubland removes CO~2~ at the
+  mean growth rate of a new forest over its rotation [@pilliJRCForest2024]. Only
+  a credited share counts as removal. The investment per hectare is annualised
+  over the rotation.
+- **Perennial grass** on the cropland that the phase-out of unsustainable
+  bioliquids frees raises the soil carbon, which is credited as removal. The
+  grass is refined in the harvest months, which consumes electricity and
+  yields biogas.
+
 ## Transport
 
 CO~2~ can be transported in a pipeline network between regions, onshore and
-submarine, whose capacity is optimised, with candidate routes following the
-existing electricity network. An optional compression stage with its
+submarine, whose capacity is optimised, with the same Delaunay-based candidate
+corridors as new [hydrogen pipelines](hydrogen.md#transport). The submarine
+share of each corridor is the share of its straight line that crosses
+offshore regions. An optional compression stage with its
 electricity demand can be added for transport in dense phase. Alternatively
 CO~2~ is copperplated, with a transport and storage cost per tonne. Venting
 captured CO~2~ back to the atmosphere can be allowed as an escape valve.
@@ -104,7 +134,8 @@ captured CO~2~ back to the atmosphere can be allowed as an escape valve.
 ## Further reading
 
 - Rules: [build_co2_sequestration_potentials][],
-  [build_clustered_co2_sequestration_potentials][], [build_co2_totals][]
+  [build_clustered_co2_sequestration_potentials][], [build_co2_totals][],
+  [build_carbon_dioxide_removal_land][], [build_afforestation_potentials][]
 - Configuration: [co2_budget](../configuration.md#co2_budget_cf) and the
-  `co2_*`, `dac` and `cc_fraction` settings under
-  [sector](../configuration.md#sector_cf)
+  `co2_*`, `dac`, `cc_fraction`, `rock_weathering`, `biochar`,
+  `afforestation` and `perennials` settings under [sector](../configuration.md#sector_cf)
