@@ -178,9 +178,9 @@ tsam = ">=2.3.1"
 #    snakemake -call results/test-elec-tyndp/maps/static/power_network_2030.pdf --configfile config/test/config.tyndp.yaml &&
 #    echo "All tests completed successfully."
 #"""
-##### Define integration-tests for pypsa-spain
+##### Define integration-tests for pypsa-spain: solve every scenario (8 cores, not all; rerun incomplete files)
 integration-tests = """
-    snakemake -call all --configfile config/test/config_ES_test.yaml &&
+    snakemake --cores 8 --rerun-incomplete solve_networks --configfile config/test/config_ES_test.yaml &&
     echo "All tests for PyPSA-Spain completed successfully."
 """
 ##### Comment integration-tests-streamlined from pypsa-eur   #####
@@ -204,9 +204,9 @@ integration-tests = """
 #    snakemake -call results/test-elec-tyndp/maps/static/power_network_2030.pdf --configfile config/test/config.tyndp.yaml --delete-all-output ;
 #	echo "All test outputs have been cleaned up."
 #"""
-##### Define clean-tests for pypsa-spain
+##### Define clean-tests for pypsa-spain (8 cores, not all; also incomplete files)
 clean-tests = """
-    snakemake -call all --configfile config/test/config_ES_test.yaml --delete-all-output ;
+    snakemake --cores 8 --rerun-incomplete all --configfile config/test/config_ES_test.yaml --delete-all-output ;
 	echo "All test outputs for PyPSA-Spain have been cleaned up."
 """
 unit-tests = "pytest test"

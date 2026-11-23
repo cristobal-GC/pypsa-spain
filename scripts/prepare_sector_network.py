@@ -6706,6 +6706,45 @@ def add_import_options(
 
 ######################################## PyPSA-Spain
 #
+# Annual H2 amounts (H2 valleys, H2 imports and exports) as constant power
+#
+# An annual amount is converted into the constant power that delivers it over a full
+# year (8760 h), as PyPSA-Eur does with every annual demand (it scales annual totals by
+# nyears = snapshot_weightings.sum() / 8760). The delivered energy then follows the
+# modelled period by itself, which makes it robust against:
+#   - periods shorter than a year (e.g. 1 month delivers 744/8760 of the annual amount),
+#   - temporal averaging (e.g. 168h: the average of a constant power is the same power,
+#     and each snapshot is weighted by its duration),
+#   - several investment periods (perfect foresight).
+# Dividing by snapshot_weightings.sum() instead, as done before, delivered the whole
+# annual amount in any modelled period (e.g. ~52x the power in a one-week run).
+#
+MWH_PER_MT_H2 = 33.33e6   # 1e6 tH2 ~ 33.33e6 MWh (LHV)
+HOURS_PER_YEAR = 8760.0
+
+
+def annual_H2_to_constant_power(annual_amount):
+    """Constant power [MW] that delivers an annual H2 amount [Mt H2/a] over a full year."""
+    return annual_amount * MWH_PER_MT_H2 / HOURS_PER_YEAR
+
+
+def log_H2_energy(n, name, p_set, annual_amount):
+    """Log the constant power and the energy it delivers over the modelled period."""
+    modelled_hours = n.snapshot_weightings.generators.sum()
+    logger.info(
+        f'##### [PyPSA-Spain] <prepare_sector_network.py> INFO: {name}: '
+        f'{annual_amount} Mt H2/a ({annual_amount * MWH_PER_MT_H2 / 1e6:.2f} TWh/a) -> '
+        f'{p_set:.2f} MW constant; {p_set * modelled_hours / 1e6:.4f} TWh over the '
+        f'{modelled_hours:.0f} modelled hours ({modelled_hours / HOURS_PER_YEAR:.4f} of a year)'
+    )
+#
+#
+########################################
+
+
+
+######################################## PyPSA-Spain
+#
 # Functions to add H2 demand in H2 valleys
 #
 
@@ -6735,9 +6774,9 @@ def attach_H2_valley_demands(n, H2_valley_demands_dic):
 
         ########## Add H2 load, with constant p_set
         ### The p_set is static (not in loads_t), since it is the same for all snapshots
-        ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
-        total_hours = n.snapshot_weightings.generators.sum()
-        p_set = vv['valley_params']['demand'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        ### Constant power of the annual demand: see annual_H2_to_constant_power()
+        p_set = annual_H2_to_constant_power(vv['valley_params']['demand'])
+        log_H2_energy(n, kk, p_set, vv['valley_params']['demand'])
         n.add('Load', vv['load_name'], p_set=p_set, **vv['load_params'])
 #
 #
@@ -6756,9 +6795,6 @@ def attach_H2_imports_exports(n, H2_imports_exports_dic):
     for c in ['H2_ic', 'H2_ic import', 'H2_ic export']:
         if c not in n.carriers.index:
             n.add('Carrier', name=c)
-
-    ### Use snapshot_weightings.sum() instead of hardcoded 8760: equal to 8760 for full-year runs at any temporal resolution, but robust against partial-year runs
-    total_hours = n.snapshot_weightings.generators.sum()
 
     for kk, vv in H2_imports_exports_dic.items():
 
@@ -6787,8 +6823,9 @@ def attach_H2_imports_exports(n, H2_imports_exports_dic):
         n.add('Bus', vv['bus_name'], **vv['bus_params'])
 
 
-        ########## Compute constant power for full annual amount [MW]
-        p_set = vv['annual_amount'] * 33.33e6 / total_hours  # 1e6 tH2 ~ 33.33e6 MWh
+        ########## Constant power of the annual amount [MW]: see annual_H2_to_constant_power()
+        p_set = annual_H2_to_constant_power(vv['annual_amount'])
+        log_H2_energy(n, kk, p_set, vv['annual_amount'])
 
 
         ########## Add H2 load on the border bus, with constant p_set

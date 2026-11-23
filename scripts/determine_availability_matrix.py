@@ -87,7 +87,7 @@ if __name__ == "__main__":
     if params["natura"]:
         excluder.add_raster(snakemake.input.natura, nodata=0, allow_no_overlap=True)
 
-    for dataset in ["corine", "luisa", "ISA"]:
+    for dataset in ["corine", "luisa", "ISA"]:   ##### PyPSA-Spain: ISA
         kwargs = {"nodata": 0} if dataset == "luisa" else {}
         settings = params.get(dataset, {})
         if not settings:

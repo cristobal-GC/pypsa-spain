@@ -15,7 +15,7 @@ demand.
 
 import json
 import logging
-from pathlib import Path
+from pathlib import Path   ##### Required in PyPSA-Spain
 
 import geopandas as gpd
 import pandas as pd

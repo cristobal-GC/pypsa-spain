@@ -37,6 +37,14 @@ jobs:
       run: |
         pixi run snakemake -n all --configfile config/test/config.validator.yaml
 
+    ##### PyPSA-Spain: the same check on the PyPSA-Spain test, which covers every scenario of
+    ##### config/test/scenarios_ES_test.yaml (ES_base plus one per PyPSA-Spain feature). It
+    ##### validates config_ES_test.yaml against the schema and builds the graph of all
+    ##### scenarios, without retrieving data or solving anything.
+    - name: Dry-run DAG validation (PyPSA-Spain test scenarios)
+      run: |
+        pixi run snakemake -n all --configfile config/test/config_ES_test.yaml
+
   ##### PyPSA-Spain: the two jobs below are upstream's full validator. They need a
   ##### self-hosted runner, which this fork does not have, so they are restricted to
   ##### workflow_dispatch instead of running on every pull request.

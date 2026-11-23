@@ -13,9 +13,9 @@ regions.
 
 import logging
 
-import atlite
+import atlite   ##### Required in PyPSA-Spain
 import geopandas as gpd
-import numpy as np
+import numpy as np   ##### Required in PyPSA-Spain
 import pandas as pd
 import xarray as xr
 

@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Spain <https://github.com/cristobal-GC/pypsa-spain>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+#################### PyPSA-Spain
+#
+# Scenarios for the PyPSA-Spain test (config/test/config_ES_test.yaml, run.name: all).
+#
+# All PyPSA-Spain features are disabled in config_ES_test.yaml. ES_base keeps them all
+# disabled, and each of the other scenarios enables exactly one, so that every feature is
+# tested on its own. local_cutouts is not tested because it depends on the machine.
+#
+# When a new feature is added to the pypsa_spain section, add its scenario here.
+#
+####################
+
+ES_base: {}
+
+ES_q2q_transform:
+  pypsa_spain:
+    q2q_transform:
+      enable: true
+
+ES_electricity_demand:
+  pypsa_spain:
+    electricity_demand:
+      enable: true
+
+ES_interconnections:
+  pypsa_spain:
+    interconnections:
+      enable: true
+
+ES_update_elec_capacities:
+  pypsa_spain:
+    update_elec_capacities:
+      enable: true
+
+ES_ISA_class:
+  pypsa_spain:
+    ISA_class:
+      enable: true
+
+ES_H2_valley_demands:
+  pypsa_spain:
+    H2_valley_demands:
+      enable: true
+
+ES_H2_imports_exports:
+  pypsa_spain:
+    H2_imports_exports:
+      enable: true
+
+ES_regional_network_focus:
+  pypsa_spain:
+    regional_network_focus:
+      enable: true
+
+ES_pop_layouts_HR:
+  pypsa_spain:
+    pop_layouts_HR:
+      enable: true
+
+ES_industry_scenario:
+  pypsa_spain:
+    industry_scenario:
+      enable: true
+      # The default alternative file equals the production PyPSA-Eur computes for ES, so it
+      # would show no effect. This test file doubles steel (Electric arc, Integrated steelworks).
+      industry_scenario_file: test/test_data/industrial_production_per_country_ES_test.csv
+
+ES_solar_rooftop:
+  pypsa_spain:
+    solar_rooftop:
+      enable: true

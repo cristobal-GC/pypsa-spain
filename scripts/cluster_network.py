@@ -338,7 +338,7 @@ def busmap_for_n_clusters(
         )
         if len(x) == 1:
             return pd.Series(prefix + "0", index=x.index)
-        weight = weighting_for_country(x, cluster_weights, k_focus)
+        weight = weighting_for_country(x, cluster_weights, k_focus)   ##### PyPSA-Spain: k_focus (regional_network_focus)
 
         if algorithm == "kmeans":
             return prefix + busmap_by_kmeans(
