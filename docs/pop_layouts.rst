@@ -64,15 +64,15 @@ In addition, the urban and rural municipalities are exported as two CSV files (`
 Per-region aggregation
 ========================
 
-The default PyPSA-Eur ``build_clustered_population_layouts`` rule aggregates the cell-level layouts to the clustered model regions using an indicator matrix :math:`I[r, c] = A(c \cap r) / A(c)`, which implicitly assumes that population is uniformly distributed over the entire cell. For coastal cells this is a poor assumption: population is concentrated in the onshore sliver covered by municipalities, while the rest of the cell lies offshore and is also outside the onshore region. As a result, part of the population deposited on those slivers is silently dropped and the per-region totals fall short of the cell-level totals.
+The default PyPSA-Eur ``build_clustered_population_layouts`` rule aggregates the cell-level layouts to the clustered model regions through the cutout grid, using an indicator matrix :math:`I[r, c] = A(c \cap r) / A(c)`. The matrix is normalised per cell, so each cell's population is fully split among the regions it overlaps. Within each cell, however, population is assumed to be distributed in proportion to the overlapped area, so the resolution of the result is limited by the cutout grid (about 30 km for ERA5): a cell shared by two regions splits its population by area, regardless of where the municipalities actually lie.
 
-When ``pop_layouts_HR.enable`` is active, PyPSA-Spain bypasses the cell intermediation in ``build_clustered_population_layouts``: it loads the urban / rural classification from the two CSV files, retrieves each municipality's geometry from the original GeoJSON (joined by ``codmun_ine``), and aggregates populations to clustered regions through an area-weighted indicator matrix
+When ``pop_layouts_HR.enable`` is active, PyPSA-Spain keeps the municipal resolution and bypasses the cell intermediation in ``build_clustered_population_layouts``: it loads the urban / rural classification from the two CSV files, retrieves each municipality's geometry from the original GeoJSON (joined by ``codmun_ine``), and aggregates populations to clustered regions through an area-weighted indicator matrix
 
 .. math::
 
    M[r, m] = \frac{A(r \cap m)}{A(m)}, \qquad p^{\text{region}}_r = \sum_m M[r, m] \cdot p^{\text{muni}}_m
 
-Each municipality's population is split across the regions that intersect it in proportion to area overlap, so total population is preserved exactly for fully-covered municipalities (i.e. all peninsular and Balearic municipalities once Canarias, Ceuta and Melilla are excluded). The fraction of municipal area falling outside ``onshore_regions`` and the corresponding lost population are reported in the log as a diagnostic.
+Each municipality's population is split across the regions that intersect it in proportion to area overlap. The columns of :math:`M` are normalised per municipality, :math:`M[r, m] \leftarrow M[r, m] / \sum_r M[r, m]`, so that municipalities only partly covered by ``onshore_regions``, whose simplified coastline leaves out part of many coastal cities (e.g. Barcelona, Valencia, Huelva or Cadiz), keep their whole population. Municipalities not overlapping any region at all (e.g. Formentera) are assigned to the nearest region. The total population is therefore preserved exactly, consistently with the normalised cell-based aggregation of PyPSA-Eur. The population reassigned in both cases is reported in the log.
 
 
 Configuration

@@ -104,6 +104,9 @@ rule build_solar_rooftop_potentials:
         solar_rooftop=config_provider(  ##### PyPSA-Spain: solar_rooftop
             "pypsa_spain", "solar_rooftop", default={"enable": False}
         ),
+        solar_rooftop_dc_ac_ratio=config_provider(  ##### PyPSA-Spain: solar_rooftop (DC -> AC)
+            "sector", "solar_rooftop_dc_ac_ratio"
+        ),
     script:
         scripts("build_solar_rooftop_potentials.py")
 

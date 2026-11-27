@@ -86,7 +86,7 @@ def plot_kw_per_person(regions, kw_per_person, nuts2_ES, title, fn):
         column="kw_per_person",
         cmap="YlOrRd",
         legend=True,
-        legend_kwds={"label": "Rooftop PV capacity (kW/person)", "shrink": 0.8},
+        legend_kwds={"label": "Rooftop PV capacity (kW AC/person)", "shrink": 0.8},
         edgecolor="white",
         linewidth=0.3,
     )
@@ -171,6 +171,17 @@ if __name__ == "__main__":
 
         kw_per_person_nuts2 = fun_kw_per_person_by_region(
             regions, nuts2_ES, df_kw, column
+        )
+        ##### The kW/person values of the source (Gallego-Castillo et al., 2021) are module
+        ### (DC, kWp) capacities: the PV is sized separately from an inverter at DC/AC = 1.2.
+        ### Since PyPSA-Eur #2078 the rooftop potential (p_nom_max) and its availability
+        ### profile refer to AC capacity at sector: solar_rooftop_dc_ac_ratio, so the DC values
+        ### are converted with that same ratio to keep potential and profile coherent.
+        dc_ac_ratio = snakemake.params.solar_rooftop_dc_ac_ratio
+        kw_per_person_nuts2 = kw_per_person_nuts2 / dc_ac_ratio
+        logger.info(
+            f"##### [PyPSA-Spain] <build_solar_rooftop_potentials.py> kW/person converted "
+            f"from DC (kWp) to AC with solar_rooftop_dc_ac_ratio = {dc_ac_ratio}"
         )
         kw_per_person.update(kw_per_person_nuts2)
 

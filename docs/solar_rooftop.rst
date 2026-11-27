@@ -23,6 +23,8 @@ The values are stored in ``data_ES/solar_rooftop/rooftop_pv_kw_per_person_nuts2.
 
 In short, the estimates start from the average residential building of each region (households per building and roof area, from the 2011 Population and Housing Census). For this building, the paper gives the optimal PV capacity per household and the share of the roof it occupies. Capacity per household is converted to capacity per person by dividing by the average household size of each region (INE, `table 60132 <https://www.ine.es/jaxiT3/Tabla.htm?t=60132>`_).
 
+The values in the data file are module (DC, kWp) capacities: in the paper, PV modules and inverter are sized separately, with the inverter set to a DC/AC ratio of 1.2. Since PyPSA-Eur `#2078 <https://github.com/PyPSA/pypsa-eur/pull/2078>`_, solar PV capacities, potentials and availability profiles refer to AC capacity, and rooftop PV uses the ratio ``sector: solar_rooftop_dc_ac_ratio`` (1.075 by default). The rule therefore divides the kW/person values by that same ratio, so that the potential and the profile of rooftop PV are on the same AC basis. Changing the ratio in the configuration keeps both coherent.
+
 Three scenarios are provided:
 
 .. list-table::
@@ -67,7 +69,7 @@ When ``enable: false``, the PyPSA-Eur default value (2 kW/person) is used for al
 Diagnostic plots
 ========================
 
-The rule also produces a control map, ``map_kw_per_person.png``, under ``resources/{PREFIX}/{NAME}/solar_rooftop/``. It shows the clustered regions of the Iberian Peninsula and the Balearic Islands coloured by their kW/person value, with the NUTS2 boundaries overlaid. The title reports the scenario, the range of kW/person values and the total potential.
+The rule also produces a control map, ``map_kw_per_person.png``, under ``resources/{PREFIX}/{NAME}/solar_rooftop/``. It shows the clustered regions of the Iberian Peninsula and the Balearic Islands coloured by their kW/person value (AC), with the NUTS2 boundaries overlaid. The title reports the scenario, the range of kW/person values and the total potential.
 
 The figure below shows the control map for ``scenario: roof_fraction`` with ``roof_fraction: 0.25``.
 

@@ -19,6 +19,7 @@ import atlite   ##### Required in PyPSA-Spain
 import geopandas as gpd
 import numpy as np   ##### Required in PyPSA-Spain
 import pandas as pd
+import scipy.sparse as sps   ##### Required in PyPSA-Spain
 import xarray as xr
 from sklearn.preprocessing import normalize
 
@@ -63,11 +64,11 @@ if __name__ == "__main__":
     #
     # Override clustered layout using municipality-level data (Spain).
     #
-    # Rationale: the cell-based aggregation above uses an indicator matrix
-    # I[r, c] = area(intersect(cell_c, region_r)) / area(cell_c), which assumes
-    # population is uniformly distributed over each cell. For coastal cells
-    # populated only on a small (onshore) sliver, this loses part of the
-    # population that was deposited on those slivers in build_population_layouts.
+    # Rationale: the cell-based aggregation above splits each cell's population
+    # among the regions it overlaps in proportion to area, i.e. it assumes
+    # population is uniformly distributed within each cell, so its resolution is
+    # limited by the cutout grid. The municipality-level aggregation below keeps
+    # the municipal resolution instead.
     #
     # Here we skip the cell intermediation: build_population_layouts.py exports
     # two CSVs (urban / rural codmun_ine + nombre + ccaa + pob_23), and we
@@ -76,11 +77,14 @@ if __name__ == "__main__":
     # matrix:
     #
     #     M[r, m] = area(intersect(region_r, muni_m)) / area(muni_m)
+    #     M[r, m] <- M[r, m] / sum_r M[r, m]   (normalised per municipality)
     #     pop_region = M @ pop_muni
     #
     # Each municipality's population is split across the regions that
-    # intersect it in proportion to area, exactly preserving the total
-    # population of fully-covered municipalities.
+    # intersect it in proportion to the overlapped area. The normalisation
+    # keeps the whole population of municipalities only partly covered by
+    # regions_onshore (coastal cities), and municipalities not covered at all
+    # go to the nearest region, so the total population is preserved exactly.
     #
     pop_layouts_HR = snakemake.params.pop_layouts_HR
     if pop_layouts_HR.get("enable", False):
@@ -111,22 +115,40 @@ if __name__ == "__main__":
             # M shape: (n_regions, n_munis), entries area(intersect)/area(muni)
             # atlite looks up these shapes by position, not by index label
             M = atlite.cutout.compute_indicatormatrix(list(sub.geometry), regions_3035)
-            # Diagnostic: per-muni share of area covered by the union of regions
-            # (1.0 = fully covered; <1.0 means part of the muni lies outside
-            # regions_onshore, e.g., on small coastal slivers).
+            M = sps.csc_matrix(M)
+            # Per-muni share of area covered by the union of regions (1.0 = fully
+            # covered; <1.0 means part of the muni lies outside regions_onshore, whose
+            # simplified coastline leaves out part of many coastal municipalities).
             coverage = np.asarray(M.sum(axis=0)).flatten()
-            lost_kinhab = float(((1.0 - coverage) * pop_kinhab).sum())
-            if lost_kinhab > 1e-3:
+            # Normalise each muni over the regions it overlaps, so that its whole
+            # population is split among them (the municipal analogue of PyPSA-Eur
+            # #2459, which normalises the cell-based indicator matrix). Without it,
+            # ~1% of the population was lost, mostly in coastal cities.
+            covered = coverage > 0
+            M = M @ sps.diags(np.where(covered, 1.0 / np.where(covered, coverage, 1.0), 0.0))
+            logger.info(
+                "##### [PyPSA-Spain] <build_clustered_population_layouts.py>: "
+                f"{label}: {((1.0 - coverage[covered]) * pop_kinhab[covered]).sum() * 1e3:.0f} "
+                f"inhabitants of partly covered municipalities reassigned to the regions "
+                f"they overlap (mean muni coverage = {coverage.mean() * 100:.2f}%)"
+            )
+            pop_region = np.asarray(M.dot(pop_kinhab)).flatten()
+            # Municipalities not overlapping any region (e.g. Formentera, absent from
+            # the simplified shapes) go to the nearest region.
+            if (~covered).any():
+                centroids = sub.geometry[~covered].centroid
+                nearest = np.array(
+                    [regions_3035.distance(c).to_numpy().argmin() for c in centroids]
+                )
+                np.add.at(pop_region, nearest, pop_kinhab[~covered])
                 logger.warning(
                     "##### [PyPSA-Spain] <build_clustered_population_layouts.py>: "
-                    f"{label}: {lost_kinhab * 1e3:.0f} inhabitants outside "
-                    f"regions_onshore (mean muni coverage = {coverage.mean() * 100:.2f}%)"
+                    f"{label}: {(~covered).sum()} municipalities "
+                    f"({pop_kinhab[~covered].sum() * 1e3:.0f} inhabitants) outside "
+                    f"regions_onshore assigned to the nearest region: "
+                    f"{list(sub.index[~covered])}"
                 )
-            return pd.Series(
-                np.asarray(M.dot(pop_kinhab)).flatten(),
-                index=clustered_regions.index,
-                name=label,
-            )
+            return pd.Series(pop_region, index=clustered_regions.index, name=label)
 
         urban = _aggregate(urban_ids, "urban")
         rural = _aggregate(rural_ids, "rural")

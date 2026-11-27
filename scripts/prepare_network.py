@@ -34,6 +34,7 @@ from pypsa.geo import haversine_pts   ##### Required in PyPSA-Spain
 
 from scripts._helpers import (
     get,
+    load_costs,   ##### PyPSA-Spain: interconnection costs (#2439 no longer passes costs to main())
 )
 from scripts.co2_budget import (
     bound_value_for_horizon,
@@ -854,6 +855,9 @@ def main(
         ### add_electricity.main(), so they are priced here. link_length_factor is left at
         ### 1.0 to reproduce the pre-#1838 numbers; see "Anomalias detectadas / A-1" in
         ### the migration plan before changing it to params.links["length_factor"].
+        ### Since #2439 main() no longer receives the cost table, so it is read here from
+        ### the same file compose_network.py loads (inputs.tech_costs, processed costs).
+        costs = load_costs(inputs.tech_costs)
         _price_interconnection_links(n, costs, link_length_factor=1.0)
     #
     ####################

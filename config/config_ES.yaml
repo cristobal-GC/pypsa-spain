@@ -8,7 +8,7 @@ version: v2026.09.0
 
 # docs in https://pypsa-spain.readthedocs.io/
 pypsa_spain:
-  q2q_transform:   ##### See https://github.com/cristobal-GC/Q2Q_repository for details
+  q2q_transform:   ##### Corrections for ERA5 cutout. See https://github.com/cristobal-GC/Q2Q_repository for details
     enable: false
     onwind: data_ES/q2q/q2q_onwind_REF_v2.pkl
     offwind-ac: ''
@@ -118,6 +118,7 @@ enable:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#co2_budget_cf
 co2_budget:
   emissions_scope: CO2
+  international_bunkers: false
   relative: true
   upper:
     2020: 0.72
@@ -337,8 +338,10 @@ renewable:
         slope: 35.0
         azimuth: 180.0
       tracking:
+      dc_ac_ratio: 1.25
     resource_classes: 1
     capacity_per_sqkm: 5.1
+    ac_cost_share: 0.18
     correction_factor: 1.0
     corine: false   #####
     luisa: false
@@ -354,8 +357,10 @@ renewable:
         slope: 35.0
         azimuth: 180.0
       tracking: horizontal
+      dc_ac_ratio: 1.25
     resource_classes: 1
     capacity_per_sqkm: 4.43
+    ac_cost_share: 0.15
     correction_factor: 1.0
     corine: false  #####
     luisa: false
@@ -500,7 +505,6 @@ load:
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#energy_cf
 energy:
   energy_totals_year: 2023
-  base_emissions_year: 1990
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#biomass_cf
 biomass:
@@ -584,6 +588,16 @@ existing_capacities:
   - 2010
   - 2015
   - 2019
+  industry_plants: false
+  blast_furnace_announced_retirement: true
+  grouping_years_industry:
+  - 1995
+  - 2000
+  - 2005
+  - 2010
+  - 2015
+  - 2020
+  - 2025
   threshold_capacity: 10
   default_heating_lifetime: 20
   solar_rooftop_ratio: 0.5
@@ -800,7 +814,7 @@ sector:
   agriculture_machinery_oil_share: 0.5
   agriculture_machinery_fuel_efficiency: 0.7
   agriculture_machinery_electric_efficiency: 0.3
-  shipping_hydrogen_liquefaction: false
+  shipping_endogenous: []
   shipping_hydrogen_share:
     2020: 0
     2025: 0
@@ -825,8 +839,19 @@ sector:
     2040: 0.45
     2045: 0.2
     2050: 0
-  shipping_methanol_efficiency: 0.46
+  shipping_lng_share:
+    2020: 0
+    2025: 0
+    2030: 0
+    2035: 0
+    2040: 0
+    2045: 0
+    2050: 0
+  shipping_methanol_efficiency: 0.4
   shipping_oil_efficiency: 0.4
+  shipping_lng_efficiency: 0.4
+  shipping_lng_methane_slip: 0.031
+  shipping_methane_gwp100: 25.0
   aviation_demand_factor: 1.0
   HVC_demand_factor: 1.0
   time_dep_hp_cop: true
@@ -974,6 +999,7 @@ sector:
       allam: false
     biomass_to_methanol: true
     biomass_to_methanol_cc: false
+    meoh_to_oa: false
   ammonia: true
   min_part_load_electrolysis: 0
   min_part_load_fischer_tropsch: 0.5
@@ -987,6 +1013,8 @@ sector:
   use_electrolysis_waste_heat: 0.25
   electricity_transmission_grid: true
   electricity_distribution_grid: true
+  solar_rooftop_dc_ac_ratio: 1.075
+  solar_rooftop_ac_cost_share: 0.23
   electricity_grid_connection: true
   transmission_efficiency:
     enable:
@@ -1102,6 +1130,8 @@ sector:
       methanol: 121
       gas: 122
       oil: 125
+  endogenous_sectors: []
+  hbi_relocation: false
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration/#industry_cf
 industry:
@@ -1187,6 +1217,7 @@ industry:
   methanol_production_today: 1.5
   MWh_elec_per_tMeOH: 0.167
   MWh_CH4_per_tMeOH: 10.25
+  MWh_naphtha_per_tHVC: 12.622
   MWh_MeOH_per_tMeOH: 5.528
   hotmaps_locate_missing: false
   reference_year: 2023
@@ -1465,6 +1496,9 @@ data:
   gem_gcct:
     source: archive
     version: latest
+  gem_gct:
+    source: archive
+    version: latest
   instrat_co2_prices:
     source: primary
     version: latest
@@ -1503,6 +1537,12 @@ data:
     version: latest
   scigrid_gas:
     source: primary
+    version: latest
+  hera:
+    source: archive
+    version: latest
+  hera_test_cutout:
+    source: archive
     version: latest
   seawater_temperature:
     source: archive
@@ -1544,6 +1584,12 @@ data:
     source: archive
     version: latest
   ghg_emissions:
+    source: archive
+    version: latest
+  ghg_emissions_energy_community:
+    source: archive
+    version: latest
+  desnz_ghg_emissions:
     source: archive
     version: latest
   gebco:
