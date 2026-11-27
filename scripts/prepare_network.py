@@ -27,12 +27,12 @@ from collections.abc import Mapping
 import numpy as np
 import pandas as pd
 import pypsa
+from pypsa.common import expand_series
 
 import yaml   ##### Required in PyPSA-Spain
 from pypsa.geo import haversine_pts   ##### Required in PyPSA-Spain
 
 from scripts._helpers import (
-    PYPSA_V1,
     get,
 )
 from scripts.co2_budget import (
@@ -41,15 +41,6 @@ from scripts.co2_budget import (
     co2_limit_name,
 )
 from scripts.prepare_sector_network import co2_emissions_year, set_temporal_aggregation
-
-# Allow for PyPSA versions <0.35
-if PYPSA_V1:
-    from pypsa.common import expand_series
-else:
-    from pypsa.descriptors import expand_series
-
-
-idx = pd.IndexSlice
 
 logger = logging.getLogger(__name__)
 
@@ -217,10 +208,9 @@ def apply_co2_budget_constraints(
         if upper_raw is not None or lower_raw is not None:
             baseline_1990 = co2_emissions_year(
                 countries=params.countries,
-                input_eurostat=inputs["eurostat"],
+                co2_totals=inputs["co2_totals"],
                 options=params.sector,
-                emissions_scope=co2_budget["emissions_scope"],
-                input_co2=inputs["co2"],
+                international_bunkers=co2_budget["international_bunkers"],
                 year=1990,
             )
 
@@ -274,7 +264,8 @@ def apply_co2_budget_constraints(
 
 
 def add_gaslimit(n, gaslimit, Nyears=1.0):
-    sel = n.carriers.index.intersection(["OCGT", "CCGT", "CHP"])
+    """Limit the fossil gas supply, i.e. the fuel of gas power plants or the gas generators."""
+    sel = n.carriers.index.intersection(["OCGT", "CCGT", "CHP", "gas"])
     n.carriers.loc[sel, "gas_usage"] = 1.0
 
     n.add(
@@ -326,9 +317,7 @@ def add_dynamic_emission_prices(n: pypsa.Network, fn: str) -> None:
     n.generators.loc[affected, "marginal_cost"] = 0.0
 
 
-def set_transmission_limit(
-    n: pypsa.Network, kind: str, factor: str | float, Nyears: float = 1
-) -> None:
+def set_transmission_limit(n: pypsa.Network, kind: str, factor: str | float) -> None:
     links_dc_b = n.links.carrier == "DC" if not n.links.empty else pd.Series()
 
     _lines_s_nom = (
@@ -769,20 +758,19 @@ def apply_temporal_aggregation(
     n: pypsa.Network,
     inputs,
     params,
-) -> None:
+) -> pypsa.Network:
     logger.info("Applying temporal aggregation")
-    n_new = set_temporal_aggregation(
-        n, params.clustering_temporal, inputs.snapshot_weightings
+    n = set_temporal_aggregation(
+        n, params.clustering["temporal"], inputs.snapshot_weightings
     )
-    n.__dict__.update(n_new.__dict__)
     logger.info("Completed temporal aggregation")
+    return n
 
 
 def main(
     n: pypsa.Network,
     inputs,
     params,
-    costs: pd.DataFrame,
     nyears: float,
     current_horizon: int,
 ) -> None:
@@ -825,7 +813,7 @@ def main(
             "transmission_limit must be a string like 'c1.25' or a (kind, factor) pair"
         )
 
-    set_transmission_limit(n, kind, factor, nyears)
+    set_transmission_limit(n, kind, factor)
 
     cap_transmission_capacity(
         n,

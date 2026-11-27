@@ -117,7 +117,7 @@ solving:
 
   check_objective:
     enable: true
-    expected_value: 567930630.22
+    expected_value: 668391722.29
 
 plotting:
   map:

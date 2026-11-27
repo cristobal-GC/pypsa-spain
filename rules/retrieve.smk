@@ -181,33 +181,49 @@ if (POPULATION_COUNT_DATASET := dataset_version("population_count"))["source"] i
 
 
 if (GHG_EMISSIONS_DATASET := dataset_version("ghg_emissions"))["source"] in [
-    "archive",
     "primary",
+    "archive",
 ]:
 
     rule retrieve_ghg_emissions:
         """Retrieves national greenhouse gas emissions reported to the UNFCCC and the EEA."""
         input:
-            ghg=storage(GHG_EMISSIONS_DATASET["url"]),
+            csv=storage(GHG_EMISSIONS_DATASET["url"]),
         output:
-            csv=f"{GHG_EMISSIONS_DATASET['folder']}/UNFCCC_v23.csv",
-            zip=(
-                f"{GHG_EMISSIONS_DATASET['folder']}/UNFCCC_v23.csv.zip"
-                if GHG_EMISSIONS_DATASET["source"] == "primary"
-                else []
-            ),
-            directory=(
-                directory(GHG_EMISSIONS_DATASET["folder"])
-                if GHG_EMISSIONS_DATASET["source"] == "primary"
-                else []
-            ),
+            csv=f"{GHG_EMISSIONS_DATASET['folder']}/UNFCCC_{GHG_EMISSIONS_DATASET['version']}.csv",
         retries: 2
         run:
-            if GHG_EMISSIONS_DATASET["source"] == "primary":
-                copy2(input["ghg"], output["zip"])
-                unpack_archive(output["zip"], GHG_EMISSIONS_DATASET["folder"])
-            else:
-                copy2(input["ghg"], output["csv"])
+            copy2(input["csv"], output["csv"])
+
+
+if (GHG_EMISSIONS_ENC_DATASET := dataset_version("ghg_emissions_energy_community"))[
+    "source"
+] in ["primary", "archive"]:
+
+    rule retrieve_ghg_emissions_energy_community:
+        """Retrieves national greenhouse gas emissions of Energy Community Contracting Parties from the EEA."""
+        input:
+            csv=storage(GHG_EMISSIONS_ENC_DATASET["url"]),
+        output:
+            csv=f"{GHG_EMISSIONS_ENC_DATASET['folder']}/UNFCCC_{GHG_EMISSIONS_ENC_DATASET['version']}.csv",
+        retries: 2
+        run:
+            copy2(input["csv"], output["csv"])
+
+
+if (DESNZ_GHG_EMISSIONS_DATASET := dataset_version("desnz_ghg_emissions"))[
+    "source"
+] in ["primary", "archive"]:
+
+    rule retrieve_desnz_ghg_emissions:
+        """Retrieves greenhouse gas emissions of the United Kingdom from DESNZ."""
+        input:
+            xlsx=storage(DESNZ_GHG_EMISSIONS_DATASET["url"]),
+        output:
+            xlsx=f"{DESNZ_GHG_EMISSIONS_DATASET['folder']}/final-greenhouse-gas-emissions-by-source.xlsx",
+        retries: 2
+        run:
+            copy2(input["xlsx"], output["xlsx"])
 
 
 if (GEBCO_DATASET := dataset_version("gebco"))["source"] in ["archive", "primary"]:
@@ -958,13 +974,20 @@ if (GEM_GSPT_DATASET := dataset_version("gem_gspt"))["source"] in [
 ]:
 
     rule retrieve_gem_gspt:
-        """Retrieves the Global Energy Monitor Global Steel Plant Tracker."""
+        """Retrieves and unpacks the Global Energy Monitor Global Iron and Steel Tracker."""
         input:
-            xlsx=storage(GEM_GSPT_DATASET["url"]),
+            zip=storage(GEM_GSPT_DATASET["url"]),
         output:
+            zip=f"{GEM_GSPT_DATASET['folder']}/gem-download.zip",
             xlsx=f"{GEM_GSPT_DATASET['folder']}/Global-Steel-Plant-Tracker.xlsx",
+            iron_units=f"{GEM_GSPT_DATASET['folder']}/Global-Iron-and-Steel-Tracker-iron-units.xlsx",
         run:
-            copy2(input["xlsx"], output["xlsx"])
+            copy2(input["zip"], output["zip"])
+            unpack_archive(output["zip"], GEM_GSPT_DATASET["folder"])
+            # file names contain the release, rename for consistency across versions
+            folder = Path(GEM_GSPT_DATASET["folder"])
+            next(folder.glob("Plant-level data*.xlsx")).rename(output["xlsx"])
+            next(folder.glob("Iron unit data*.xlsx")).rename(output["iron_units"])
 
 
 if (GEM_GCCT_DATASET := dataset_version("gem_gcct"))["source"] in [
@@ -978,6 +1001,20 @@ if (GEM_GCCT_DATASET := dataset_version("gem_gcct"))["source"] in [
             xlsx=storage(GEM_GCCT_DATASET["url"]),
         output:
             xlsx=f"{GEM_GCCT_DATASET['folder']}/Global-Cement-and-Concrete-Tracker.xlsx",
+        run:
+            copy2(input["xlsx"], output["xlsx"])
+
+
+if (GEM_GCT_DATASET := dataset_version("gem_gct"))["source"] in [
+    "archive",
+]:
+
+    rule retrieve_gem_gct:
+        """Retrieves the Global Energy Monitor Global Chemicals Tracker."""
+        input:
+            xlsx=storage(GEM_GCT_DATASET["url"]),
+        output:
+            xlsx=f"{GEM_GCT_DATASET['folder']}/Global-Chemicals-Tracker.xlsx",
         run:
             copy2(input["xlsx"], output["xlsx"])
 
@@ -1424,58 +1461,87 @@ if (LAU_REGIONS_DATASET := dataset_version("lau_regions"))["source"] in [
         run:
             copy2(input["lau_regions"], output["zip"])
 
+
+if (SEAWATER_TEMPERATURE_DATASET := dataset_version("seawater_temperature"))[
+    "source"
+] in ["archive"]:
+
+    rule retrieve_seawater_temperature:
+        """Retrieves daily seawater temperature for one year from the PyPSA data archive."""
+        input:
+            storage(
+                SEAWATER_TEMPERATURE_DATASET["url"] + "/seawater_temperature_{year}.nc"
+            ),
+        output:
+            seawater_temperature=f"{SEAWATER_TEMPERATURE_DATASET['folder']}/seawater_temperature_{{year}}.nc",
+        log:
+            "logs/retrieve_seawater_temperature_{year}.log",
+        retries: 2
+        run:
+            copy2(input[0], output[0])
+
+elif SEAWATER_TEMPERATURE_DATASET["source"] in ["primary"]:
+
     rule retrieve_seawater_temperature:
         """Downloads daily seawater temperature for one year from the Copernicus Marine Service."""
         output:
-            seawater_temperature="data/seawater_temperature_{year}.nc",
+            seawater_temperature=f"{SEAWATER_TEMPERATURE_DATASET['folder']}/seawater_temperature_{{year}}.nc",
         log:
             "logs/retrieve_seawater_temperature_{year}.log",
         resources:
             mem_mb=10000,
-        params:
-            default_cutout=config_provider("atlite", "default_cutout"),
-            test_data_url=dataset_version("seawater_temperature")["url"],
         script:
             scripts("retrieve_seawater_temperature.py")
 
+
+if (HERA_TEST_CUTOUT_DATASET := dataset_version("hera_test_cutout"))["source"] in [
+    "primary",
+    "archive",
+]:
+
     rule retrieve_hera_data_test_cutout:
-        """Retrieves and unpacks a small HERA test dataset for Belgium from Zenodo."""
+        """Retrieves and unpacks a small HERA test dataset for Belgium."""
         input:
-            hera_data_url=storage(
-                f"https://zenodo.org/records/15828866/files/hera_be_2013-03-01_to_2013-03-08.zip"
-            ),
+            zip=storage(HERA_TEST_CUTOUT_DATASET["url"]),
         output:
-            river_discharge=f"data/hera_be_2013-03-01_to_2013-03-08/river_discharge_be_2013-03-01_to_2013-03-08.nc",
-            ambient_temperature=f"data/hera_be_2013-03-01_to_2013-03-08/ambient_temp_be_2013-03-01_to_2013-03-08.nc",
+            river_discharge=f"{HERA_TEST_CUTOUT_DATASET['folder']}/hera_be_2013-03-01_to_2013-03-08/river_discharge_be_2013-03-01_to_2013-03-08.nc",
+            ambient_temperature=f"{HERA_TEST_CUTOUT_DATASET['folder']}/hera_be_2013-03-01_to_2013-03-08/ambient_temp_be_2013-03-01_to_2013-03-08.nc",
         log:
             "logs/retrieve_hera_data_test_cutout.log",
         retries: 2
         resources:
             mem_mb=10000,
         params:
-            folder="data",
+            folder=HERA_TEST_CUTOUT_DATASET["folder"],
         run:
-            unpack_archive(input[0], params.folder)
+            unpack_archive(input["zip"], params.folder)
+
+
+if (HERA_DATASET := dataset_version("hera"))["source"] in ["primary", "archive"]:
+    # the archive holds the files of the primary source in a single folder
+    HERA_PRIMARY = HERA_DATASET["source"] == "primary"
 
     rule retrieve_hera_data:
-        """Downloads HERA river discharge and air temperature for one year from the JRC."""
+        """Retrieves HERA river discharge and air temperature for one year."""
         input:
             river_discharge=storage(
-                "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/HERA/VER1-0/Data/NetCDF/river_discharge/dis.HERA{year}.nc"
+                HERA_DATASET["url"]
+                + ("/river_discharge" if HERA_PRIMARY else "")
+                + "/dis.HERA{year}.nc"
             ),
             ambient_temperature=storage(
-                "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/HERA/VER1-0/Data/NetCDF/climate_inputs/ta6/ta6_{year}.nc"
+                HERA_DATASET["url"]
+                + ("/climate_inputs/ta6" if HERA_PRIMARY else "")
+                + "/ta6_{year}.nc"
             ),
         output:
-            river_discharge="data/hera_{year}/river_discharge_{year}.nc",
-            ambient_temperature="data/hera_{year}/ambient_temp_{year}.nc",
+            river_discharge=f"{HERA_DATASET['folder']}/river_discharge_{{year}}.nc",
+            ambient_temperature=f"{HERA_DATASET['folder']}/ambient_temp_{{year}}.nc",
         log:
             "logs/retrieve_hera_data_{year}.log",
         retries: 2
         resources:
             mem_mb=10000,
-        params:
-            snapshot_year="{year}",
         run:
             move(input.river_discharge, output.river_discharge)
             move(input.ambient_temperature, output.ambient_temperature)
